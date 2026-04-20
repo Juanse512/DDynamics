@@ -1,0 +1,4 @@
+- [x] Probar integración físicas externas Unity
+- [ ] Probar integración físicas externas Unreal
+- [x] Investigar modelo en tiempo real en Modellica
+- [x] Implementar prueba piloto de objeto con física en Modellica en motor elegido

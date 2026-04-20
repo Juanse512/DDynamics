@@ -1,0 +1,3 @@
+- Se deja un proyecto piloto llamado 3D que recibe información por el puerto 5000 y actualiza la posición de un asset a partir de eso.
+- Se puede abrir un socket TCP directamente desde C# sin la necesidad de integrar código de bajo nivel.
+- No se deshabilitaron las físicas internas de Unity, por lo cual deberia poder utilizarse el sistema de detección de colisiones interno para dar feedback a Modelica
