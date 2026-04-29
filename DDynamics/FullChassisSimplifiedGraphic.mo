@@ -4,7 +4,6 @@ model FullChassisSimplifiedGraphic
   import Blocks = Modelica.Blocks.Sources;
 
 // --- GLOBAL CONTROL ---
-
   inner MultiBody.World world(g=9.81, n={0,0,-1}) 
     annotation(Placement(transformation(origin = {4, 10}, extent = {{-90, 70}, {-70, 90}})));
   Blocks.Constant zeroAngle(k=0) 
@@ -18,11 +17,11 @@ model FullChassisSimplifiedGraphic
     
   MultiBody.Parts.Body chassis(m=1200) 
     annotation(Placement(transformation(extent={{10,-10},{30,10}})));
-// --- GROUND FORCES ---
+  // --- GROUND FORCES ---
   parameter Real R_wheel = 0.3 "Wheel radius in meters";
   parameter Real ground_mu = 10000 "Viscous friction coefficient";
   parameter Real joint_damping = 1.0 "Tiny damping to prevent singularity";
-// --- FRONT LEFT (FL) ---
+  // --- FRONT LEFT (FL) ---
   MultiBody.Parts.FixedTranslation mountFL(r={1.5, 0.9, -0.2}) annotation(Placement(transformation(extent={{50,30},{70,50}})));
   MultiBody.Joints.Prismatic suspFL(n={0,0,-1}, s(start=0.1, fixed=true)) annotation(Placement(transformation(extent={{90,30},{110,50}})));
   MultiBody.Forces.SpringDamperParallel shockFL(s_unstretched=0.3, c=30000, d=2500) annotation(Placement(transformation(origin = {0, -6}, extent = {{90, 60}, {110, 80}})));
@@ -32,8 +31,7 @@ model FullChassisSimplifiedGraphic
   MultiBody.Joints.Revolute spinFL(n={0,1,0}, useAxisFlange=true) annotation(Placement(transformation(extent={{170,30},{190,50}})));
   MultiBody.Parts.Body wheelFL(m=20) annotation(Placement(transformation(extent={{210,30},{230,50}})));
   //Modelica.Mechanics.Translational.Components.ElastoGap bumpFL(c=1e3, d=50000, s_rel0=0.05);
-  
-// --- FRONT RIGHT (FR) ---
+  // --- FRONT RIGHT (FR) ---
   MultiBody.Parts.FixedTranslation mountFR(r={1.5, -0.9, -0.2}) annotation(Placement(transformation(extent={{50,-50},{70,-30}})));
   MultiBody.Joints.Prismatic suspFR(n={0,0,-1}, s(start=0.1, fixed=true)) annotation(Placement(transformation(extent={{90,-50},{110,-30}})));
   MultiBody.Forces.SpringDamperParallel shockFR(s_unstretched=0.3, c=30000, d=2500) annotation(Placement(transformation(extent={{90,-80},{110,-60}})));
@@ -43,31 +41,27 @@ model FullChassisSimplifiedGraphic
   //Rotational.Sources.Position spinActFR annotation(Placement(transformation(extent={{170,-80},{190,-60}}, rotation=90)));
   MultiBody.Parts.Body wheelFR(m=20) annotation(Placement(transformation(extent={{210,-50},{230,-30}})));
   //Modelica.Mechanics.Translational.Components.ElastoGap bumpFR(c=1e3, d=50000, s_rel0=0.05);
-  
-// --- REAR LEFT (RL) ---
+  // --- REAR LEFT (RL) ---
   MultiBody.Parts.FixedTranslation mountRL(r={-1.5, 0.9, -0.2}) annotation(Placement(transformation(extent={{-70,30},{-50,50}})));
   MultiBody.Joints.Prismatic suspRL(n={0,0,-1}, s(start=0.1, fixed=true)) annotation(Placement(transformation(extent={{-110,30},{-90,50}})));
   MultiBody.Forces.SpringDamperParallel shockRL(s_unstretched=0.3, c=30000, d=2500) annotation(Placement(transformation(origin = {-2, 0}, extent = {{-110, 60}, {-90, 80}})));
   MultiBody.Joints.Revolute spinRL(n={0,1,0}) annotation(Placement(transformation(extent={{-150,30},{-130,50}}))); // No actuator, so no flange needed
   MultiBody.Parts.Body wheelRL(m=20) annotation(Placement(transformation(extent={{-190,30},{-170,50}})));
   //Modelica.Mechanics.Translational.Components.ElastoGap bumpRL(c=1e3, d=50000, s_rel0=0.05);
-  
-// --- REAR RIGHT (RR) ---
+  // --- REAR RIGHT (RR) ---
   MultiBody.Parts.FixedTranslation mountRR(r={-1.5, -0.9, -0.2}) annotation(Placement(transformation(extent={{-70,-50},{-50,-30}})));
   MultiBody.Joints.Prismatic suspRR(n={0,0,-1}, s(start=0.1, fixed=true)) annotation(Placement(transformation(extent={{-110,-50},{-90,-30}})));
   MultiBody.Forces.SpringDamperParallel shockRR(s_unstretched=0.3, c=30000, d=2500) annotation(Placement(transformation(origin = {2, -2}, extent = {{-110, -80}, {-90, -60}})));
   MultiBody.Joints.Revolute spinRR(n={0,1,0}) annotation(Placement(transformation(extent={{-150,-50},{-130,-30}}))); // No actuator, so no flange needed
   MultiBody.Parts.Body wheelRR(m=20) annotation(Placement(transformation(extent={{-190,-50},{-170,-30}})));
   //Modelica.Mechanics.Translational.Components.ElastoGap bumpRR(c=1e3, d=50000, s_rel0=0.05);
-  
-// --- 1D TRANSLATIONAL BRIDGES (To fix Pantelides error) ---
+  // --- 1D TRANSLATIONAL BRIDGES (To fix Pantelides error) ---
   Modelica.Mechanics.Translational.Components.Fixed transGround;
   Modelica.Mechanics.Translational.Components.Mass dummyMassFL(m=0.001);
   Modelica.Mechanics.Translational.Components.Mass dummyMassFR(m=0.001);
   Modelica.Mechanics.Translational.Components.Mass dummyMassRL(m=0.001);
   Modelica.Mechanics.Translational.Components.Mass dummyMassRR(m=0.001);
-  
-// --- FLOOR LOGIC ---
+  // --- FLOOR LOGIC ---
   MultiBody.Forces.WorldForce floorFL annotation(Placement(transformation(extent={{250,30},{270,50}})));
   MultiBody.Forces.WorldForce floorFR annotation(Placement(transformation(extent={{250,-50},{270,-30}})));
   MultiBody.Forces.WorldForce floorRL annotation(Placement(transformation(extent={{-230,30},{-210,50}})));
@@ -78,9 +72,9 @@ model FullChassisSimplifiedGraphic
   //Modelica.Mechanics.Rotational.Sources.Accelerate spinAccActFL annotation(
   // Placement(transformation(origin = {182, 82}, extent = {{-10, -10}, {10, 10}})));
   //Modelica.Mechanics.Rotational.Sources.Accelerate spinAccActFR annotation(
-    //Placement(transformation(origin = {186, -88}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+  //Placement(transformation(origin = {186, -88}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
   //Modelica.Mechanics.Rotational.Sources.Accelerate spinAccActFL annotation(
-    //Placement(transformation(origin = {176, 90}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
+  //Placement(transformation(origin = {176, 90}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
   Modelica.Blocks.Sources.Constant const(k = 2)  annotation(
     Placement(transformation(origin = {18, 130}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.Ramp ramp(height = 5, startTime = 5)  annotation(
@@ -91,6 +85,8 @@ model FullChassisSimplifiedGraphic
     Placement(transformation(origin = {206, 92}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
   Modelica.Mechanics.Rotational.Sources.Speed spinSpeedActFR annotation(
     Placement(transformation(origin = {246, -80}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+  Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_chassis_out annotation(
+    Placement(transformation(origin = {16, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
 equation
 // FIX 1: Connecting the Chassis to the World
   connect(world.frame_b, freeMotion.frame_a) annotation(
@@ -116,9 +112,8 @@ equation
     Line(points = {{31, 84}, {83.5, 84}, {83.5, 94}, {140, 94}}, color = {0, 0, 127}));
   connect(steerActFL.flange, steerFL.axis) annotation(
     Line(points = {{140, 72}, {140, 50}}, color = {0, 0, 127}));
-  //connect(suspFL.support, bumpFL.flange_a);
-  //connect(suspFL.axis, bumpFL.flange_b);
-  
+//connect(suspFL.support, bumpFL.flange_a);
+//connect(suspFL.axis, bumpFL.flange_b);
 // --- FRONT RIGHT (FR) ---
   connect(chassis.frame_a, mountFR.frame_a) annotation(
     Line(points = {{20, 0}, {20, -40}, {50, -40}}, color = {95, 95, 95}));
@@ -138,12 +133,12 @@ equation
     Line(points = {{31, 84}, {68.5, 84}, {68.5, -128}, {158, -128}}, color = {0, 0, 127}));
   connect(steerActFR.flange, steerFR.axis) annotation(
     Line(points = {{158, -106}, {158, 44}, {140, 44}, {140, -50}}, color = {0, 0, 127}));
-  //connect(suspFR.support, bumpFR.flange_a);
-  //connect(suspFR.axis, bumpFR.flange_b);
-  //connect(zeroAngle.y, spinActFR.phi_ref) annotation(
-    //Line(points = {{31, 84}, {31, -80}, {180, -80}}, color = {0, 0, 127}));
-  //connect(spinActFR.flange, spinFR.axis) annotation(
-    //Line(points = {{180, -60}, {180, -50}}, color = {0, 0, 127}));
+//connect(suspFR.support, bumpFR.flange_a);
+//connect(suspFR.axis, bumpFR.flange_b);
+//connect(zeroAngle.y, spinActFR.phi_ref) annotation(
+//Line(points = {{31, 84}, {31, -80}, {180, -80}}, color = {0, 0, 127}));
+//connect(spinActFR.flange, spinFR.axis) annotation(
+//Line(points = {{180, -60}, {180, -50}}, color = {0, 0, 127}));
 // --- REAR LEFT (RL) ---
   connect(chassis.frame_a, mountRL.frame_a) annotation(
     Line(points = {{10, 0}, {10, 40}, {-50, 40}}, color = {95, 95, 95}));
@@ -157,8 +152,8 @@ equation
     Line(points = {{-110, 40}, {-130, 40}}, color = {95, 95, 95}));
   connect(spinRL.frame_b, wheelRL.frame_a) annotation(
     Line(points = {{-150, 40}, {-170, 40}}, color = {95, 95, 95}));
-  //connect(suspRL.support, bumpRL.flange_a);
-  //connect(suspRL.axis, bumpRL.flange_b);
+//connect(suspRL.support, bumpRL.flange_a);
+//connect(suspRL.axis, bumpRL.flange_b);
 // --- REAR RIGHT (RR) ---
   connect(chassis.frame_a, mountRR.frame_a) annotation(
     Line(points = {{10, 0}, {10, -40}, {-50, -40}}, color = {95, 95, 95}));
@@ -172,10 +167,9 @@ equation
     Line(points = {{-110, -40}, {-130, -40}}, color = {95, 95, 95}));
   connect(spinRR.frame_b, wheelRR.frame_a) annotation(
     Line(points = {{-150, -40}, {-170, -40}}, color = {95, 95, 95}));
-  //connect(suspRR.support, bumpRR.flange_a);
-  //connect(suspRR.axis, bumpRR.flange_b);
- 
- /*
+//connect(suspRR.support, bumpRR.flange_a);
+//connect(suspRR.axis, bumpRR.flange_b);
+/*
  // --- SUSPENSION BUMP STOP CONNECTIONS ---
   // Front Left
   connect(transGround.flange, bumpFL.flange_a);
@@ -212,7 +206,6 @@ equation
     if noEvent(wheelFL.frame_a.r_0[3] < terrain.getZ(wheelFL.frame_a.r_0[1], wheelFL.frame_a.r_0[2])) then 
         ground_c*(terrain.getZ(wheelFL.frame_a.r_0[1], wheelFL.frame_a.r_0[2]) - wheelFL.frame_a.r_0[3]) - ground_d*wheelFL.v_0[3] else 0
   };
-
 // --- FRONT RIGHT FLOOR ---
   connect(floorFR.frame_b, wheelFR.frame_a) annotation(
     Line(points = {{250, -40}, {230, -40}}, color = {95, 95, 95}));
@@ -222,7 +215,6 @@ equation
     if noEvent(wheelFR.frame_a.r_0[3] < terrain.getZ(wheelFR.frame_a.r_0[1], wheelFR.frame_a.r_0[2])) then 
         ground_c*(terrain.getZ(wheelFR.frame_a.r_0[1], wheelFR.frame_a.r_0[2]) - wheelFR.frame_a.r_0[3]) - ground_d*wheelFR.v_0[3] else 0
   };
-
 // --- REAR LEFT FLOOR ---
   connect(floorRL.frame_b, wheelRL.frame_a) annotation(
     Line(points = {{-210, 40}, {-190, 40}}, color = {95, 95, 95}));
@@ -249,5 +241,7 @@ equation
     Line(points = {{246, -70}, {202, -70}, {202, -18}, {180, -18}, {180, -30}}));
   connect(spinSpeedActFR.w_ref, throttleIN) annotation(
     Line(points = {{246, -92}, {246, -126}, {294, -126}, {294, 114}, {248, 114}, {248, 144}}, color = {0, 0, 127}));
+  connect(chassis.frame_a, frame_chassis_out) annotation(
+    Line(points = {{10, 0}, {16, 0}, {16, -98}}, color = {95, 95, 95}));
   annotation(uses(Modelica(version="4.1.0")));
 end FullChassisSimplifiedGraphic;

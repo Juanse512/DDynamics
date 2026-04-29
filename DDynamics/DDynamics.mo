@@ -114,17 +114,21 @@ package DDynamics
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
       Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
   // Position is a real array
-  
   Modelica.Blocks.Interfaces.RealOutput x_out annotation(
-      Placement(transformation(origin = {111, 39}, extent = {{-19, -19}, {19, 19}}), iconTransformation(origin = {102, 38}, extent = {{-10, -10}, {10, 10}})));
+      Placement(transformation(origin = {107, 57}, extent = {{-19, -19}, {19, 19}}), iconTransformation(origin = {102, 38}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Interfaces.RealOutput y_out annotation(
-      Placement(transformation(origin = {114, -44}, extent = {{-22, -22}, {22, 22}}), iconTransformation(origin = {98, -42}, extent = {{-10, -10}, {10, 10}})));
-  
+      Placement(transformation(origin = {110, 0}, extent = {{-22, -22}, {22, 22}}), iconTransformation(origin = {98, -42}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Blocks.Interfaces.RealOutput z_out annotation(
+      Placement(transformation(origin = {111, -61}, extent = {{-21, -21}, {21, 21}}), iconTransformation(origin = {102, -84}, extent = {{-10, -10}, {10, 10}})));
   equation
   
   frame_a.r_0[1] = x_out;
   frame_a.r_0[2] = y_out;
+  frame_a.r_0[3] = z_out;
   
+  
+  frame_a.f = {0, 0, 0};
+  frame_a.t = {0, 0, 0};
   
   end FrameToReal;
 
