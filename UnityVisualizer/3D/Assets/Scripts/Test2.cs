@@ -43,8 +43,8 @@ public class UDPFloatReceiver : MonoBehaviour
                     lock (lockObj)
                     {
                         latestFloatX = valueX;
-                        latestFloatY = valueY;
-                        latestFloatZ = valueZ;
+                        latestFloatY = valueZ;
+                        latestFloatZ = valueY;
                     }
                 }
             }
