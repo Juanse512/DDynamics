@@ -162,6 +162,54 @@ package DDynamics
   connect(frameToReal.y_out, addFloat1.u[1]) annotation(
       Line(points = {{-18, -10}, {36, -10}, {36, -32}}, color = {0, 0, 127}));
   end FrameToUDP;
+
+  model FrontTire
+  Modelica.Mechanics.MultiBody.Joints.Revolute steerFL(n = {0, 0, 1}, useAxisFlange = true) annotation(
+      Placement(transformation(origin = {-148, -42}, extent = {{130, 30}, {150, 50}})));
+  Modelica.Mechanics.MultiBody.Joints.Revolute spinFL(n = {0, 1, 0}, useAxisFlange = true) annotation(
+      Placement(transformation(origin = {-148, -42}, extent = {{170, 30}, {190, 50}})));
+  Modelica.Mechanics.MultiBody.Parts.Body wheelFL(m = 20) annotation(
+      Placement(transformation(origin = {-148, -42}, extent = {{210, 30}, {230, 50}})));
+  Modelica.Mechanics.MultiBody.Interfaces.Frame_a wheelSupport annotation(
+      Placement(transformation(origin = {100, -2}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
+  Modelica.Mechanics.Rotational.Interfaces.Flange_a steerInput annotation(
+      Placement(transformation(origin = {-8, 100}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {-6, 100}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Mechanics.Rotational.Interfaces.Flange_a spinInput annotation(
+      Placement(transformation(origin = {32, 100}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {32, 100}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Mechanics.MultiBody.Interfaces.Frame_a suspMount annotation(
+      Placement(transformation(origin = {-102, -2}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-102, 2}, extent = {{-16, -16}, {16, 16}})));
+  equation
+    connect(steerFL.frame_b, spinFL.frame_a) annotation(
+      Line(points = {{2, -2}, {22, -2}}, color = {95, 95, 95}));
+    connect(spinFL.frame_b, wheelFL.frame_a) annotation(
+      Line(points = {{42, -2}, {62, -2}}, color = {95, 95, 95}));
+    connect(wheelSupport, wheelFL.frame_a) annotation(
+      Line(points = {{100, -2}, {62, -2}}));
+    connect(steerInput, steerFL.axis) annotation(
+      Line(points = {{-8, 100}, {-8, 8}}));
+    connect(spinInput, spinFL.axis) annotation(
+      Line(points = {{32, 100}, {32, 8}}));
+  connect(suspMount, steerFL.frame_a) annotation(
+      Line(points = {{-102, -2}, {-18, -2}}));
+  end FrontTire;
+  
+  model RearTire
+  Modelica.Mechanics.MultiBody.Parts.Body wheelFL(m = 20) annotation(
+      Placement(transformation(origin = {-148, -42}, extent = {{210, 30}, {230, 50}})));
+  Modelica.Mechanics.MultiBody.Interfaces.Frame_a wheelSupport annotation(
+      Placement(transformation(origin = {100, -2}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
+  Modelica.Mechanics.MultiBody.Interfaces.Frame_a suspMount annotation(
+      Placement(transformation(origin = {-102, -2}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-102, 2}, extent = {{-16, -16}, {16, 16}})));
+  Modelica.Mechanics.MultiBody.Joints.Revolute spinRL(n = {0, 1, 0}) annotation(
+      Placement(transformation(origin = {168, -42}, extent = {{-150, 30}, {-130, 50}})));
+  equation
+    connect(wheelSupport, wheelFL.frame_a) annotation(
+      Line(points = {{100, -2}, {62, -2}}));
+  connect(suspMount, spinRL.frame_a) annotation(
+      Line(points = {{-102, -2}, {18, -2}}));
+  connect(spinRL.frame_b, wheelFL.frame_a) annotation(
+      Line(points = {{38, -2}, {62, -2}}, color = {95, 95, 95}));
+  end RearTire;
   annotation(
     uses(Modelica(version = "4.1.0"), Modelica_DeviceDrivers(version = "2.2.0")));
 end DDynamics;
