@@ -81,7 +81,7 @@ model ChassisOOP
     Placement(transformation(origin = {-164, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
   DDynamics.Tires.Tire rearTireR annotation(
     Placement(transformation(origin = {-162, -40}, extent = {{-10, -10}, {10, 10}})));
-  SolidAxle solidAxle annotation(
+  DDynamics.Differentials.SolidAxle solidAxle annotation(
     Placement(transformation(origin = {192, 4}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
 equation
 // FIX 1: Connecting the Chassis to the World
