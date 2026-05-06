@@ -71,20 +71,18 @@ model ChassisOOP
     Placement(transformation(origin = {18, 130}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.Ramp ramp(height = 5, startTime = 5)  annotation(
     Placement(transformation(origin = {-62, 132}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Mechanics.Rotational.Sources.Speed spinSpeedActFL annotation(
-    Placement(transformation(origin = {206, 92}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  Modelica.Mechanics.Rotational.Sources.Speed spinSpeedActFR annotation(
-    Placement(transformation(origin = {246, -80}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_chassis_out annotation(
     Placement(transformation(origin = {16, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
-  DDynamics.FrontTire frontTireL annotation(
+  DDynamics.Tires.DrivingSteeringTire frontTireL annotation(
     Placement(transformation(origin = {172, 40}, extent = {{-10, -10}, {10, 10}})));
-  DDynamics.FrontTire frontTireR annotation(
+  DDynamics.Tires.DrivingSteeringTire frontTireR annotation(
     Placement(transformation(origin = {172, -40}, extent = {{-10, -10}, {10, 10}})));
-  DDynamics.RearTire rearTireL annotation(
+  DDynamics.Tires.Tire rearTireL annotation(
     Placement(transformation(origin = {-164, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
-  DDynamics.RearTire rearTireR annotation(
+  DDynamics.Tires.Tire rearTireR annotation(
     Placement(transformation(origin = {-162, -40}, extent = {{-10, -10}, {10, 10}})));
+  SolidAxle solidAxle annotation(
+    Placement(transformation(origin = {192, 4}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
 equation
 // FIX 1: Connecting the Chassis to the World
   connect(world.frame_b, freeMotion.frame_a) annotation(
@@ -185,24 +183,15 @@ equation
     Line(points = {{110, 40}, {162, 40}}, color = {95, 95, 95}));
   connect(steerActFL.flange, frontTireL.steerInput) annotation(
     Line(points = {{140, 72}, {170, 72}, {170, 50}, {172, 50}}));
-  connect(spinSpeedActFL.flange, frontTireL.spinInput) annotation(
-    Line(points = {{206, 82}, {200, 82}, {200, 72}, {176, 72}, {176, 50}}));
   connect(frontTireL.wheelSupport, floorFL.frame_b) annotation(
     Line(points = {{182, 40}, {270, 40}}, color = {95, 95, 95}));
   connect(suspFR.frame_b, frontTireR.suspMount) annotation(
     Line(points = {{110, -40}, {162, -40}}, color = {95, 95, 95}));
   connect(frontTireR.wheelSupport, floorFR.frame_b) annotation(
     Line(points = {{182, -40}, {270, -40}}, color = {95, 95, 95}));
-  connect(spinSpeedActFR.flange, frontTireR.spinInput) annotation(
-    Line(points = {{246, -70}, {212, -70}, {212, -16}, {176, -16}, {176, -30}}));
   connect(steerActFR.flange, frontTireR.steerInput) annotation(
     Line(points = {{158, -106}, {156, -106}, {156, -16}, {172, -16}, {172, -30}}));
-  connect(const.y, spinSpeedActFL.w_ref) annotation(
-    Line(points = {{30, 130}, {206, 130}, {206, 104}}, color = {0, 0, 127}));
-  connect(const.y, spinSpeedActFR.w_ref) annotation(
-    Line(points = {{30, 130}, {316, 130}, {316, -128}, {246, -128}, {246, -92}}, color = {0, 0, 127}));
-  
-  /*
+/*
   connect(rearTireL.wheelSupport, floorRL.frame_b) annotation(
     Line(points = {{-174, 40}, {-210, 40}}, color = {95, 95, 95}));
   connect(rearTireL.suspMount, suspRL.frame_a) annotation(
@@ -215,16 +204,18 @@ equation
 // --- REAR LEFT CONNECTIONS ---
   connect(suspRL.frame_b, rearTireL.suspMount) annotation(
     Line(points = {{-110, 40}, {-174, 40}}, color = {95, 95, 95}));
-  
   connect(rearTireL.wheelSupport, floorRL.frame_b) annotation(
     Line(points = {{-154, 40}, {-210, 40}}, color = {95, 95, 95}));
-
-  // --- REAR RIGHT CONNECTIONS ---
+// --- REAR RIGHT CONNECTIONS ---
   connect(suspRR.frame_b, rearTireR.suspMount) annotation(
     Line(points = {{-110, -40}, {-172, -40}}, color = {95, 95, 95}));
-    
   connect(rearTireR.wheelSupport, floorRR.frame_b) annotation(
     Line(points = {{-152, -40}, {-210, -40}}, color = {95, 95, 95}));
-  
+  connect(const.y, solidAxle.i) annotation(
+    Line(points = {{30, 130}, {201, 130}, {201, 4}}, color = {0, 0, 127}));
+  connect(solidAxle.left_out, frontTireL.spinInput) annotation(
+    Line(points = {{192, 14}, {190, 14}, {190, 60}, {176, 60}, {176, 50}}));
+  connect(solidAxle.right_out, frontTireR.spinInput) annotation(
+    Line(points = {{192, -6}, {190, -6}, {190, -16}, {176, -16}, {176, -30}}));
   annotation(uses(Modelica(version="4.1.0")));
 end ChassisOOP;
