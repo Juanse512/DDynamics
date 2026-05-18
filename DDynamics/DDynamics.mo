@@ -47,67 +47,6 @@ wheelSpeed = spinRL.w;
         Line(points = {{-102, -2}, {22, -2}}));
     end DrivingTire;
 
-    model SteeringTire
-      Modelica.Mechanics.MultiBody.Joints.Revolute steerFL(n = {0, 1, 0}, useAxisFlange = true) annotation(
-        Placement(transformation(origin = {-148, -42}, extent = {{130, 30}, {150, 50}})));
-      Modelica.Mechanics.MultiBody.Joints.Revolute spinFL(n = {0, 0, -1}, useAxisFlange = true) annotation(
-        Placement(transformation(origin = {-148, -42}, extent = {{170, 30}, {190, 50}})));
-      Modelica.Mechanics.MultiBody.Parts.Body wheelFL(m = 20) annotation(
-        Placement(transformation(origin = {-148, -42}, extent = {{210, 30}, {230, 50}})));
-      Modelica.Mechanics.MultiBody.Interfaces.Frame_a wheelSupport annotation(
-        Placement(transformation(origin = {100, -2}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
-      Modelica.Mechanics.Rotational.Interfaces.Flange_a steerInput annotation(
-        Placement(transformation(origin = {-8, 100}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {-6, 100}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.MultiBody.Interfaces.Frame_a suspMount annotation(
-        Placement(transformation(origin = {-102, -2}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-102, 2}, extent = {{-16, -16}, {16, 16}})));
-  Modelica.Blocks.Interfaces.RealOutput wheelSpeed annotation(
-        Placement(transformation(origin = {0, -104}, extent = {{-10, -10}, {10, 10}}, rotation = -90), iconTransformation(origin = {0, -100}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-    equation
-      wheelSpeed = spinFL.w;
-      connect(steerFL.frame_b, spinFL.frame_a) annotation(
-        Line(points = {{2, -2}, {22, -2}}, color = {95, 95, 95}));
-      connect(spinFL.frame_b, wheelFL.frame_a) annotation(
-        Line(points = {{42, -2}, {62, -2}}, color = {95, 95, 95}));
-      connect(wheelSupport, wheelFL.frame_a) annotation(
-        Line(points = {{100, -2}, {62, -2}}));
-      connect(steerInput, steerFL.axis) annotation(
-        Line(points = {{-8, 100}, {-8, 8}}));
-      connect(suspMount, steerFL.frame_a) annotation(
-        Line(points = {{-102, -2}, {-18, -2}}));
-    end SteeringTire;
-
-    model DrivingSteeringTire
-      Modelica.Mechanics.MultiBody.Joints.Revolute steerFL(n = {0, 1, 0}, useAxisFlange = true) annotation(
-        Placement(transformation(origin = {-148, -42}, extent = {{130, 30}, {150, 50}})));
-      Modelica.Mechanics.MultiBody.Joints.Revolute spinFL(n = {0, 0, -1}, useAxisFlange = true) annotation(
-        Placement(transformation(origin = {-148, -42}, extent = {{170, 30}, {190, 50}})));
-      Modelica.Mechanics.MultiBody.Parts.Body wheelFL(m = 20) annotation(
-        Placement(transformation(origin = {-148, -42}, extent = {{210, 30}, {230, 50}})));
-      Modelica.Mechanics.MultiBody.Interfaces.Frame_a wheelSupport annotation(
-        Placement(transformation(origin = {100, -2}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
-      Modelica.Mechanics.Rotational.Interfaces.Flange_a steerInput annotation(
-        Placement(transformation(origin = {-8, 100}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {-6, 100}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.Rotational.Interfaces.Flange_a spinInput annotation(
-        Placement(transformation(origin = {32, 100}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {32, 100}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.MultiBody.Interfaces.Frame_a suspMount annotation(
-        Placement(transformation(origin = {-102, -2}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-102, 2}, extent = {{-16, -16}, {16, 16}})));
-  Modelica.Blocks.Interfaces.RealOutput wheelSpeed annotation(
-        Placement(transformation(origin = {0, -104}, extent = {{-10, -10}, {10, 10}}, rotation = -90), iconTransformation(origin = {0, -100}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-    equation
-      wheelSpeed = spinFL.w;
-      connect(steerFL.frame_b, spinFL.frame_a) annotation(
-        Line(points = {{2, -2}, {22, -2}}, color = {95, 95, 95}));
-      connect(spinFL.frame_b, wheelFL.frame_a) annotation(
-        Line(points = {{42, -2}, {62, -2}}, color = {95, 95, 95}));
-      connect(wheelSupport, wheelFL.frame_a) annotation(
-        Line(points = {{100, -2}, {62, -2}}));
-      connect(steerInput, steerFL.axis) annotation(
-        Line(points = {{-8, 100}, {-8, 8}}));
-      connect(spinInput, spinFL.axis) annotation(
-        Line(points = {{32, 100}, {32, 8}}));
-      connect(suspMount, steerFL.frame_a) annotation(
-        Line(points = {{-102, -2}, {-18, -2}}));
-    end DrivingSteeringTire;
   end Tires;
 
   package Differentials
@@ -173,6 +112,9 @@ partial model Differential
       parameter Real k_spring = 30000 "Spring rate (N/m)";
       parameter Real d_damper = 2500 "Damping rate (N.s/m)";
       parameter Real m_hub = 15 "Unsprung mass of the hub/knuckle (kg)";
+      parameter Boolean steerable = false "Enable steering revolute at wheel output";
+      Modelica.Mechanics.Rotational.Interfaces.Flange_b steerInput if steerable annotation(
+        Placement(transformation(extent = {{-10, 90}, {10, 110}}), iconTransformation(extent = {{-10, 90}, {10, 110}})));
     end BaseSuspension;
 
     model DoubleWishbone
@@ -214,6 +156,14 @@ partial model Differential
       MultiBody.Parts.FixedTranslation wheelOffset(r={0, -(upperMountZ + lowerMountZ)/2, 0}) annotation(
         Placement(transformation(extent={{60, -10}, {80, 10}})));
 
+// --- Steering revolute (axis always exposed; locked by steerLock when steerable=false) ---
+      MultiBody.Joints.Revolute steer(
+        n = {0, 1, 0},
+        useAxisFlange = true) annotation(
+        Placement(transformation(origin = {-6, 18}, extent = {{82, -10}, {102, 10}})));
+      Modelica.Mechanics.Rotational.Components.Fixed steerLock if not steerable annotation(
+        Placement(transformation(origin = {76, 40}, extent = {{-6, -6}, {6, 6}})));
+
 // --- Spring-damper ---
       MultiBody.Forces.SpringDamperParallel shock(c=k_spring, d=d_damper, s_unstretched=0.55) annotation(
         Placement(transformation(origin = {-14, -2}, extent = {{-20, -80}, {0, -60}})));
@@ -240,8 +190,8 @@ partial model Differential
 // Wheel output at knuckle center (offset down from upper ball joint)
       connect(jointLoop.frame_ia, wheelOffset.frame_a) annotation(
         Line(points={{66, -38}, {66, 50}, {60, 50}, {60, 0}}, color={95, 95, 95}));
-      connect(wheelOffset.frame_b, wheelMount) annotation(
-        Line(points={{80, 0}, {100, 0}}, color={95, 95, 95}));
+      connect(wheelOffset.frame_b, steer.frame_a) annotation(
+        Line(points = {{80, 0}, {80, 10}, {76, 10}, {76, 18}}, color = {95, 95, 95}));
 // Shock: top mount above chassis to lower ball-joint point (middle revolute = frame_im)
       connect(chassisMount, shockTopMount.frame_a) annotation(
         Line(points={{-100, 0}, {-80, 0}, {-80, 60}, {-70, 60}}, color={95, 95, 95}));
@@ -249,6 +199,12 @@ partial model Differential
         Line(points={{-50, 60}, {-34, 60}, {-34, -72}}, color={95, 95, 95}));
       connect(jointLoop.frame_im, shock.frame_b) annotation(
         Line(points={{50, -38}, {50, -56}, {-14, -56}, {-14, -72}}, color={95, 95, 95}));
+  connect(steerInput, steer.axis) annotation(
+        Line(points = {{0, 100}, {0, 44}, {86, 44}, {86, 28}}));
+  connect(steer.axis, steerLock.flange) annotation(
+        Line(points = {{86, 28}, {86, 40}, {82, 40}}));
+  connect(steer.frame_b, wheelMount) annotation(
+        Line(points = {{96, 18}, {114, 18}, {114, 0}, {100, 0}}, color = {95, 95, 95}));
       annotation(Icon(graphics={
         Line(points={{-80, 30}, {0, 50}}, color={95, 95, 95}, thickness=1),
         Line(points={{-80, -30}, {0, -50}}, color={95, 95, 95}, thickness=1),
@@ -266,7 +222,7 @@ partial model Differential
       import MultiBody = Modelica.Mechanics.MultiBody;
       parameter Real ground_c = 1e5 "Floor stiffness (N/m)";
       parameter Real ground_d = 5000 "Floor damping (N.s/m)";
-      outer TerrainMap terrain;
+      outer DDynamics.Terrains.TerrainMap terrain;
       MultiBody.Interfaces.Frame_b wheelContact annotation(
         Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
         iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
@@ -299,18 +255,24 @@ partial model Differential
         Placement(transformation(origin = {40, 0}, extent = {{-10, -10}, {10, 10}})));
     protected
       parameter Real contactRampDepth = 0.001 "Depth over which friction ramps from 0 to full (m)";
-      Real vx, vlateral, contactDepth, frictionScale;
+      Real vWorld[3], axleWorld[3], headingWorld[3], contactDepth, frictionScale;
+      Real vLong, vLat;
     equation
       connect(frictionForce.frame_b, wheelContact);
-      vx = der(wheelContact.r_0[1]);
-      vlateral = der(wheelContact.r_0[3]);
+      vWorld = der(wheelContact.r_0);
+// Spin-invariant axle direction: rotating around n={0,0,-1} leaves that axis unchanged,
+// so resolve1(R, {0,0,-1}) equals the same world vector regardless of wheel spin angle.
+      axleWorld = Modelica.Mechanics.MultiBody.Frames.resolve1(wheelContact.R, {0,0,-1});
+// Rolling direction: project world-forward {1,0,0} onto the plane perpendicular to axle.
+// Correct for both left and right wheels regardless of axle sign.
+      headingWorld = {1, 0, 0} - axleWorld[1] * axleWorld;
+      vLong = vWorld * headingWorld;
+      vLat  = vWorld * axleWorld;
       contactDepth = noEvent(max(0, terrain.getZ(wheelContact.r_0[1], wheelContact.r_0[3]) - wheelContact.r_0[2]));
       frictionScale = noEvent(min(1, contactDepth / contactRampDepth));
-      frictionForce.force = {
-        -ground_mu * (vx - spinSpeed * R_wheel) * frictionScale,
-        0,
-        -ground_mu * vlateral * frictionScale
-      };
+      frictionForce.force = frictionScale * (
+        -ground_mu * (vLong - spinSpeed * R_wheel) * headingWorld
+        - ground_mu * vLat * axleWorld);
     end GroundFriction;
 
     model Floor "Complete wheel-ground contact. Connect tire.wheelSupport to wheelContact."
@@ -426,13 +388,13 @@ partial model Differential
         Placement(transformation(origin = {-110, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
   Suspension.DoubleWishbone doubleWishboneRR(sideSign = -1)  annotation(
         Placement(transformation(origin = {-110, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
-  Suspension.DoubleWishbone doubleWishboneFL annotation(
+  Suspension.DoubleWishbone doubleWishboneFL(steerable = true) annotation(
         Placement(transformation(origin = {110, 40}, extent = {{-10, -10}, {10, 10}})));
-  Suspension.DoubleWishbone doubleWishboneFR(sideSign = -1)  annotation(
+  Suspension.DoubleWishbone doubleWishboneFR(sideSign = -1, steerable = true)  annotation(
         Placement(transformation(origin = {110, -40}, extent = {{-10, -10}, {10, 10}})));
-  Tires.SteeringTire ttireFL annotation(
+  Tires.Tire ttireFL annotation(
         Placement(transformation(origin = {150, 40}, extent = {{-10, -10}, {10, 10}})));
-  Tires.SteeringTire tireFR annotation(
+  Tires.Tire tireFR annotation(
         Placement(transformation(origin = {150, -40}, extent = {{-10, -10}, {10, 10}})));
   Tires.DrivingTire tireRL annotation(
         Placement(transformation(origin = {-150, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
@@ -454,8 +416,8 @@ partial model Differential
         Placement(transformation(origin = {-4, 44}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.Constant speed(k = 5)  annotation(
         Placement(transformation(origin = {-92, -2}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
-  Modelica.Blocks.Sources.Constant steer(k = 0)  annotation(
-        Placement(transformation(origin = {48, 0}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Blocks.Sources.Constant steer(k = 1)  annotation(
+        Placement(transformation(origin = {50, 0}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Sources.Position steerAct annotation(
         Placement(transformation(origin = {102, 10}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Sources.Position steerAct1 annotation(
@@ -503,14 +465,10 @@ partial model Differential
         Line(points = {{6, 44}, {12, 44}, {12, 20}, {-20, 20}, {-20, 0}, {-10, 0}}, color = {95, 95, 95}));
   connect(solidAxle.i, speed.y) annotation(
         Line(points = {{-142, -2}, {-102, -2}}, color = {0, 0, 127}));
-  connect(steerAct.flange, ttireFL.steerInput) annotation(
-        Line(points = {{112, 10}, {130, 10}, {130, 60}, {150, 60}, {150, 50}}));
   connect(steer.y, steerAct.phi_ref) annotation(
-        Line(points = {{60, 0}, {75, 0}, {75, 10}, {90, 10}}, color = {0, 0, 127}));
-  connect(steerAct1.flange, tireFR.steerInput) annotation(
-        Line(points = {{112, -12}, {150, -12}, {150, -30}}));
+        Line(points = {{61, 0}, {75, 0}, {75, 10}, {90, 10}}, color = {0, 0, 127}));
   connect(steer.y, steerAct1.phi_ref) annotation(
-        Line(points = {{60, 0}, {76, 0}, {76, -12}, {90, -12}}, color = {0, 0, 127}));
+        Line(points = {{61, 0}, {76, 0}, {76, -12}, {90, -12}}, color = {0, 0, 127}));
   connect(doubleWishboneRL.chassisMount, mountRL.frame_b) annotation(
         Line(points = {{-100, 40}, {-80, 40}}, color = {95, 95, 95}));
   connect(mountRL.frame_a, chassis.frame_a) annotation(
@@ -519,6 +477,10 @@ partial model Differential
         Line(points = {{-100, -40}, {-80, -40}}, color = {95, 95, 95}));
   connect(mountRR.frame_a, chassis.frame_a) annotation(
         Line(points = {{-60, -40}, {-26, -40}, {-26, 0}, {-10, 0}}, color = {95, 95, 95}));
+  connect(steerAct1.flange, doubleWishboneFR.steerInput) annotation(
+        Line(points = {{112, -12}, {124, -12}, {124, -26}, {110, -26}, {110, -30}}));
+  connect(steerAct.flange, doubleWishboneFL.steerInput) annotation(
+        Line(points = {{112, 10}, {128, 10}, {128, 60}, {110, 60}, {110, 50}}));
     end CarExample;
   end Examples;
   annotation(
