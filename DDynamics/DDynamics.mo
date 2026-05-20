@@ -242,9 +242,10 @@ partial model Differential
 
     model GroundFriction "Slip-based longitudinal and viscous lateral friction"
       import MultiBody = Modelica.Mechanics.MultiBody;
-      parameter Real ground_mu = 10000 "Viscous friction coefficient (N.s/m)";
+      parameter Real ground_mu = 10000 "Longitudinal viscous friction coefficient (N.s/m)";
+      parameter Real mu_lat = 100000 "Lateral viscous friction coefficient (N.s/m)";
       parameter Real R_wheel = 0.3 "Wheel radius (m)";
-      outer TerrainMap terrain;
+      outer DDynamics.Terrains.TerrainMap terrain;
       MultiBody.Interfaces.Frame_b wheelContact annotation(
         Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
         iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
@@ -263,23 +264,24 @@ partial model Differential
 // Spin-invariant axle direction: rotating around n={0,0,-1} leaves that axis unchanged,
 // so resolve1(R, {0,0,-1}) equals the same world vector regardless of wheel spin angle.
       axleWorld = Modelica.Mechanics.MultiBody.Frames.resolve1(wheelContact.R, {0,0,-1});
-// Rolling direction: project world-forward {1,0,0} onto the plane perpendicular to axle.
-// Correct for both left and right wheels regardless of axle sign.
-      headingWorld = {1, 0, 0} - axleWorld[1] * axleWorld;
+// Rolling direction: cross product of axle and world-up {0,1,0}.
+// Works for all heading directions; never degenerates when the car turns.
+      headingWorld = cross(axleWorld, {0, 1, 0});
       vLong = vWorld * headingWorld;
       vLat  = vWorld * axleWorld;
       contactDepth = noEvent(max(0, terrain.getZ(wheelContact.r_0[1], wheelContact.r_0[3]) - wheelContact.r_0[2]));
       frictionScale = noEvent(min(1, contactDepth / contactRampDepth));
       frictionForce.force = frictionScale * (
         -ground_mu * (vLong - spinSpeed * R_wheel) * headingWorld
-        - ground_mu * vLat * axleWorld);
+        - mu_lat * vLat * axleWorld);
     end GroundFriction;
 
     model Floor "Complete wheel-ground contact. Connect tire.wheelSupport to wheelContact."
       import MultiBody = Modelica.Mechanics.MultiBody;
       parameter Real ground_c = 1e5 "Floor stiffness (N/m)";
       parameter Real ground_d = 5000 "Floor damping (N.s/m)";
-      parameter Real ground_mu = 10000 "Viscous friction coefficient (N.s/m)";
+      parameter Real ground_mu = 10000 "Longitudinal viscous friction coefficient (N.s/m)";
+      parameter Real mu_lat = 100000 "Lateral viscous friction coefficient (N.s/m)";
       parameter Real R_wheel = 0.3 "Wheel radius (m)";
       MultiBody.Interfaces.Frame_b wheelContact annotation(
         Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
@@ -289,7 +291,7 @@ partial model Differential
         iconTransformation(origin = {0, 108}, extent = {{-20, -20}, {20, 20}}, rotation = -90)));
       GroundSpring gs(ground_c = ground_c, ground_d = ground_d) annotation(
         Placement(transformation(origin = {0, 30}, extent = {{-10, -10}, {10, 10}})));
-      GroundFriction gf(ground_mu = ground_mu, R_wheel = R_wheel) annotation(
+      GroundFriction gf(ground_mu = ground_mu, mu_lat = mu_lat, R_wheel = R_wheel) annotation(
         Placement(transformation(origin = {0, -30}, extent = {{-10, -10}, {10, 10}})));
     equation
       connect(gs.wheelContact, wheelContact);
@@ -300,17 +302,13 @@ partial model Differential
 
   package Terrains
     block TerrainMap "Calculates ground height based on X,Y position"
-      // Inputs: We could use connectors, but for simplicity,
-      // we will just use public functions or variables.
-
       function getZ
         input Real x;
         input Real y;
         output Real z;
       algorithm // Example: A 3D wave or a ramp
-// Let's do a sine-wave road (washboard) + a 5m hill
-        z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
-//z := 1;
+        //z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
+        z := 1;
       end getZ;
     
     end TerrainMap;
