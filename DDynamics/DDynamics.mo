@@ -351,12 +351,13 @@ partial model Differential
       Modelica.Blocks.Interfaces.RealInput spinSpeed annotation(
         Placement(transformation(origin = {0, 108}, extent = {{-20, -20}, {20, 20}}, rotation = -90),
         iconTransformation(origin = {0, 108}, extent = {{-20, -20}, {20, 20}}, rotation = -90)));
-      MultiBody.Forces.WorldForce frictionForce annotation(
+      MultiBody.Forces.WorldForceAndTorque frictionForce annotation(
         Placement(transformation(origin = {40, 0}, extent = {{-10, -10}, {10, 10}})));
     protected
       parameter Real contactRampDepth = 0.001 "Depth over which friction ramps from 0 to full (m)";
       Real vWorld[3], axleWorld[3], headingWorld[3], contactDepth, frictionScale;
       Real vLong, vLat;
+      Real frictionVec[3];
     equation
       connect(frictionForce.frame_b, wheelContact);
       vWorld = der(wheelContact.r_0);
@@ -370,9 +371,13 @@ partial model Differential
       vLat  = vWorld * axleWorld;
       contactDepth = noEvent(max(0, terrain.getZ(wheelContact.r_0[1], wheelContact.r_0[3]) - wheelContact.r_0[2]));
       frictionScale = noEvent(min(1, contactDepth / contactRampDepth));
-      frictionForce.force = frictionScale * (
+      frictionVec = frictionScale * (
         -ground_mu * (vLong - spinSpeed * R_wheel) * headingWorld
         - mu_lat * vLat * axleWorld);
+      frictionForce.force  = frictionVec;
+// Torque from applying friction at the contact patch (offset R_wheel below wheel center).
+// cross({0,-R,0}, F) gives the rolling torque that spins the free revolute on non-driven wheels.
+      frictionForce.torque = cross({0, -R_wheel, 0}, frictionVec);
     end GroundFriction;
 
     model Floor "Complete wheel-ground contact. Connect tire.wheelSupport to wheelContact."
