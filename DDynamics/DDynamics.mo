@@ -2,6 +2,7 @@ package DDynamics
 
   package Tires
       model Tire
+      parameter Real R_wheel = 0.25 "Tire radius (m)";
       Modelica.Mechanics.MultiBody.Parts.Body wheelFL(m = 20) annotation(
         Placement(transformation(origin = {-148, -40}, extent = {{210, 30}, {230, 50}})));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a wheelSupport annotation(
@@ -12,7 +13,7 @@ package DDynamics
         Placement(transformation(origin = {168, -40}, extent = {{-150, 30}, {-130, 50}})));
   Modelica.Blocks.Interfaces.RealOutput wheelSpeed annotation(
         Placement(transformation(origin = {0, -104}, extent = {{-10, -10}, {10, 10}}, rotation = -90), iconTransformation(origin = {2, -98}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  TireVisualizer tireVisualizer annotation(
+  TireVisualizer tireVisualizer(rTire = R_wheel) annotation(
         Placement(transformation(origin = {96, 46}, extent = {{-10, -10}, {10, 10}})));
     equation
       wheelSpeed = spinRL.w;
@@ -27,6 +28,7 @@ package DDynamics
     end Tire;
 
     model DrivingTire
+      parameter Real R_wheel = 0.25 "Tire radius (m)";
       Modelica.Mechanics.MultiBody.Joints.Revolute spinFL(n = {0, 0, -1}, useAxisFlange = true) annotation(
         Placement(transformation(origin = {-148, -42}, extent = {{170, 30}, {190, 50}})));
       Modelica.Mechanics.MultiBody.Parts.Body wheelFL(m = 20) annotation(
@@ -39,7 +41,7 @@ package DDynamics
         Placement(transformation(origin = {-102, -2}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-102, 2}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Blocks.Interfaces.RealOutput wheelSpeed annotation(
         Placement(transformation(origin = {0, -104}, extent = {{-10, -10}, {10, 10}}, rotation = -90), iconTransformation(origin = {0, -100}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  TireVisualizer tireVisualizer annotation(
+  TireVisualizer tireVisualizer(rTire = R_wheel) annotation(
         Placement(transformation(origin = {98, 56}, extent = {{-10, -10}, {10, 10}})));
     equation
       wheelSpeed = spinFL.w;
@@ -321,6 +323,7 @@ partial model Differential
       import MultiBody = Modelica.Mechanics.MultiBody;
       parameter Real ground_c = 1e5 "Floor stiffness (N/m)";
       parameter Real ground_d = 5000 "Floor damping (N.s/m)";
+      parameter Real R_wheel = 0.25 "Tire radius (m)";
       outer DDynamics.Terrains.TerrainMap terrain;
       MultiBody.Interfaces.Frame_b wheelContact annotation(
         Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
@@ -334,7 +337,7 @@ partial model Differential
       vy = der(wheelContact.r_0[2]);
       normalForce.force = {
         0,
-        noEvent(max(0, ground_c * (terrain.getZ(wheelContact.r_0[1], wheelContact.r_0[3]) - wheelContact.r_0[2]) - ground_d * vy)),
+        noEvent(max(0, ground_c * (terrain.getZ(wheelContact.r_0[1], wheelContact.r_0[3]) + R_wheel - wheelContact.r_0[2]) - ground_d * vy)),
         0
       };
     end GroundSpring;
@@ -369,7 +372,7 @@ partial model Differential
       headingWorld = cross(axleWorld, {0, 1, 0});
       vLong = vWorld * headingWorld;
       vLat  = vWorld * axleWorld;
-      contactDepth = noEvent(max(0, terrain.getZ(wheelContact.r_0[1], wheelContact.r_0[3]) - wheelContact.r_0[2]));
+      contactDepth = noEvent(max(0, terrain.getZ(wheelContact.r_0[1], wheelContact.r_0[3]) + R_wheel - wheelContact.r_0[2]));
       frictionScale = noEvent(min(1, contactDepth / contactRampDepth));
       frictionVec = frictionScale * (
         -ground_mu * (vLong - spinSpeed * R_wheel) * headingWorld
@@ -393,7 +396,7 @@ partial model Differential
       Modelica.Blocks.Interfaces.RealInput spinSpeed annotation(
         Placement(transformation(origin = {0, 108}, extent = {{-20, -20}, {20, 20}}, rotation = -90),
         iconTransformation(origin = {0, 108}, extent = {{-20, -20}, {20, 20}}, rotation = -90)));
-      GroundSpring gs(ground_c = ground_c, ground_d = ground_d) annotation(
+      GroundSpring gs(ground_c = ground_c, ground_d = ground_d, R_wheel = R_wheel) annotation(
         Placement(transformation(origin = {0, 30}, extent = {{-10, -10}, {10, 10}})));
       GroundFriction gf(ground_mu = ground_mu, mu_lat = mu_lat, R_wheel = R_wheel) annotation(
         Placement(transformation(origin = {0, -30}, extent = {{-10, -10}, {10, 10}})));
@@ -411,14 +414,14 @@ partial model Differential
         input Real y;
         output Real z;
       algorithm // Example: A 3D wave or a ramp
-//z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
+    //z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
         z := 1;
       end getZ;
 
     end TerrainMap;
 
     function terrainSurface "Surface characteristic for terrain visualization (keep in sync with TerrainMap.getZ)"
-      extends Modelica.Mechanics.MultiBody.Visualizers.Advanced.Interfaces.partialSurfaceCharacteristic(
+      extends Modelica.Mechanics.MultiBody.Visualizers.Advanced.SurfaceCharacteristics.partialSurfaceCharacteristic(
           final multiColoredSurface=false);
       input Real x_min = -10 "Minimum X (forward)";
       input Real x_max =  10 "Maximum X (forward)";
@@ -429,8 +432,8 @@ partial model Differential
         for j in 1:nv loop
           X[i,j] := x_min + (i-1) * (x_max - x_min) / (nu - 1);
           Z[i,j] := z_min + (j-1) * (z_max - z_min) / (nv - 1);
-//Y[i,j] := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * X[i,j] / 5);
-          Y[i,j] := 1;
+      Y[i,j] := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * X[i,j] / 5);
+          //Y[i,j] := 1;
         end for;
       end for;
     end terrainSurface;
@@ -520,6 +523,7 @@ partial model Differential
 
   package Examples
   model CarExample
+    parameter Real R_wheel = 0.25 "Tire radius (m) — propagated to all tires and floor contact";
     inner Terrains.TerrainMap terrainMap annotation(
         Placement(transformation(origin = {-88, 78}, extent = {{-10, -10}, {10, 10}})));
   Terrains.TerrainVisualizer terrainViz annotation(
@@ -542,23 +546,23 @@ partial model Differential
         Placement(transformation(origin = {110, 40}, extent = {{-10, -10}, {10, 10}})));
   Suspension.DoubleWishbone doubleWishboneFR(sideSign = -1, steerable = true)  annotation(
         Placement(transformation(origin = {110, -40}, extent = {{-10, -10}, {10, 10}})));
-  Tires.Tire ttireFL annotation(
+  Tires.Tire ttireFL(R_wheel = R_wheel) annotation(
         Placement(transformation(origin = {150, 40}, extent = {{-10, -10}, {10, 10}})));
-  Tires.Tire tireFR annotation(
+  Tires.Tire tireFR(R_wheel = R_wheel) annotation(
         Placement(transformation(origin = {150, -40}, extent = {{-10, -10}, {10, 10}})));
-  Tires.DrivingTire tireRL annotation(
+  Tires.DrivingTire tireRL(R_wheel = R_wheel) annotation(
         Placement(transformation(origin = {-150, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
-  Tires.DrivingTire tireRR annotation(
+  Tires.DrivingTire tireRR(R_wheel = R_wheel) annotation(
         Placement(transformation(origin = {-150, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
   Differentials.SolidAxle solidAxle annotation(
         Placement(transformation(origin = {-152, -2}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  Floors.Floor floorFL annotation(
+  Floors.Floor floorFL(R_wheel = R_wheel) annotation(
         Placement(transformation(origin = {180, 40}, extent = {{-10, -10}, {10, 10}})));
-  Floors.Floor floorFR annotation(
+  Floors.Floor floorFR(R_wheel = R_wheel) annotation(
         Placement(transformation(origin = {180, -40}, extent = {{-10, -10}, {10, 10}})));
-  Floors.Floor floorRR annotation(
+  Floors.Floor floorRR(R_wheel = R_wheel) annotation(
         Placement(transformation(origin = {-190, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
-  Floors.Floor floorRL annotation(
+  Floors.Floor floorRL(R_wheel = R_wheel) annotation(
         Placement(transformation(origin = {-190, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
   inner Modelica.Mechanics.MultiBody.World world annotation(
         Placement(transformation(origin = {-42, 80}, extent = {{-10, -10}, {10, 10}})));
