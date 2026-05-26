@@ -11,12 +11,9 @@ package DDynamics
         Placement(transformation(origin = {-102, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
       Modelica.Mechanics.MultiBody.Joints.Revolute spinRL(n = {0, 0, -1}) annotation(
         Placement(transformation(origin = {168, -40}, extent = {{-150, 30}, {-130, 50}})));
-  Modelica.Blocks.Interfaces.RealOutput wheelSpeed annotation(
-        Placement(transformation(origin = {0, -104}, extent = {{-10, -10}, {10, 10}}, rotation = -90), iconTransformation(origin = {2, -98}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  TireVisualizer tireVisualizer(rTire = R_wheel) annotation(
+    TireVisualizer tireVisualizer(rTire = R_wheel) annotation(
         Placement(transformation(origin = {96, 46}, extent = {{-10, -10}, {10, 10}})));
     equation
-      wheelSpeed = spinRL.w;
       connect(wheelSupport, wheelFL.frame_a) annotation(
         Line(points = {{100, 0}, {62, 0}}));
       connect(suspMount, spinRL.frame_a) annotation(
@@ -39,12 +36,9 @@ package DDynamics
         Placement(transformation(origin = {32, 100}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {32, 100}, extent = {{-10, -10}, {10, 10}})));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a suspMount annotation(
         Placement(transformation(origin = {-102, -2}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-102, 2}, extent = {{-16, -16}, {16, 16}})));
-  Modelica.Blocks.Interfaces.RealOutput wheelSpeed annotation(
-        Placement(transformation(origin = {0, -104}, extent = {{-10, -10}, {10, 10}}, rotation = -90), iconTransformation(origin = {0, -100}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  TireVisualizer tireVisualizer(rTire = R_wheel) annotation(
+      TireVisualizer tireVisualizer(rTire = R_wheel) annotation(
         Placement(transformation(origin = {98, 56}, extent = {{-10, -10}, {10, 10}})));
     equation
-      wheelSpeed = spinFL.w;
       connect(spinFL.frame_b, wheelFL.frame_a) annotation(
         Line(points = {{42, -2}, {62, -2}}, color = {95, 95, 95}));
       connect(wheelSupport, wheelFL.frame_a) annotation(
@@ -351,9 +345,7 @@ partial model Differential
       MultiBody.Interfaces.Frame_b wheelContact annotation(
         Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
         iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
-      Modelica.Blocks.Interfaces.RealInput spinSpeed annotation(
-        Placement(transformation(origin = {0, 108}, extent = {{-20, -20}, {20, 20}}, rotation = -90),
-        iconTransformation(origin = {0, 108}, extent = {{-20, -20}, {20, 20}}, rotation = -90)));
+        
       MultiBody.Forces.WorldForceAndTorque frictionForce annotation(
         Placement(transformation(origin = {40, 0}, extent = {{-10, -10}, {10, 10}})));
     protected
@@ -375,7 +367,7 @@ partial model Differential
       contactDepth = noEvent(max(0, terrain.getZ(wheelContact.r_0[1], wheelContact.r_0[3]) + R_wheel - wheelContact.r_0[2]));
       frictionScale = noEvent(min(1, contactDepth / contactRampDepth));
       frictionVec = frictionScale * (
-        -ground_mu * (vLong - spinSpeed * R_wheel) * headingWorld
+        -ground_mu * (vLong - (wheelContact.R.w * {0, 0, -1}) * R_wheel) * headingWorld
         - mu_lat * vLat * axleWorld);
       frictionForce.force  = frictionVec;
 // Torque from applying friction at the contact patch (offset R_wheel below wheel center).
@@ -393,9 +385,6 @@ partial model Differential
       MultiBody.Interfaces.Frame_b wheelContact annotation(
         Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
         iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
-      Modelica.Blocks.Interfaces.RealInput spinSpeed annotation(
-        Placement(transformation(origin = {0, 108}, extent = {{-20, -20}, {20, 20}}, rotation = -90),
-        iconTransformation(origin = {0, 108}, extent = {{-20, -20}, {20, 20}}, rotation = -90)));
       GroundSpring gs(ground_c = ground_c, ground_d = ground_d, R_wheel = R_wheel) annotation(
         Placement(transformation(origin = {0, 30}, extent = {{-10, -10}, {10, 10}})));
       GroundFriction gf(ground_mu = ground_mu, mu_lat = mu_lat, R_wheel = R_wheel) annotation(
@@ -403,8 +392,41 @@ partial model Differential
     equation
       connect(gs.wheelContact, wheelContact);
       connect(gf.wheelContact, wheelContact);
-      gf.spinSpeed = spinSpeed;
     end Floor;
+
+    model Floor4Corners "Ground contact for all 4 car corners. Connect each tire.wheelSupport to the matching frame."
+      import MultiBody = Modelica.Mechanics.MultiBody;
+      parameter Real ground_c  = 1e5    "Floor stiffness (N/m)";
+      parameter Real ground_d  = 5000   "Floor damping (N.s/m)";
+      parameter Real ground_mu = 10000  "Longitudinal viscous friction coefficient (N.s/m)";
+      parameter Real mu_lat    = 100000 "Lateral viscous friction coefficient (N.s/m)";
+      parameter Real R_wheel   = 0.3    "Wheel radius (m)";
+      MultiBody.Interfaces.Frame_b wheelContactFL annotation(
+        Placement(transformation(origin = {100, 60}, extent = {{-16, -16}, {16, 16}}),
+        iconTransformation(origin = {100, 60}, extent = {{-16, -16}, {16, 16}})));
+      MultiBody.Interfaces.Frame_b wheelContactFR annotation(
+        Placement(transformation(origin = {100, 20}, extent = {{-16, -16}, {16, 16}}),
+        iconTransformation(origin = {100, 20}, extent = {{-16, -16}, {16, 16}})));
+      MultiBody.Interfaces.Frame_b wheelContactRL annotation(
+        Placement(transformation(origin = {100, -20}, extent = {{-16, -16}, {16, 16}}),
+        iconTransformation(origin = {100, -20}, extent = {{-16, -16}, {16, 16}})));
+      MultiBody.Interfaces.Frame_b wheelContactRR annotation(
+        Placement(transformation(origin = {100, -60}, extent = {{-16, -16}, {16, 16}}),
+        iconTransformation(origin = {100, -60}, extent = {{-16, -16}, {16, 16}})));
+      Floor floorFL(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, R_wheel = R_wheel) annotation(
+        Placement(transformation(origin = {0, 60}, extent = {{-10, -10}, {10, 10}})));
+      Floor floorFR(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, R_wheel = R_wheel) annotation(
+        Placement(transformation(origin = {0, 20}, extent = {{-10, -10}, {10, 10}})));
+      Floor floorRL(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, R_wheel = R_wheel) annotation(
+        Placement(transformation(origin = {0, -20}, extent = {{-10, -10}, {10, 10}})));
+      Floor floorRR(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, R_wheel = R_wheel) annotation(
+        Placement(transformation(origin = {0, -60}, extent = {{-10, -10}, {10, 10}})));
+    equation
+      connect(floorFL.wheelContact, wheelContactFL);
+      connect(floorFR.wheelContact, wheelContactFR);
+      connect(floorRL.wheelContact, wheelContactRL);
+      connect(floorRR.wheelContact, wheelContactRR);
+    end Floor4Corners;
   end Floors;
 
   package Terrains
@@ -414,7 +436,7 @@ partial model Differential
         input Real y;
         output Real z;
       algorithm // Example: A 3D wave or a ramp
-    //z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
+//z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
         z := 1;
       end getZ;
 
@@ -433,7 +455,7 @@ partial model Differential
           X[i,j] := x_min + (i-1) * (x_max - x_min) / (nu - 1);
           Z[i,j] := z_min + (j-1) * (z_max - z_min) / (nv - 1);
       Y[i,j] := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * X[i,j] / 5);
-          //Y[i,j] := 1;
+//Y[i,j] := 1;
         end for;
       end for;
     end terrainSurface;
@@ -556,14 +578,6 @@ partial model Differential
         Placement(transformation(origin = {-150, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
   Differentials.SolidAxle solidAxle annotation(
         Placement(transformation(origin = {-152, -2}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  Floors.Floor floorFL(R_wheel = R_wheel) annotation(
-        Placement(transformation(origin = {180, 40}, extent = {{-10, -10}, {10, 10}})));
-  Floors.Floor floorFR(R_wheel = R_wheel) annotation(
-        Placement(transformation(origin = {180, -40}, extent = {{-10, -10}, {10, 10}})));
-  Floors.Floor floorRR(R_wheel = R_wheel) annotation(
-        Placement(transformation(origin = {-190, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
-  Floors.Floor floorRL(R_wheel = R_wheel) annotation(
-        Placement(transformation(origin = {-190, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
   inner Modelica.Mechanics.MultiBody.World world annotation(
         Placement(transformation(origin = {-42, 80}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Joints.FreeMotion freeMotion(r_rel_a(start = {0, 1.2, 0}), v_rel_a(start = {0, 0, 0}))  annotation(
@@ -576,67 +590,61 @@ partial model Differential
         Placement(transformation(origin = {102, 10}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Sources.Position steerAct1 annotation(
         Placement(transformation(origin = {102, -12}, extent = {{-10, -10}, {10, 10}})));
+  Floors.Floor4Corners floor annotation(
+        Placement(transformation(origin = {-2, -86}, extent = {{-10, -10}, {10, 10}})));
     equation
-  connect(mountFL.frame_a, chassis.frame_a) annotation(
+      connect(mountFL.frame_a, chassis.frame_a) annotation(
         Line(points = {{40, 40}, {20, 40}, {20, 0}, {-10, 0}}, color = {95, 95, 95}));
-  connect(mountFR.frame_a, chassis.frame_a) annotation(
+      connect(mountFR.frame_a, chassis.frame_a) annotation(
         Line(points = {{40, -40}, {20, -40}, {20, 0}, {-10, 0}}, color = {95, 95, 95}));
-  connect(mountFL.frame_b, doubleWishboneFL.chassisMount) annotation(
+      connect(mountFL.frame_b, doubleWishboneFL.chassisMount) annotation(
         Line(points = {{60, 40}, {100, 40}}, color = {95, 95, 95}));
-  connect(mountFR.frame_b, doubleWishboneFR.chassisMount) annotation(
+      connect(mountFR.frame_b, doubleWishboneFR.chassisMount) annotation(
         Line(points = {{60, -40}, {100, -40}}, color = {95, 95, 95}));
-  connect(doubleWishboneFR.wheelMount, tireFR.suspMount) annotation(
+      connect(doubleWishboneFR.wheelMount, tireFR.suspMount) annotation(
         Line(points = {{120, -40}, {140, -40}}, color = {95, 95, 95}));
-  connect(doubleWishboneFL.wheelMount, ttireFL.suspMount) annotation(
+      connect(doubleWishboneFL.wheelMount, ttireFL.suspMount) annotation(
         Line(points = {{120, 40}, {140, 40}}, color = {95, 95, 95}));
-  connect(doubleWishboneRL.wheelMount, tireRL.suspMount) annotation(
+      connect(doubleWishboneRL.wheelMount, tireRL.suspMount) annotation(
         Line(points = {{-120, 40}, {-140, 40}}, color = {95, 95, 95}));
-  connect(doubleWishboneRR.wheelMount, tireRR.suspMount) annotation(
+      connect(doubleWishboneRR.wheelMount, tireRR.suspMount) annotation(
         Line(points = {{-120, -40}, {-140, -40}}, color = {95, 95, 95}));
-  connect(solidAxle.right_out, tireRR.spinInput) annotation(
+      connect(solidAxle.right_out, tireRR.spinInput) annotation(
         Line(points = {{-152, -12}, {-152, -22}, {-174, -22}, {-174, -58}, {-154, -58}, {-154, -50}}));
-  connect(solidAxle.left_out, tireRL.spinInput) annotation(
+      connect(solidAxle.left_out, tireRL.spinInput) annotation(
         Line(points = {{-152, 8}, {-152, 19}, {-154, 19}, {-154, 30}}));
-  connect(ttireFL.wheelSupport, floorFL.wheelContact) annotation(
-        Line(points = {{160, 40}, {170, 40}}, color = {95, 95, 95}));
-  connect(tireFR.wheelSupport, floorFR.wheelContact) annotation(
-        Line(points = {{160, -40}, {170, -40}}, color = {95, 95, 95}));
-  connect(floorRR.wheelContact, tireRR.wheelSupport) annotation(
-        Line(points = {{-180, -40}, {-160, -40}}, color = {95, 95, 95}));
-  connect(floorRL.wheelContact, tireRL.wheelSupport) annotation(
-        Line(points = {{-180, 40}, {-160, 40}}, color = {95, 95, 95}));
-  connect(tireRL.wheelSpeed, floorRL.spinSpeed) annotation(
-        Line(points = {{-150, 50}, {-150, 68}, {-216, 68}, {-216, 20}, {-190, 20}, {-190, 30}}, color = {0, 0, 127}));
-  connect(tireRR.wheelSpeed, floorRR.spinSpeed) annotation(
-        Line(points = {{-150, -30}, {-152, -30}, {-152, -22}, {-216, -22}, {-216, -64}, {-190, -64}, {-190, -50}}, color = {0, 0, 127}));
-  connect(ttireFL.wheelSpeed, floorFL.spinSpeed) annotation(
-        Line(points = {{150, 30}, {150, 8}, {210, 8}, {210, 66}, {180, 66}, {180, 50}}, color = {0, 0, 127}));
-  connect(tireFR.wheelSpeed, floorFR.spinSpeed) annotation(
-        Line(points = {{150, -50}, {150, -72}, {210, -72}, {210, -14}, {180, -14}, {180, -30}}, color = {0, 0, 127}));
-  connect(world.frame_b, freeMotion.frame_a) annotation(
+      connect(world.frame_b, freeMotion.frame_a) annotation(
         Line(points = {{-32, 80}, {-18, 80}, {-18, 44}, {-14, 44}}, color = {95, 95, 95}));
-  connect(world.frame_b, terrainViz.frame_a) annotation(
+      connect(world.frame_b, terrainViz.frame_a) annotation(
         Line(points = {{-32, 80}, {-60, 80}, {-60, 60}, {-78, 60}}, color = {95, 95, 95}));
-  connect(freeMotion.frame_b, chassis.frame_a) annotation(
+      connect(freeMotion.frame_b, chassis.frame_a) annotation(
         Line(points = {{6, 44}, {12, 44}, {12, 20}, {-20, 20}, {-20, 0}, {-10, 0}}, color = {95, 95, 95}));
-  connect(solidAxle.i, speed.y) annotation(
+      connect(solidAxle.i, speed.y) annotation(
         Line(points = {{-142, -2}, {-102, -2}}, color = {0, 0, 127}));
-  connect(steer.y, steerAct.phi_ref) annotation(
+      connect(steer.y, steerAct.phi_ref) annotation(
         Line(points = {{61, 0}, {75, 0}, {75, 10}, {90, 10}}, color = {0, 0, 127}));
-  connect(steer.y, steerAct1.phi_ref) annotation(
+      connect(steer.y, steerAct1.phi_ref) annotation(
         Line(points = {{61, 0}, {76, 0}, {76, -12}, {90, -12}}, color = {0, 0, 127}));
-  connect(doubleWishboneRL.chassisMount, mountRL.frame_b) annotation(
+      connect(doubleWishboneRL.chassisMount, mountRL.frame_b) annotation(
         Line(points = {{-100, 40}, {-80, 40}}, color = {95, 95, 95}));
-  connect(mountRL.frame_a, chassis.frame_a) annotation(
+      connect(mountRL.frame_a, chassis.frame_a) annotation(
         Line(points = {{-60, 40}, {-26, 40}, {-26, 0}, {-10, 0}}, color = {95, 95, 95}));
-  connect(doubleWishboneRR.chassisMount, mountRR.frame_b) annotation(
+      connect(doubleWishboneRR.chassisMount, mountRR.frame_b) annotation(
         Line(points = {{-100, -40}, {-80, -40}}, color = {95, 95, 95}));
-  connect(mountRR.frame_a, chassis.frame_a) annotation(
+      connect(mountRR.frame_a, chassis.frame_a) annotation(
         Line(points = {{-60, -40}, {-26, -40}, {-26, 0}, {-10, 0}}, color = {95, 95, 95}));
-  connect(steerAct1.flange, doubleWishboneFR.steerInput) annotation(
+      connect(steerAct1.flange, doubleWishboneFR.steerInput) annotation(
         Line(points = {{112, -12}, {124, -12}, {124, -26}, {110, -26}, {110, -30}}));
-  connect(steerAct.flange, doubleWishboneFL.steerInput) annotation(
+      connect(steerAct.flange, doubleWishboneFL.steerInput) annotation(
         Line(points = {{112, 10}, {128, 10}, {128, 60}, {110, 60}, {110, 50}}));
+  connect(floor.wheelContactFL, ttireFL.wheelSupport) annotation(
+        Line(points = {{8, -80}, {190, -80}, {190, 40}, {160, 40}}, color = {95, 95, 95}));
+  connect(floor.wheelContactFR, tireFR.wheelSupport) annotation(
+        Line(points = {{8, -84}, {172, -84}, {172, -40}, {160, -40}}, color = {95, 95, 95}));
+  connect(floor.wheelContactRL, tireRL.wheelSupport) annotation(
+        Line(points = {{8, -88}, {26, -88}, {26, -116}, {-202, -116}, {-202, 40}, {-160, 40}}, color = {95, 95, 95}));
+  connect(floor.wheelContactRR, tireRR.wheelSupport) annotation(
+        Line(points = {{8, -92}, {16, -92}, {16, -106}, {-188, -106}, {-188, -40}, {-160, -40}}, color = {95, 95, 95}));
     end CarExample;
   end Examples;
   annotation(
