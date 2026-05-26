@@ -22,7 +22,10 @@ package DDynamics
         Line(points = {{38, 0}, {62, 0}}, color = {95, 95, 95}));
   connect(tireVisualizer.frame_a, wheelFL.frame_a) annotation(
         Line(points = {{86, 46}, {62, 46}, {62, 0}}, color = {95, 95, 95}));
-    end Tire;
+    annotation(
+        Diagram(graphics),
+        Icon(graphics = {Ellipse(origin = {-1, -4}, fillPattern = FillPattern.Solid, extent = {{-97, 94}, {97, -94}}), Ellipse(origin = {-1, -3}, fillColor = {255, 255, 255}, fillPattern = FillPattern.Solid, extent = {{-77, 73}, {77, -73}})}));
+end Tire;
 
     model DrivingTire
       parameter Real R_wheel = 0.25 "Tire radius (m)";
@@ -33,7 +36,7 @@ package DDynamics
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a wheelSupport annotation(
         Placement(transformation(origin = {100, -2}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
       Modelica.Mechanics.Rotational.Interfaces.Flange_a spinInput annotation(
-        Placement(transformation(origin = {32, 100}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {32, 100}, extent = {{-10, -10}, {10, 10}})));
+        Placement(transformation(origin = {32, 100}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {0, 102}, extent = {{-10, -10}, {10, 10}})));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a suspMount annotation(
         Placement(transformation(origin = {-102, -2}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-102, 2}, extent = {{-16, -16}, {16, 16}})));
       TireVisualizer tireVisualizer(rTire = R_wheel) annotation(
@@ -49,7 +52,10 @@ package DDynamics
         Line(points = {{-102, -2}, {22, -2}}));
   connect(tireVisualizer.frame_a, wheelFL.frame_a) annotation(
         Line(points = {{88, 56}, {62, 56}, {62, -2}}, color = {95, 95, 95}));
-    end DrivingTire;
+    annotation(
+        Icon(graphics = {Ellipse(origin = {-1, -4}, fillPattern = FillPattern.Solid, extent = {{-97, 94}, {97, -94}}), Ellipse(origin = {-1, -3}, fillColor = {255, 255, 255}, fillPattern = FillPattern.Solid, extent = {{-77, 73}, {77, -73}}), Rectangle(origin = {0, 46}, extent = {{-8, 54}, {8, -54}})}),
+  Diagram(graphics));
+end DrivingTire;
 
     
     
@@ -173,7 +179,9 @@ partial model Differential
         Line(points = {{0, 108}, {0, 0}, {-40, 0}}, color = {0, 0, 127}));
       connect(i, right.w_ref) annotation(
         Line(points = {{0, 108}, {0, 0}, {38, 0}}, color = {0, 0, 127}));
-    end SolidAxle;
+    annotation(
+        Icon(graphics = {Rectangle(lineColor = {134, 159, 156}, fillColor = {185, 192, 194}, fillPattern = FillPattern.Solid, extent = {{-100, 20}, {100, -20}}), Rectangle(origin = {0, 40}, fillPattern = FillPattern.Solid, extent = {{-20, 60}, {20, -60}})}));
+end SolidAxle;
   end Differentials;
 
   package Suspension
@@ -403,16 +411,16 @@ partial model Differential
       parameter Real R_wheel   = 0.3    "Wheel radius (m)";
       MultiBody.Interfaces.Frame_b wheelContactFL annotation(
         Placement(transformation(origin = {100, 60}, extent = {{-16, -16}, {16, 16}}),
-        iconTransformation(origin = {100, 60}, extent = {{-16, -16}, {16, 16}})));
+        iconTransformation(origin = {60, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
       MultiBody.Interfaces.Frame_b wheelContactFR annotation(
         Placement(transformation(origin = {100, 20}, extent = {{-16, -16}, {16, 16}}),
-        iconTransformation(origin = {100, 20}, extent = {{-16, -16}, {16, 16}})));
+        iconTransformation(origin = {60, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
       MultiBody.Interfaces.Frame_b wheelContactRL annotation(
         Placement(transformation(origin = {100, -20}, extent = {{-16, -16}, {16, 16}}),
-        iconTransformation(origin = {100, -20}, extent = {{-16, -16}, {16, 16}})));
+        iconTransformation(origin = {-60, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
       MultiBody.Interfaces.Frame_b wheelContactRR annotation(
         Placement(transformation(origin = {100, -60}, extent = {{-16, -16}, {16, 16}}),
-        iconTransformation(origin = {100, -60}, extent = {{-16, -16}, {16, 16}})));
+        iconTransformation(origin = {-60, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
       Floor floorFL(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, R_wheel = R_wheel) annotation(
         Placement(transformation(origin = {0, 60}, extent = {{-10, -10}, {10, 10}})));
       Floor floorFR(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, R_wheel = R_wheel) annotation(
@@ -426,19 +434,25 @@ partial model Differential
       connect(floorFR.wheelContact, wheelContactFR);
       connect(floorRL.wheelContact, wheelContactRL);
       connect(floorRR.wheelContact, wheelContactRR);
-    end Floor4Corners;
+    annotation(
+        Icon(graphics = {Rectangle(origin = {0, -1}, fillColor = {126, 126, 126}, fillPattern = FillPattern.Solid, extent = {{-100, 51}, {100, -51}}), Rectangle(origin = {-61, -1}, lineColor = {255, 238, 56}, fillColor = {254, 238, 19}, fillPattern = FillPattern.Solid, extent = {{-21, 7}, {21, -7}}), Rectangle(origin = {-3, -1}, lineColor = {255, 238, 56}, fillColor = {254, 238, 19}, fillPattern = FillPattern.Solid, extent = {{-21, 7}, {21, -7}}), Rectangle(origin = {57, -1}, lineColor = {255, 238, 56}, fillColor = {254, 238, 19}, fillPattern = FillPattern.Solid, extent = {{-21, 7}, {21, -7}})}),
+  Diagram(graphics));
+end Floor4Corners;
   end Floors;
 
   package Terrains
     block TerrainMap "Calculates ground height based on X,Y position"
-      function getZ
+  function getZ
         input Real x;
         input Real y;
         output Real z;
-      algorithm // Example: A 3D wave or a ramp
+      algorithm
+// Example: A 3D wave or a ramp
 //z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
         z := 1;
       end getZ;
+      annotation(
+        Icon(graphics = {Rectangle(origin = {0, -40}, fillColor = {163, 141, 98}, fillPattern = FillPattern.Solid, extent = {{-100, 60}, {100, -60}}), Line(origin = {-1.29108, 33.677}, points = {{-98.7089, -13.677}, {-78.7089, 16.323}, {-68.7089, 6.323}, {-58.7089, 16.323}, {-48.7089, 6.323}, {-38.7089, 16.323}, {-28.7089, 6.323}, {-18.7089, 16.323}, {-6.70892, 6.323}, {1.29108, 16.323}, {11.2911, 6.323}, {21.2911, 16.323}, {33.2911, 6.323}, {41.2911, 14.323}, {51.2911, 6.323}, {61.2911, 16.323}, {71.2911, 6.323}, {81.2911, 16.323}, {101.291, -13.677}, {-98.7089, -13.677}, {-100.709, -15.677}})}));
 
     end TerrainMap;
 
@@ -486,7 +500,9 @@ partial model Differential
     equation
       frame_a.f = zeros(3);
       frame_a.t = zeros(3);
-    end TerrainVisualizer;
+    annotation(
+        Icon(graphics = {Rectangle(lineColor = {75, 197, 22},fillColor = {30, 165, 9}, fillPattern = FillPattern.Solid, extent = {{-100, 80}, {100, -80}})}));
+end TerrainVisualizer;
 
   end Terrains;
 
@@ -547,9 +563,9 @@ partial model Differential
   model CarExample
     parameter Real R_wheel = 0.25 "Tire radius (m) — propagated to all tires and floor contact";
     inner Terrains.TerrainMap terrainMap annotation(
-        Placement(transformation(origin = {-88, 78}, extent = {{-10, -10}, {10, 10}})));
+        Placement(transformation(origin = {-88, 88}, extent = {{-10, -10}, {10, 10}})));
   Terrains.TerrainVisualizer terrainViz annotation(
-        Placement(transformation(origin = {-88, 60}, extent = {{-10, -10}, {10, 10}})));
+        Placement(transformation(origin = {-88, 60}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
   Modelica.Mechanics.MultiBody.Parts.Body chassis(m = 400)  annotation(
         Placement(transformation(extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFL(r = {1.5, -0.25, 0.9})  annotation(
