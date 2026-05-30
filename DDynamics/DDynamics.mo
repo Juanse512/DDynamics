@@ -447,8 +447,7 @@ end Floor4Corners;
         input Real y;
         output Real z;
       algorithm
-// Example: A 3D wave or a ramp
-//z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
+        //z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
         z := 1;
       end getZ;
       annotation(
@@ -559,6 +558,37 @@ end TerrainVisualizer;
   
   end Interfaces;
 
+  package Chassis
+    partial model BaseChassis
+      import MultiBody = Modelica.Mechanics.MultiBody;
+      parameter Real m = 400 "Total mass [kg]";
+      MultiBody.Interfaces.Frame_a frame_a annotation(
+        Placement(transformation(extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));annotation(
+        Icon(graphics = {Rectangle(origin = {0, 80}, extent = {{-50, 20}, {50, -20}}), Rectangle(extent = {{-60, 60}, {60, -60}}), Rectangle(origin = {0, -80}, extent = {{-50, 20}, {50, -20}})}));
+    end BaseChassis;
+
+    model RectangularChassis
+      extends BaseChassis;
+      parameter Real length = 3.0 "Longitudinal (X) extent [m]";
+      parameter Real width = 1.8 "Lateral (Z) extent [m]";
+      parameter Real height = 0.3 "Vertical (Y) extent [m]";
+    protected
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRear(r = {-length/2, 0, 0});
+      Modelica.Mechanics.MultiBody.Parts.BodyBox box(
+        r = {length, 0, 0},
+        widthDirection = {0, 0, 1},
+        width = width,
+        height = height,
+        density = m / (length * width * height)
+      );
+    equation
+      connect(frame_a, toRear.frame_a);
+      connect(toRear.frame_b, box.frame_a);
+    annotation(
+        Icon(graphics = {Rectangle(lineColor = {85, 255, 255}, extent = {{-80, 100}, {80, -100}})}));
+end RectangularChassis;
+  end Chassis;
+
   package Examples
     model CarExample
       parameter Real R_wheel = 0.25 "Tire radius (m) — propagated to all tires and floor contact";
@@ -566,7 +596,7 @@ end TerrainVisualizer;
         Placement(transformation(origin = {-88, 88}, extent = {{-10, -10}, {10, 10}})));
       Terrains.TerrainVisualizer terrainViz annotation(
         Placement(transformation(origin = {-88, 60}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
-      Modelica.Mechanics.MultiBody.Parts.Body chassis(m = 400) annotation(
+      Chassis.RectangularChassis chassis(m = 400, length = 3.0, width = 1.8, height = 0.5) annotation(
         Placement(transformation(extent = {{-10, -10}, {10, 10}})));
       Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFL(r = {1.5, -0.25, 0.9}) annotation(
         Placement(transformation(origin = {50, 40}, extent = {{-10, -10}, {10, 10}})));
@@ -665,7 +695,7 @@ end TerrainVisualizer;
 
     model CarInterface
       parameter Real R_wheel = 0.25 "Tire radius (m) — propagated to all tires and floor contact";
-      Modelica.Mechanics.MultiBody.Parts.Body chassis(m = 400) annotation(
+      Chassis.RectangularChassis chassis(m = 400, length = 3.0, width = 1.8, height = 0.5) annotation(
         Placement(transformation(extent = {{-10, -10}, {10, 10}})));
       Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFL(r = {1.5, -0.25, 0.9}) annotation(
         Placement(transformation(origin = {50, 40}, extent = {{-10, -10}, {10, 10}})));
@@ -715,10 +745,6 @@ end TerrainVisualizer;
         Placement(transformation(origin = {-80, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {-97, -1}, extent = {{-13, -13}, {13, 13}})));
       outer Modelica.Mechanics.MultiBody.World world;
     equation
-      connect(mountFL.frame_a, chassis.frame_a) annotation(
-        Line(points = {{40, 40}, {20, 40}, {20, 0}, {-10, 0}}, color = {95, 95, 95}));
-      connect(mountFR.frame_a, chassis.frame_a) annotation(
-        Line(points = {{40, -40}, {20, -40}, {20, 0}, {-10, 0}}, color = {95, 95, 95}));
       connect(mountFL.frame_b, doubleWishboneFL.chassisMount) annotation(
         Line(points = {{60, 40}, {100, 40}}, color = {95, 95, 95}));
       connect(mountFR.frame_b, doubleWishboneFR.chassisMount) annotation(
@@ -735,16 +761,10 @@ end TerrainVisualizer;
         Line(points = {{-152, -12}, {-152, -22}, {-174, -22}, {-174, -58}, {-154, -58}, {-154, -50}}));
       connect(solidAxle.left_out, tireRL.spinInput) annotation(
         Line(points = {{-152, 8}, {-152, 19}, {-154, 19}, {-154, 30}}));
-      connect(freeMotion.frame_b, chassis.frame_a) annotation(
-        Line(points = {{6, 44}, {12, 44}, {12, 20}, {-20, 20}, {-20, 0}, {-10, 0}}, color = {95, 95, 95}));
       connect(doubleWishboneRL.chassisMount, mountRL.frame_b) annotation(
         Line(points = {{-100, 40}, {-80, 40}}, color = {95, 95, 95}));
-      connect(mountRL.frame_a, chassis.frame_a) annotation(
-        Line(points = {{-60, 40}, {-26, 40}, {-26, 0}, {-10, 0}}, color = {95, 95, 95}));
       connect(doubleWishboneRR.chassisMount, mountRR.frame_b) annotation(
         Line(points = {{-100, -40}, {-80, -40}}, color = {95, 95, 95}));
-      connect(mountRR.frame_a, chassis.frame_a) annotation(
-        Line(points = {{-60, -40}, {-26, -40}, {-26, 0}, {-10, 0}}, color = {95, 95, 95}));
       connect(steerAct1.flange, doubleWishboneFR.steerInput) annotation(
         Line(points = {{112, -12}, {124, -12}, {124, -26}, {110, -26}, {110, -30}}));
       connect(steerAct.flange, doubleWishboneFL.steerInput) annotation(
@@ -757,8 +777,6 @@ end TerrainVisualizer;
         Line(points = {{-160, 40}, {-180, 40}, {-180, 80}, {-150, 80}, {-150, 100}}, color = {95, 95, 95}));
       connect(tireRR.wheelSupport, frame_RR) annotation(
         Line(points = {{-160, -40}, {-202, -40}, {-202, -100}, {-150, -100}}, color = {95, 95, 95}));
-      connect(chassis.frame_a, chassis_pos) annotation(
-        Line(points = {{-10, 0}, {-2, 0}, {-2, -102}}, color = {95, 95, 95}));
       connect(steerInput, steerAct.phi_ref) annotation(
         Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, 10}, {90, 10}}, color = {0, 0, 127}));
       connect(steerInput, steerAct1.phi_ref) annotation(
@@ -767,6 +785,18 @@ end TerrainVisualizer;
         Line(points = {{-80, 110}, {-80, -2}, {-142, -2}}, color = {0, 0, 127}));
   connect(world.frame_b, freeMotion.frame_a) annotation(
         Line(points = {{-20, 100}, {-20, 44}, {-14, 44}}));
+  connect(chassis_pos, chassis.frame_a) annotation(
+        Line(points = {{-2, -102}, {0, -102}, {0, -10}}));
+  connect(mountRL.frame_a, chassis.frame_a) annotation(
+        Line(points = {{-60, 40}, {-26, 40}, {-26, -10}, {0, -10}}, color = {95, 95, 95}));
+  connect(mountRR.frame_a, chassis.frame_a) annotation(
+        Line(points = {{-60, -40}, {0, -40}, {0, -10}}, color = {95, 95, 95}));
+  connect(mountFR.frame_a, chassis.frame_a) annotation(
+        Line(points = {{40, -40}, {0, -40}, {0, -10}}, color = {95, 95, 95}));
+  connect(mountFL.frame_a, chassis.frame_a) annotation(
+        Line(points = {{40, 40}, {20, 40}, {20, -10}, {0, -10}}, color = {95, 95, 95}));
+  connect(freeMotion.frame_b, chassis.frame_a) annotation(
+        Line(points = {{6, 44}, {16, 44}, {16, -10}, {0, -10}}, color = {95, 95, 95}));
       annotation(
         Icon(graphics = {Line(points = {{-80, 60}, {-80, -60}, {80, -60}, {80, 60}, {-80, 60}, {-80, 60}}), Line(origin = {-2, 0}, points = {{-58, 40}, {-58, -40}, {62, -40}, {62, 40}, {-58, 40}, {-58, 40}, {-58, 40}}), Line(origin = {-0.193375, 0.27735}, points = {{-59.8066, 39.7226}, {-29.8066, 19.7226}, {-29.8066, -20.2774}, {-59.8066, -40.2774}, {-29.8066, -20.2774}, {40.1934, -20.2774}, {40.1934, 19.7226}, {-29.8066, 19.7226}, {40.1934, 19.7226}, {60.1934, 39.7226}, {40.1934, 19.7226}, {40.1934, -20.2774}, {60.1934, -40.2774}, {60.1934, -38.2774}})}));
 end CarInterface;
@@ -781,7 +811,7 @@ end CarInterface;
         Placement(transformation(origin = {98, 0}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.Constant speed(k = 5) annotation(
         Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Blocks.Sources.Constant steer(k = 0.5)  annotation(
+  Modelica.Blocks.Sources.Constant steer(k = 0.2)  annotation(
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
   DDynamics.Terrains.TerrainVisualizer terrainViz annotation(
         Placement(transformation(origin = {-106, -88}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
