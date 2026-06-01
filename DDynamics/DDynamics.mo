@@ -447,7 +447,7 @@ end Floor4Corners;
         input Real y;
         output Real z;
       algorithm
-        //z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
+//z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
         z := 1;
       end getZ;
       annotation(
@@ -805,35 +805,63 @@ end CarInterface;
   parameter Real R_wheel = 0.25 "Tire radius (m) — propagated to tires and floor contact";
   CarInterface car(R_wheel = R_wheel) annotation(
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
-  inner Terrains.TerrainMap terrain annotation(
-        Placement(transformation(origin = {-68, 70}, extent = {{-10, -10}, {10, 10}})));
-  Floors.Floor4Corners floor4Corners(R_wheel = R_wheel) annotation(
-        Placement(transformation(origin = {98, 0}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.Constant speed(k = 5) annotation(
         Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.Constant steer(k = 0.2)  annotation(
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
-  DDynamics.Terrains.TerrainVisualizer terrainViz annotation(
-        Placement(transformation(origin = {-106, -88}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
-  inner Modelica.Mechanics.MultiBody.World world annotation(
-        Placement(transformation(origin = {-70, -54}, extent = {{-10, -10}, {10, 10}})));
+  Roads.Road road(R_wheel = R_wheel) annotation(
+        Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
     equation
-      connect(floor4Corners.wheelContactRL, car.frame_RL) annotation(
-        Line(points = {{92, 10}, {92, 72}, {-24, 72}, {-24, 28}, {-22, 28}}, color = {95, 95, 95}));
-      connect(floor4Corners.wheelContactFL, car.frame_FL) annotation(
-        Line(points = {{104, 10}, {106, 10}, {106, 46}, {16, 46}, {16, 28}}, color = {95, 95, 95}));
-      connect(floor4Corners.wheelContactRR, car.frame_RR) annotation(
-        Line(points = {{92, -10}, {92, -68}, {-22, -68}, {-22, -28}}, color = {95, 95, 95}));
-      connect(floor4Corners.wheelContactFR, car.frame_FR) annotation(
-        Line(points = {{104, -10}, {104, -54}, {16, -54}, {16, -28}}, color = {95, 95, 95}));
       connect(speed.y, car.speedInput) annotation(
         Line(points = {{-60, 0}, {-28, 0}}, color = {0, 0, 127}));
       connect(steer.y, car.steerInput) annotation(
         Line(points = {{52, 0}, {28, 0}}, color = {0, 0, 127}));
-      connect(world.frame_b, terrainViz.frame_a) annotation(
-        Line(points = {{-60, -54}, {-73, -54}, {-73, -88}, {-96, -88}}, color = {95, 95, 95}));
+  connect(road.FL, car.frame_FL) annotation(
+        Line(points = {{66, 70}, {66, 86}, {16, 86}, {16, 28}}, color = {95, 95, 95}));
+  connect(road.RL, car.frame_RL) annotation(
+        Line(points = {{54, 70}, {54, 80}, {-22, 80}, {-22, 28}}, color = {95, 95, 95}));
+  connect(road.FR, car.frame_FR) annotation(
+        Line(points = {{66, 50}, {80, 50}, {80, -50}, {16, -50}, {16, -28}}, color = {95, 95, 95}));
+  connect(road.RR, car.frame_RR) annotation(
+        Line(points = {{54, 50}, {54, 26}, {76, 26}, {76, -44}, {-22, -44}, {-22, -28}}, color = {95, 95, 95}));
     end Car;
   end Examples;
+
+  package Roads
+  model Road
+  inner DDynamics.Terrains.TerrainMap terrain annotation(
+        Placement(transformation(origin = {-58, 34}, extent = {{-10, -10}, {10, 10}})));
+  parameter Real R_wheel;
+  DDynamics.Floors.Floor4Corners floor4Corners(R_wheel = R_wheel) annotation(
+        Placement(transformation(extent = {{-10, -10}, {10, 10}})));
+  DDynamics.Terrains.TerrainVisualizer terrainViz annotation(
+        Placement(transformation(origin = {-36, -74}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+  inner Modelica.Mechanics.MultiBody.World world annotation(
+        Placement(transformation(origin = {0, -40}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Mechanics.MultiBody.Interfaces.Frame_a FL annotation(
+        Placement(transformation(origin = {70, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {62, 98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+  Modelica.Mechanics.MultiBody.Interfaces.Frame_a FR annotation(
+        Placement(transformation(origin = {70, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {60, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+  Modelica.Mechanics.MultiBody.Interfaces.Frame_a RL annotation(
+        Placement(transformation(origin = {-70, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {-60, 98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+  Modelica.Mechanics.MultiBody.Interfaces.Frame_a RR annotation(
+        Placement(transformation(origin = {-70, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {-60, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+    equation
+      connect(world.frame_b, terrainViz.frame_a) annotation(
+        Line(points = {{10, -40}, {-3, -40}, {-3, -74}, {-26, -74}}, color = {95, 95, 95}));
+  connect(RL, floor4Corners.wheelContactRL) annotation(
+        Line(points = {{-70, 100}, {-70, 20}, {-6, 20}, {-6, 10}}));
+  connect(floor4Corners.wheelContactFL, FL) annotation(
+        Line(points = {{6, 10}, {6, 20}, {70, 20}, {70, 100}}, color = {95, 95, 95}));
+  connect(floor4Corners.wheelContactRR, RR) annotation(
+        Line(points = {{-6, -10}, {-6, -20}, {-70, -20}, {-70, -100}}, color = {95, 95, 95}));
+  connect(floor4Corners.wheelContactFR, FR) annotation(
+        Line(points = {{6, -10}, {6, -20}, {70, -20}, {70, -100}}, color = {95, 95, 95}));
+    annotation(
+        Icon(graphics = {Polygon(fillPattern = FillPattern.Solid, points = {{-80, 80}, {-80, -80}, {80, -80}, {80, -20}, {48, -12}, {80, 20}, {80, 80}, {4, 80}, {4, 80}, {-80, 80}}), Polygon(fillColor = {76, 157, 0}, fillPattern = FillPattern.Solid, points = {{-60, 60}, {-60, -60}, {60, -60}, {60, -40}, {12, -20}, {42, 20}, {60, 60}, {4, 60}, {0, 60}, {-60, 60}}), Rectangle(origin = {-69, 48}, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-69, 18}, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-69, -12}, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-69, -40}, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-69, -66}, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-43, -70}, rotation = -90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-17, -70}, rotation = -90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {9, -70}, rotation = -90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {35, -70}, rotation = -90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {61, -70}, rotation = -90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {71, -48}, rotation = 180, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {55, -26}, rotation = 90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {37, -12}, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {53, 12}, rotation = -90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {69, 38}, rotation = 180, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {69, 66}, rotation = 180, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {45, 70}, rotation = 90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {19, 70}, rotation = 90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-7, 70}, rotation = 90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-33, 70}, rotation = 90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-59, 70}, rotation = 90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}})}),
+  Diagram(graphics));
+end Road;
+  end Roads;
   annotation(
     uses(Modelica(version = "4.1.0"), Modelica_DeviceDrivers(version = "2.2.0")));
 end DDynamics;
