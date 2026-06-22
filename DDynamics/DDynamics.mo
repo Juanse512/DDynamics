@@ -11,6 +11,8 @@ package DDynamics
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Roads.Road road annotation(
         Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Blocks.Sources.Step brake_input(height = 1, startTime = 3)  annotation(
+        Placement(transformation(origin = {-68, 58}, extent = {{-10, -10}, {10, 10}})));
     equation
       connect(speed.y, car.speedInput) annotation(
         Line(points = {{-60, 0}, {-28, 0}}, color = {0, 0, 127}));
@@ -24,7 +26,74 @@ package DDynamics
         Line(points = {{66, 50}, {80, 50}, {80, -50}, {16, -50}, {16, -28}}, color = {95, 95, 95}));
       connect(road.RR, car.frame_RR) annotation(
         Line(points = {{54, 50}, {54, 26}, {76, 26}, {76, -44}, {-22, -44}, {-22, -28}}, color = {95, 95, 95}));
+      connect(brake_input.y, car.brakeInput) annotation(
+        Line(points = {{-56, 58}, {0, 58}, {0, 28}}, color = {0, 0, 127}));
+      annotation(
+        Documentation(info = "<html>
+<body>
+<h4>CarExample</h4>
+<p>Top-level simulation entry point. Instantiates a <code>Car</code> and a <code>Road</code>, drives them with constant speed and steering signals. The example drives a car at 5 m/s with 0.2 rad of steering on a flat terrain at y = 1 m.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Instance</th><th>Type</th><th>Value</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>R_wheel</code></td><td><code>inner parameter Real</code></td><td>0.25 m</td><td>Tire radius &mdash; propagated to all sub-models via <code>outer</code></td></tr>
+<tr><td><code>car</code></td><td><code>Cars.Car</code></td><td>&mdash;</td><td>The vehicle</td></tr>
+<tr><td><code>road</code></td><td><code>Roads.Road</code></td><td>&mdash;</td><td>The road environment (owns World and terrain)</td></tr>
+<tr><td><code>speed</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 5</td><td>Wheel angular velocity setpoint (rad/s)</td></tr>
+<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.2</td><td>Front wheel steer angle (rad)</td></tr>
+</tbody>
+</table>
+<p><b>Connections:</b> speed.y &rarr; car.speedInput &bull; steer.y &rarr; car.steerInput &bull; road.FL/FR/RL/RR &harr; car.frame_FL/FR/RL/RR</p>
+</body>
+</html>"));
     end CarExample;
+
+    model CivicEKExample
+      inner parameter Real R_wheel = 0.30 "Tire radius (m) — 185/65R14, propagated to tires and floor contact";
+      Cars.CivicEKCar car annotation(
+        Placement(transformation(extent = {{-28, -28}, {28, 28}})));
+      Modelica.Blocks.Sources.Constant speed(k = 10) annotation(
+        Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Blocks.Sources.Constant steer(k = 0.1) annotation(
+        Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Roads.Road road annotation(
+        Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Blocks.Sources.Step brake_input(height = 1, startTime = 5) annotation(
+        Placement(transformation(origin = {-68, 58}, extent = {{-10, -10}, {10, 10}})));
+    equation
+      connect(speed.y, car.speedInput) annotation(
+        Line(points = {{-60, 0}, {-28, 0}}, color = {0, 0, 127}));
+      connect(steer.y, car.steerInput) annotation(
+        Line(points = {{52, 0}, {28, 0}}, color = {0, 0, 127}));
+      connect(road.FL, car.frame_FL) annotation(
+        Line(points = {{66, 70}, {66, 86}, {16, 86}, {16, 28}}, color = {95, 95, 95}));
+      connect(road.RL, car.frame_RL) annotation(
+        Line(points = {{54, 70}, {54, 80}, {-22, 80}, {-22, 28}}, color = {95, 95, 95}));
+      connect(road.FR, car.frame_FR) annotation(
+        Line(points = {{66, 50}, {80, 50}, {80, -50}, {16, -50}, {16, -28}}, color = {95, 95, 95}));
+      connect(road.RR, car.frame_RR) annotation(
+        Line(points = {{54, 50}, {54, 26}, {76, 26}, {76, -44}, {-22, -44}, {-22, -28}}, color = {95, 95, 95}));
+      connect(brake_input.y, car.brakeInput) annotation(
+        Line(points = {{-56, 58}, {0, 58}, {0, 28}}, color = {0, 0, 127}));
+      annotation(
+        Documentation(info = "<html>
+<body>
+<h4>CivicEKExample</h4>
+<p>Top-level simulation for the Honda Civic EK hatchback. Front-wheel drive, 1130 kg, 185/65R14 tires (R = 0.30 m). Drives at 5 rad/s with 0.1 rad of steering on a flat terrain. Brakes engage at t = 5 s.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Instance</th><th>Type</th><th>Value</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>R_wheel</code></td><td><code>inner parameter Real</code></td><td>0.30 m</td><td>Tire radius &mdash; 185/65R14</td></tr>
+<tr><td><code>car</code></td><td><code>Cars.CivicEKCar</code></td><td>&mdash;</td><td>The Civic EK vehicle</td></tr>
+<tr><td><code>road</code></td><td><code>Roads.Road</code></td><td>&mdash;</td><td>The road environment</td></tr>
+<tr><td><code>speed</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 5</td><td>Front wheel angular velocity setpoint (rad/s)</td></tr>
+<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.1</td><td>Front wheel steer angle (rad)</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
+    end CivicEKExample;
+
   end Examples;
 
   package Interfaces
@@ -44,6 +113,22 @@ package DDynamics
       frame_a.r_0[3] = z_out;
       frame_a.f = {0, 0, 0};
       frame_a.t = {0, 0, 0};
+      annotation(
+        Documentation(info = "<html>
+<body>
+<h4>FrameToReal</h4>
+<p>Reads the world-frame position of a multibody <code>Frame_a</code> and exposes it as three <code>RealOutput</code> signals. Sets zero force and torque (sensor only, no mechanical effect).</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Direction</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>frame_a</code></td><td>Frame_a</td><td>in</td><td>MultiBody frame to read position from</td></tr>
+<tr><td><code>x_out</code></td><td>RealOutput</td><td>out</td><td>X position (m)</td></tr>
+<tr><td><code>y_out</code></td><td>RealOutput</td><td>out</td><td>Y position (m)</td></tr>
+<tr><td><code>z_out</code></td><td>RealOutput</td><td>out</td><td>Z position (m)</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
     end FrameToReal;
 
     model FrameToUDP
@@ -81,6 +166,29 @@ package DDynamics
         Line(points = {{46, -68}, {46, -82}, {62, -82}, {62, -62}, {72, -62}}));
   connect(frameToReal.z_out, addFloat11.u[1]) annotation(
         Line(points = {{-18, -22}, {16, -22}, {16, -58}, {34, -58}}, color = {0, 0, 127}));
+      annotation(
+        Documentation(info = "<html>
+<body>
+<h4>FrameToUDP</h4>
+<p>Sends the X, Y, and Z world-frame position of a <code>Frame_a</code> over UDP using <code>Modelica_DeviceDrivers</code>. Internally chains <code>FrameToReal &rarr; SerialPackager &rarr; AddFloat &times; 3 &rarr; UDPSend</code>.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>frame_a</code></td><td>Frame_a</td><td>Frame whose position is transmitted</td></tr>
+</tbody>
+</table>
+<p><b>Packet format</b> &mdash; 12 bytes, sent to UDP port 12345 at 100 Hz (sample time 0.01 s):</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Bytes</th><th>Type</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>0&ndash;3</td><td>float (32-bit IEEE 754, little-endian)</td><td>X position (m)</td></tr>
+<tr><td>4&ndash;7</td><td>float (32-bit IEEE 754, little-endian)</td><td>Y position (m)</td></tr>
+<tr><td>8&ndash;11</td><td>float (32-bit IEEE 754, little-endian)</td><td>Z position (m)</td></tr>
+</tbody>
+</table>
+<p><code>RealtimeSynchronize</code> locks simulation time to wall-clock time, so the 100 Hz sample rate corresponds to real seconds on the receiving end.</p>
+</body>
+</html>"));
     end FrameToUDP;
 
   end Interfaces;
@@ -117,7 +225,30 @@ package DDynamics
         Line(points = {{6, -10}, {6, -20}, {70, -20}, {70, -100}}, color = {95, 95, 95}));
       annotation(
         Icon(graphics = {Polygon(fillPattern = FillPattern.Solid, points = {{-80, 80}, {-80, -80}, {80, -80}, {80, -20}, {48, -12}, {80, 20}, {80, 80}, {4, 80}, {4, 80}, {-80, 80}}), Polygon(fillColor = {76, 157, 0}, fillPattern = FillPattern.Solid, points = {{-60, 60}, {-60, -60}, {60, -60}, {60, -40}, {12, -20}, {42, 20}, {60, 60}, {4, 60}, {0, 60}, {-60, 60}}), Rectangle(origin = {-69, 48}, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-69, 18}, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-69, -12}, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-69, -40}, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-69, -66}, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-43, -70}, rotation = -90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-17, -70}, rotation = -90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {9, -70}, rotation = -90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {35, -70}, rotation = -90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {61, -70}, rotation = -90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {71, -48}, rotation = 180, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {55, -26}, rotation = 90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {37, -12}, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {53, 12}, rotation = -90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {69, 38}, rotation = 180, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {69, 66}, rotation = 180, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {45, 70}, rotation = 90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {19, 70}, rotation = 90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-7, 70}, rotation = 90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-33, 70}, rotation = 90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}}), Rectangle(origin = {-59, 70}, rotation = 90, fillColor = {255, 221, 28}, fillPattern = FillPattern.Solid, extent = {{-3, 10}, {3, -10}})}),
-        Diagram(graphics));
+        Diagram(graphics),
+        Documentation(info = "<html>
+<body>
+<h4>Road</h4>
+<p>Self-contained road environment. Owns the Modelica <code>World</code>, the terrain height map, and the four ground-contact floor models. Exposes four <code>Frame_a</code> connectors that attach to the vehicle&apos;s wheel support frames.</p>
+<p><b>Inner objects</b> (accessible via <code>outer</code>):</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>terrain</code></td><td>DDynamics.Roads.Terrains.TerrainMap</td><td>Terrain height lookup</td></tr>
+<tr><td><code>world</code></td><td>Modelica.Mechanics.MultiBody.World</td><td>Gravity and animation root</td></tr>
+</tbody>
+</table>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>FL</code></td><td>Frame_a</td><td>Front-left wheel contact point</td></tr>
+<tr><td><code>FR</code></td><td>Frame_a</td><td>Front-right wheel contact point</td></tr>
+<tr><td><code>RL</code></td><td>Frame_a</td><td>Rear-left wheel contact point</td></tr>
+<tr><td><code>RR</code></td><td>Frame_a</td><td>Rear-right wheel contact point</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
     end Road;
 
     package Floors
@@ -155,7 +286,32 @@ package DDynamics
         connect(floorRR.wheelContact, wheelContactRR);
         annotation(
           Icon(graphics = {Rectangle(origin = {0, -1}, fillColor = {126, 126, 126}, fillPattern = FillPattern.Solid, extent = {{-100, 51}, {100, -51}}), Rectangle(origin = {-61, -1}, lineColor = {255, 238, 56}, fillColor = {254, 238, 19}, fillPattern = FillPattern.Solid, extent = {{-21, 7}, {21, -7}}), Rectangle(origin = {-3, -1}, lineColor = {255, 238, 56}, fillColor = {254, 238, 19}, fillPattern = FillPattern.Solid, extent = {{-21, 7}, {21, -7}}), Rectangle(origin = {57, -1}, lineColor = {255, 238, 56}, fillColor = {254, 238, 19}, fillPattern = FillPattern.Solid, extent = {{-21, 7}, {21, -7}})}),
-          Diagram(graphics));
+          Diagram(graphics),
+          Documentation(info = "<html>
+<body>
+<h4>Floor4Corners</h4>
+<p>Aggregates four identical <code>Floor</code> contact models (one per wheel corner) and distributes shared road parameters to all four.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>ground_c</code></td><td>1e5</td><td>Floor stiffness (N/m)</td></tr>
+<tr><td><code>ground_d</code></td><td>5000</td><td>Floor damping (N&middot;s/m)</td></tr>
+<tr><td><code>ground_mu</code></td><td>10000</td><td>Longitudinal friction coefficient (N&middot;s/m)</td></tr>
+<tr><td><code>mu_lat</code></td><td>100000</td><td>Lateral friction coefficient (N&middot;s/m)</td></tr>
+<tr><td><code>R_wheel</code></td><td>outer</td><td>Tire radius &mdash; resolved from CarExample</td></tr>
+</tbody>
+</table>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>wheelContactFL</code></td><td>Frame_b</td><td>Front-left ground contact (&rarr; tire wheelSupport)</td></tr>
+<tr><td><code>wheelContactFR</code></td><td>Frame_b</td><td>Front-right ground contact</td></tr>
+<tr><td><code>wheelContactRL</code></td><td>Frame_b</td><td>Rear-left ground contact</td></tr>
+<tr><td><code>wheelContactRR</code></td><td>Frame_b</td><td>Rear-right ground contact</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
       end Floor4Corners;
 
       package Components
@@ -180,6 +336,24 @@ package DDynamics
             noEvent(max(0, ground_c * (terrain.getZ(wheelContact.r_0[1], wheelContact.r_0[3]) + R_wheel - wheelContact.r_0[2]) - ground_d * vy)),
             0
           };
+          annotation(
+            Documentation(info = "<html>
+<body>
+<h4>GroundSpring</h4>
+<p>Applies a vertical spring-damper normal force to a wheel contact frame. Force is zero while the tire center is above the terrain surface; grows linearly once the tire penetrates.</p>
+<p><b>Force law:</b> <code>F_y = max(0, ground_c * (terrain.getZ(x, z) + R_wheel - y) - ground_d * vy)</code></p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>ground_c</code></td><td>1e5</td><td>Stiffness (N/m)</td></tr>
+<tr><td><code>ground_d</code></td><td>5000</td><td>Damping (N&middot;s/m)</td></tr>
+<tr><td><code>R_wheel</code></td><td>outer</td><td>Tire radius</td></tr>
+<tr><td><code>terrain</code></td><td>outer</td><td>Terrain height function</td></tr>
+</tbody>
+</table>
+<p><b>Connector:</b> <code>wheelContact</code> (Frame_b) &mdash; attach to tire wheel center frame.</p>
+</body>
+</html>"));
         end GroundSpring;
 
         model GroundFriction "Slip-based longitudinal and viscous lateral friction"
@@ -218,6 +392,25 @@ package DDynamics
 // Torque from applying friction at the contact patch (offset R_wheel below wheel center).
 // cross({0,-R,0}, F) gives the rolling torque that spins the free revolute on non-driven wheels.
           frictionForce.torque = cross({0, -R_wheel, 0}, frictionVec);
+          annotation(
+            Documentation(info = "<html>
+<body>
+<h4>GroundFriction</h4>
+<p>Applies longitudinal (slip-based) and lateral (viscous) friction forces at the contact patch, plus the rolling torque from applying friction below the wheel center.</p>
+<p>Heading and axle directions are computed from the wheel rotation matrix (spin-invariant: uses <code>resolve1(R, {0,0,-1})</code> and <code>cross(axle, {0,1,0})</code>).</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>ground_mu</code></td><td>10000</td><td>Longitudinal friction coefficient (N&middot;s/m)</td></tr>
+<tr><td><code>mu_lat</code></td><td>100000</td><td>Lateral friction coefficient (N&middot;s/m)</td></tr>
+<tr><td><code>R_wheel</code></td><td>outer</td><td>Tire radius</td></tr>
+<tr><td><code>terrain</code></td><td>outer</td><td>Terrain height function</td></tr>
+<tr><td><code>contactRampDepth</code></td><td>0.001 m (protected)</td><td>Penetration depth over which friction scales from 0 to full</td></tr>
+</tbody>
+</table>
+<p><b>Connector:</b> <code>wheelContact</code> (Frame_b).</p>
+</body>
+</html>"));
         end GroundFriction;
 
         model Floor "Complete wheel-ground contact. Connect tire.wheelSupport to wheelContact."
@@ -237,6 +430,15 @@ package DDynamics
         equation
           connect(gs.wheelContact, wheelContact);
           connect(gf.wheelContact, wheelContact);
+          annotation(
+            Documentation(info = "<html>
+<body>
+<h4>Floor</h4>
+<p>Composite model combining <code>GroundSpring</code> (normal force) and <code>GroundFriction</code> (friction + torque) into a single wheel-ground contact. Both sub-models share the same <code>wheelContact</code> frame.</p>
+<p><b>Parameters:</b> <code>ground_c</code>, <code>ground_d</code>, <code>ground_mu</code>, <code>mu_lat</code> plus <code>outer R_wheel</code>.</p>
+<p><b>Connector:</b> <code>wheelContact</code> (Frame_b).</p>
+</body>
+</html>"));
         end Floor;
 
       end Components;
@@ -250,11 +452,18 @@ package DDynamics
           input Real y;
           output Real z;
         algorithm
-    //  z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
+//  z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
           z := 1;
         end getZ;
         annotation(
-          Icon(graphics = {Rectangle(origin = {0, -40}, fillColor = {163, 141, 98}, fillPattern = FillPattern.Solid, extent = {{-100, 60}, {100, -60}}), Line(origin = {-1.29108, 33.677}, points = {{-98.7089, -13.677}, {-78.7089, 16.323}, {-68.7089, 6.323}, {-58.7089, 16.323}, {-48.7089, 6.323}, {-38.7089, 16.323}, {-28.7089, 6.323}, {-18.7089, 16.323}, {-6.70892, 6.323}, {1.29108, 16.323}, {11.2911, 6.323}, {21.2911, 16.323}, {33.2911, 6.323}, {41.2911, 14.323}, {51.2911, 6.323}, {61.2911, 16.323}, {71.2911, 6.323}, {81.2911, 16.323}, {101.291, -13.677}, {-98.7089, -13.677}, {-100.709, -15.677}})}));
+          Icon(graphics = {Rectangle(origin = {0, -40}, fillColor = {163, 141, 98}, fillPattern = FillPattern.Solid, extent = {{-100, 60}, {100, -60}}), Line(origin = {-1.29108, 33.677}, points = {{-98.7089, -13.677}, {-78.7089, 16.323}, {-68.7089, 6.323}, {-58.7089, 16.323}, {-48.7089, 6.323}, {-38.7089, 16.323}, {-28.7089, 6.323}, {-18.7089, 16.323}, {-6.70892, 6.323}, {1.29108, 16.323}, {11.2911, 6.323}, {21.2911, 16.323}, {33.2911, 6.323}, {41.2911, 14.323}, {51.2911, 6.323}, {61.2911, 16.323}, {71.2911, 6.323}, {81.2911, 16.323}, {101.291, -13.677}, {-98.7089, -13.677}, {-100.709, -15.677}})}),
+          Documentation(info = "<html>
+<body>
+<h4>TerrainMap (block)</h4>
+<p>Provides the <code>getZ(x, y)</code> function that returns terrain height at any world-XZ position. All ground contact models query this block via <code>outer terrain</code>.</p>
+<p>Currently returns a flat plane at <code>z = 1</code>. To implement a custom terrain, modify the <code>algorithm</code> section of <code>getZ</code> and update <code>TerrainVisualizer.groundHeight</code> and <code>terrainSurface</code> to match.</p>
+</body>
+</html>"));
       end TerrainMap;
 
       package Components
@@ -274,6 +483,22 @@ package DDynamics
 //Y[i,j] := 1;
             end for;
           end for;
+          annotation(
+            Documentation(info = "<html>
+<body>
+<h4>terrainSurface (function)</h4>
+<p>Surface characteristic function for 3D terrain visualization. Passed to <code>Modelica.Mechanics.MultiBody.Visualizers.Advanced.Surface</code>. Extends <code>partialSurfaceCharacteristic</code> with <code>multiColoredSurface = false</code>. <b>Must be kept in sync with <code>TerrainMap.getZ</code>.</b></p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>x_min</code></td><td>-10</td><td>Minimum X extent (m)</td></tr>
+<tr><td><code>x_max</code></td><td>10</td><td>Maximum X extent (m)</td></tr>
+<tr><td><code>z_min</code></td><td>-5</td><td>Minimum Z extent (m)</td></tr>
+<tr><td><code>z_max</code></td><td>5</td><td>Maximum Z extent (m)</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
         end terrainSurface;
 
         model TerrainVisualizer "Flat ground slab visualization aligned with TerrainMap height"
@@ -303,7 +528,27 @@ package DDynamics
           frame_a.f = zeros(3);
           frame_a.t = zeros(3);
           annotation(
-            Icon(graphics = {Rectangle(lineColor = {75, 197, 22},fillColor = {30, 165, 9}, fillPattern = FillPattern.Solid, extent = {{-100, 80}, {100, -80}})}));
+            Icon(graphics = {Rectangle(lineColor = {75, 197, 22},fillColor = {30, 165, 9}, fillPattern = FillPattern.Solid, extent = {{-100, 80}, {100, -80}})}),
+            Documentation(info = "<html>
+<body>
+<h4>TerrainVisualizer</h4>
+<p>Renders the ground surface as a flat colored box in the 3D animation. Extends <code>PartialVisualizer</code>. <b>Keep <code>groundHeight</code> in sync with <code>TerrainMap.getZ</code>.</b></p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>animation</code></td><td>true</td><td>Enable animation</td></tr>
+<tr><td><code>x_min</code></td><td>-10</td><td>Slab start in X (m)</td></tr>
+<tr><td><code>x_max</code></td><td>10</td><td>Slab end in X (m)</td></tr>
+<tr><td><code>z_min</code></td><td>-5</td><td>Slab start in Z (m)</td></tr>
+<tr><td><code>z_max</code></td><td>5</td><td>Slab end in Z (m)</td></tr>
+<tr><td><code>groundHeight</code></td><td>1.0</td><td>Slab Y position &mdash; must match TerrainMap.getZ</td></tr>
+<tr><td><code>color</code></td><td>{0, 160, 0}</td><td>RGB ground color</td></tr>
+<tr><td><code>specularCoefficient</code></td><td>0.1</td><td>Reflectivity</td></tr>
+</tbody>
+</table>
+<p><b>Connector:</b> <code>frame_a</code> (Frame_a, from PartialVisualizer) &mdash; connect to <code>world.frame_b</code>.</p>
+</body>
+</html>"));
         end TerrainVisualizer;
       end Components;
 
@@ -362,6 +607,16 @@ package DDynamics
         Placement(transformation(origin = {42, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {98, -2}, extent = {{-14, -14}, {14, 14}}, rotation = 180)));
       Modelica.Blocks.Interfaces.RealInput speedInput annotation(
         Placement(transformation(origin = {-80, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {-97, -1}, extent = {{-13, -13}, {13, 13}})));
+      Modelica.Blocks.Interfaces.RealInput brakeInput "Brake demand [0=released, 1=fully applied]" annotation(
+        Placement(transformation(origin = {0, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {0, 98}, extent = {{-14, -14}, {14, 14}}, rotation = -90)));
+      Parts.Brakes.DiscBrake brakeFL(maxBrakeTorque = 2000) annotation(
+        Placement(transformation(origin = {164, 64}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Brakes.DiscBrake brakeFR(maxBrakeTorque = 2000) annotation(
+        Placement(transformation(origin = {148, -16}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Brakes.DiscBrake brakeRL(maxBrakeTorque = 2000) annotation(
+        Placement(transformation(origin = {-128, 58}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Brakes.DiscBrake brakeRR(maxBrakeTorque = 2000) annotation(
+        Placement(transformation(origin = {-118, -64}, extent = {{-10, -10}, {10, 10}})));
       outer Modelica.Mechanics.MultiBody.World world;
     equation
       connect(mountFL.frame_b, doubleWishboneFL.chassisMount) annotation(
@@ -402,6 +657,22 @@ package DDynamics
         Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, -12}, {90, -12}}, color = {0, 0, 127}));
       connect(speedInput, solidAxle.i) annotation(
         Line(points = {{-80, 110}, {-80, -2}, {-142, -2}}, color = {0, 0, 127}));
+      connect(brakeFL.shaft, ttireFL.brakeFlange) annotation(
+        Line(points = {{154, 64}, {154, 52}, {150, 52}, {150, 40}}));
+      connect(brakeFR.shaft, tireFR.brakeFlange) annotation(
+        Line(points = {{138, -16}, {138, -40}, {150, -40}}));
+      connect(brakeRL.shaft, tireRL.brakeFlange) annotation(
+        Line(points = {{-138, 58}, {-168, 58}, {-168, 40}, {-150, 40}}));
+      connect(brakeRR.shaft, tireRR.brakeFlange) annotation(
+        Line(points = {{-128, -64}, {-128, -51}, {-150, -51}, {-150, -40}}));
+      connect(brakeInput, brakeFL.u) annotation(
+        Line(points = {{0, 110}, {0, 80}, {164, 80}, {164, 74}}, color = {0, 0, 127}));
+      connect(brakeInput, brakeFR.u) annotation(
+        Line(points = {{0, 110}, {0, 80}, {148, 80}, {148, -6}}, color = {0, 0, 127}));
+      connect(brakeInput, brakeRL.u) annotation(
+        Line(points = {{0, 110}, {0, 80}, {-128, 80}, {-128, 68}}, color = {0, 0, 127}));
+      connect(brakeInput, brakeRR.u) annotation(
+        Line(points = {{0, 110}, {0, 80}, {-118, 80}, {-118, -54}}, color = {0, 0, 127}));
       connect(world.frame_b, freeMotion.frame_a) annotation(
         Line(points = {{-20, 100}, {-20, 44}, {-14, 44}}));
       connect(chassis_pos, chassis.frame_a) annotation(
@@ -417,8 +688,180 @@ package DDynamics
       connect(freeMotion.frame_b, chassis.frame_a) annotation(
         Line(points = {{6, 44}, {16, 44}, {16, -10}, {0, -10}}, color = {95, 95, 95}));
       annotation(
-        Icon(graphics = {Line(points = {{-80, 60}, {-80, -60}, {80, -60}, {80, 60}, {-80, 60}, {-80, 60}}), Line(origin = {-2, 0}, points = {{-58, 40}, {-58, -40}, {62, -40}, {62, 40}, {-58, 40}, {-58, 40}, {-58, 40}}), Line(origin = {-0.193375, 0.27735}, points = {{-59.8066, 39.7226}, {-29.8066, 19.7226}, {-29.8066, -20.2774}, {-59.8066, -40.2774}, {-29.8066, -20.2774}, {40.1934, -20.2774}, {40.1934, 19.7226}, {-29.8066, 19.7226}, {40.1934, 19.7226}, {60.1934, 39.7226}, {40.1934, 19.7226}, {40.1934, -20.2774}, {60.1934, -40.2774}, {60.1934, -38.2774}})}));
+        Icon(graphics = {Line(points = {{-80, 60}, {-80, -60}, {80, -60}, {80, 60}, {-80, 60}, {-80, 60}}), Line(origin = {-2, 0}, points = {{-58, 40}, {-58, -40}, {62, -40}, {62, 40}, {-58, 40}, {-58, 40}, {-58, 40}}), Line(origin = {-0.193375, 0.27735}, points = {{-59.8066, 39.7226}, {-29.8066, 19.7226}, {-29.8066, -20.2774}, {-59.8066, -40.2774}, {-29.8066, -20.2774}, {40.1934, -20.2774}, {40.1934, 19.7226}, {-29.8066, 19.7226}, {40.1934, 19.7226}, {60.1934, 39.7226}, {40.1934, 19.7226}, {40.1934, -20.2774}, {60.1934, -40.2774}, {60.1934, -38.2774}})}),
+        Documentation(info = "<html>
+<body>
+<h4>Car</h4>
+<p>Complete 4-wheeled vehicle assembly. Contains a <code>RectangularChassis</code> (400 kg), 4 &times; <code>DoubleWishbone</code> suspension (front pair steerable), 2 &times; passive <code>Tire</code> (front), 2 &times; <code>DrivingTire</code> (rear), a <code>SolidAxle</code> differential, a <code>FreeMotion</code> joint (initial height y = 1.2 m), and 2 &times; <code>Position</code> actuators for steering.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>frame_FL</code></td><td>Frame_a</td><td>Front-left ground contact &mdash; connect to Road.FL</td></tr>
+<tr><td><code>frame_FR</code></td><td>Frame_a</td><td>Front-right ground contact &mdash; connect to Road.FR</td></tr>
+<tr><td><code>frame_RL</code></td><td>Frame_a</td><td>Rear-left ground contact &mdash; connect to Road.RL</td></tr>
+<tr><td><code>frame_RR</code></td><td>Frame_a</td><td>Rear-right ground contact &mdash; connect to Road.RR</td></tr>
+<tr><td><code>chassis_pos</code></td><td>Frame_a</td><td>Chassis reference frame (for external position reading)</td></tr>
+<tr><td><code>speedInput</code></td><td>RealInput</td><td>Rear wheel angular velocity setpoint (rad/s)</td></tr>
+<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front wheel steer angle (rad)</td></tr>
+</tbody>
+</table>
+<p><code>outer World world</code> is resolved from <code>Road</code>.</p>
+</body>
+</html>"));
     end Car;
+
+    model CivicEKCar
+      Parts.Chassis.RectangularChassis chassis(m = 990, length = 4.178, width = 1.704, height = 0.4) annotation(
+        Placement(transformation(extent = {{-10, -10}, {10, 10}})));
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFL(r = {1.31, -0.25, 0.735}) annotation(
+        Placement(transformation(origin = {50, 40}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFR(r = {1.31, -0.25, -0.735}) annotation(
+        Placement(transformation(origin = {50, -40}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRL(r = {-1.31, -0.25, 0.735}) annotation(
+        Placement(transformation(origin = {-70, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRR(r = {-1.31, -0.25, -0.735}) annotation(
+        Placement(transformation(origin = {-70, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Parts.Suspension.DoubleWishbone doubleWishboneRL(k_spring = 14000, d_damper = 1800) annotation(
+        Placement(transformation(origin = {-110, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Parts.Suspension.DoubleWishbone doubleWishboneRR(sideSign = -1, k_spring = 14000, d_damper = 1800) annotation(
+        Placement(transformation(origin = {-110, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Parts.Suspension.DoubleWishbone doubleWishboneFL(steerable = true, k_spring = 16000, d_damper = 1800) annotation(
+        Placement(transformation(origin = {110, 40}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Suspension.DoubleWishbone doubleWishboneFR(sideSign = -1, steerable = true, k_spring = 16000, d_damper = 1800) annotation(
+        Placement(transformation(origin = {110, -40}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Tires.DrivingTire tireFL annotation(
+        Placement(transformation(origin = {150, 40}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Tires.DrivingTire tireFR annotation(
+        Placement(transformation(origin = {150, -40}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Tires.Tire tireRL annotation(
+        Placement(transformation(origin = {-150, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Parts.Tires.Tire tireRR annotation(
+        Placement(transformation(origin = {-150, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Parts.Differentials.SolidAxle solidAxle annotation(
+        Placement(transformation(origin = {152, -2}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
+      Modelica.Mechanics.MultiBody.Joints.FreeMotion freeMotion(r_rel_a(start = {0, 1.4, 0}), v_rel_a(start = {0, 0, 0})) annotation(
+        Placement(transformation(origin = {-4, 44}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Mechanics.Rotational.Sources.Position steerAct annotation(
+        Placement(transformation(origin = {102, 10}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Mechanics.Rotational.Sources.Position steerAct1 annotation(
+        Placement(transformation(origin = {102, -12}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_FL annotation(
+        Placement(transformation(origin = {94, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {60, 98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+      Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_FR annotation(
+        Placement(transformation(origin = {94, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {60, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+      Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_RL annotation(
+        Placement(transformation(origin = {-150, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {-80, 98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+      Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_RR annotation(
+        Placement(transformation(origin = {-150, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {-80, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+      Modelica.Mechanics.MultiBody.Interfaces.Frame_a chassis_pos annotation(
+        Placement(transformation(origin = {-2, -102}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {2, 0}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+      Modelica.Blocks.Interfaces.RealInput steerInput annotation(
+        Placement(transformation(origin = {42, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {98, -2}, extent = {{-14, -14}, {14, 14}}, rotation = 180)));
+      Modelica.Blocks.Interfaces.RealInput speedInput annotation(
+        Placement(transformation(origin = {-80, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {-97, -1}, extent = {{-13, -13}, {13, 13}})));
+      Modelica.Blocks.Interfaces.RealInput brakeInput "Brake demand [0=released, 1=fully applied]" annotation(
+        Placement(transformation(origin = {0, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {0, 98}, extent = {{-14, -14}, {14, 14}}, rotation = -90)));
+      Parts.Brakes.DiscBrake brakeFL(maxBrakeTorque = 2000) annotation(
+        Placement(transformation(origin = {164, 64}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Brakes.DiscBrake brakeFR(maxBrakeTorque = 2000) annotation(
+        Placement(transformation(origin = {148, -16}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Brakes.DiscBrake brakeRL(maxBrakeTorque = 2000) annotation(
+        Placement(transformation(origin = {-128, 58}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Brakes.DiscBrake brakeRR(maxBrakeTorque = 2000) annotation(
+        Placement(transformation(origin = {-118, -64}, extent = {{-10, -10}, {10, 10}})));
+      outer Modelica.Mechanics.MultiBody.World world;
+    equation
+      connect(mountFL.frame_b, doubleWishboneFL.chassisMount) annotation(
+        Line(points = {{60, 40}, {100, 40}}, color = {95, 95, 95}));
+      connect(mountFR.frame_b, doubleWishboneFR.chassisMount) annotation(
+        Line(points = {{60, -40}, {100, -40}}, color = {95, 95, 95}));
+      connect(doubleWishboneFR.wheelMount, tireFR.suspMount) annotation(
+        Line(points = {{120, -40}, {140, -40}}, color = {95, 95, 95}));
+      connect(doubleWishboneFL.wheelMount, tireFL.suspMount) annotation(
+        Line(points = {{120, 40}, {140, 40}}, color = {95, 95, 95}));
+      connect(doubleWishboneRL.wheelMount, tireRL.suspMount) annotation(
+        Line(points = {{-120, 40}, {-140, 40}}, color = {95, 95, 95}));
+      connect(doubleWishboneRR.wheelMount, tireRR.suspMount) annotation(
+        Line(points = {{-120, -40}, {-140, -40}}, color = {95, 95, 95}));
+      connect(solidAxle.right_out, tireFR.spinInput) annotation(
+        Line(points = {{152, -12}, {152, -22}, {174, -22}, {174, -58}, {154, -58}, {154, -50}}));
+      connect(solidAxle.left_out, tireFL.spinInput) annotation(
+        Line(points = {{152, 8}, {152, 19}, {154, 19}, {154, 30}}));
+      connect(doubleWishboneRL.chassisMount, mountRL.frame_b) annotation(
+        Line(points = {{-100, 40}, {-80, 40}}, color = {95, 95, 95}));
+      connect(doubleWishboneRR.chassisMount, mountRR.frame_b) annotation(
+        Line(points = {{-100, -40}, {-80, -40}}, color = {95, 95, 95}));
+      connect(steerAct1.flange, doubleWishboneFR.steerInput) annotation(
+        Line(points = {{112, -12}, {124, -12}, {124, -26}, {110, -26}, {110, -30}}));
+      connect(steerAct.flange, doubleWishboneFL.steerInput) annotation(
+        Line(points = {{112, 10}, {128, 10}, {128, 60}, {110, 60}, {110, 50}}));
+      connect(tireFL.wheelSupport, frame_FL) annotation(
+        Line(points = {{160, 40}, {180, 40}, {180, 82}, {94, 82}, {94, 100}}, color = {95, 95, 95}));
+      connect(tireFR.wheelSupport, frame_FR) annotation(
+        Line(points = {{160, -40}, {174, -40}, {174, -100}, {94, -100}}, color = {95, 95, 95}));
+      connect(tireRL.wheelSupport, frame_RL) annotation(
+        Line(points = {{-160, 40}, {-180, 40}, {-180, 80}, {-150, 80}, {-150, 100}}, color = {95, 95, 95}));
+      connect(tireRR.wheelSupport, frame_RR) annotation(
+        Line(points = {{-160, -40}, {-202, -40}, {-202, -100}, {-150, -100}}, color = {95, 95, 95}));
+      connect(steerInput, steerAct.phi_ref) annotation(
+        Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, 10}, {90, 10}}, color = {0, 0, 127}));
+      connect(steerInput, steerAct1.phi_ref) annotation(
+        Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, -12}, {90, -12}}, color = {0, 0, 127}));
+      connect(speedInput, solidAxle.i) annotation(
+        Line(points = {{-80, 110}, {-80, -2}, {142, -2}}, color = {0, 0, 127}));
+      connect(brakeFL.shaft, tireFL.brakeFlange) annotation(
+        Line(points = {{154, 64}, {154, 52}, {150, 52}, {150, 40}}));
+      connect(brakeFR.shaft, tireFR.brakeFlange) annotation(
+        Line(points = {{138, -16}, {138, -40}, {150, -40}}));
+      connect(brakeRL.shaft, tireRL.brakeFlange) annotation(
+        Line(points = {{-138, 58}, {-168, 58}, {-168, 40}, {-150, 40}}));
+      connect(brakeRR.shaft, tireRR.brakeFlange) annotation(
+        Line(points = {{-128, -64}, {-128, -51}, {-150, -51}, {-150, -40}}));
+      connect(brakeInput, brakeFL.u) annotation(
+        Line(points = {{0, 110}, {0, 80}, {164, 80}, {164, 74}}, color = {0, 0, 127}));
+      connect(brakeInput, brakeFR.u) annotation(
+        Line(points = {{0, 110}, {0, 80}, {148, 80}, {148, -6}}, color = {0, 0, 127}));
+      connect(brakeInput, brakeRL.u) annotation(
+        Line(points = {{0, 110}, {0, 80}, {-128, 80}, {-128, 68}}, color = {0, 0, 127}));
+      connect(brakeInput, brakeRR.u) annotation(
+        Line(points = {{0, 110}, {0, 80}, {-118, 80}, {-118, -54}}, color = {0, 0, 127}));
+      connect(world.frame_b, freeMotion.frame_a) annotation(
+        Line(points = {{-20, 100}, {-20, 44}, {-14, 44}}));
+      connect(chassis_pos, chassis.frame_a) annotation(
+        Line(points = {{-2, -102}, {0, -102}, {0, -10}}));
+      connect(mountRL.frame_a, chassis.frame_a) annotation(
+        Line(points = {{-60, 40}, {-26, 40}, {-26, -10}, {0, -10}}, color = {95, 95, 95}));
+      connect(mountRR.frame_a, chassis.frame_a) annotation(
+        Line(points = {{-60, -40}, {0, -40}, {0, -10}}, color = {95, 95, 95}));
+      connect(mountFR.frame_a, chassis.frame_a) annotation(
+        Line(points = {{40, -40}, {0, -40}, {0, -10}}, color = {95, 95, 95}));
+      connect(mountFL.frame_a, chassis.frame_a) annotation(
+        Line(points = {{40, 40}, {20, 40}, {20, -10}, {0, -10}}, color = {95, 95, 95}));
+      connect(freeMotion.frame_b, chassis.frame_a) annotation(
+        Line(points = {{6, 44}, {16, 44}, {16, -10}, {0, -10}}, color = {95, 95, 95}));
+      annotation(
+        Icon(graphics = {Line(points = {{-80, 60}, {-80, -60}, {80, -60}, {80, 60}, {-80, 60}, {-80, 60}}), Line(origin = {-2, 0}, points = {{-58, 40}, {-58, -40}, {62, -40}, {62, 40}, {-58, 40}, {-58, 40}, {-58, 40}}), Line(origin = {-0.193375, 0.27735}, points = {{-59.8066, 39.7226}, {-29.8066, 19.7226}, {-29.8066, -20.2774}, {-59.8066, -40.2774}, {-29.8066, -20.2774}, {40.1934, -20.2774}, {40.1934, 19.7226}, {-29.8066, 19.7226}, {40.1934, 19.7226}, {60.1934, 39.7226}, {40.1934, 19.7226}, {40.1934, -20.2774}, {60.1934, -40.2774}, {60.1934, -38.2774}})}),
+        Documentation(info = "<html>
+<body>
+<h4>CivicEKCar</h4>
+<p>Honda Civic EK hatchback vehicle model. Front-wheel drive. Dimensions: 4178 mm long, 1704 mm wide, 2620 mm wheelbase, 1130 kg total mass (990 kg sprung). Uses <code>DrivingTire</code> on the front axle and passive <code>Tire</code> on the rear. Spring rates: 16 kN/m front, 14 kN/m rear. Damping: 1800 N&middot;s/m all corners. Tire: 185/65R14 (R = 0.30 m).</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>frame_FL</code></td><td>Frame_a</td><td>Front-left ground contact &mdash; connect to Road.FL</td></tr>
+<tr><td><code>frame_FR</code></td><td>Frame_a</td><td>Front-right ground contact &mdash; connect to Road.FR</td></tr>
+<tr><td><code>frame_RL</code></td><td>Frame_a</td><td>Rear-left ground contact &mdash; connect to Road.RL</td></tr>
+<tr><td><code>frame_RR</code></td><td>Frame_a</td><td>Rear-right ground contact &mdash; connect to Road.RR</td></tr>
+<tr><td><code>chassis_pos</code></td><td>Frame_a</td><td>Chassis reference frame</td></tr>
+<tr><td><code>speedInput</code></td><td>RealInput</td><td>Front wheel angular velocity setpoint (rad/s)</td></tr>
+<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front wheel steer angle (rad)</td></tr>
+<tr><td><code>brakeInput</code></td><td>RealInput</td><td>Brake demand [0=released, 1=fully applied]</td></tr>
+</tbody>
+</table>
+<p><code>outer World world</code> is resolved from <code>Road</code>.</p>
+</body>
+</html>"));
+    end CivicEKCar;
 
     package Parts
 
@@ -431,10 +874,12 @@ package DDynamics
             Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
           Modelica.Mechanics.MultiBody.Interfaces.Frame_a suspMount annotation(
             Placement(transformation(origin = {-102, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
-          Modelica.Mechanics.MultiBody.Joints.Revolute spinRL(n = {0, 0, -1}) annotation(
+          Modelica.Mechanics.MultiBody.Joints.Revolute spinRL(n = {0, 0, -1}, useAxisFlange = true) annotation(
             Placement(transformation(origin = {168, -40}, extent = {{-150, 30}, {-130, 50}})));
           Components.TireVisualizer tireVisualizer(rTire = R_wheel) annotation(
             Placement(transformation(origin = {96, 46}, extent = {{-10, -10}, {10, 10}})));
+          Modelica.Mechanics.Rotational.Interfaces.Flange_b brakeFlange "External connection point for DiscBrake" annotation(
+            Placement(transformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {0, 102}, extent = {{-10, -10}, {10, 10}})));
         equation
           connect(wheelSupport, wheelFL.frame_a) annotation(
             Line(points = {{100, 0}, {62, 0}}));
@@ -444,9 +889,23 @@ package DDynamics
             Line(points = {{38, 0}, {62, 0}}, color = {95, 95, 95}));
           connect(tireVisualizer.frame_a, wheelFL.frame_a) annotation(
             Line(points = {{86, 46}, {62, 46}, {62, 0}}, color = {95, 95, 95}));
+          connect(spinRL.axis, brakeFlange);
           annotation(
             Diagram(graphics),
-            Icon(graphics = {Ellipse(origin = {-1, -4}, fillPattern = FillPattern.Solid, extent = {{-97, 94}, {97, -94}}), Ellipse(origin = {-1, -3}, fillColor = {255, 255, 255}, fillPattern = FillPattern.Solid, extent = {{-77, 73}, {77, -73}})}));
+            Icon(graphics = {Ellipse(origin = {-1, -4}, fillPattern = FillPattern.Solid, extent = {{-97, 94}, {97, -94}}), Ellipse(origin = {-1, -3}, fillColor = {255, 255, 255}, fillPattern = FillPattern.Solid, extent = {{-77, 73}, {77, -73}})}),
+            Documentation(info = "<html>
+<body>
+<h4>Tire (passive)</h4>
+<p>Non-driven wheel. A rigid <code>Body</code> (20 kg) connected through a free <code>Revolute</code> (spin axis <code>{0,0,-1}</code>) to the suspension. The tire can spin freely; no torque is applied. <code>outer parameter Real R_wheel</code> drives <code>TireVisualizer.rTire</code>.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>suspMount</code></td><td>Frame_a</td><td>Connects to suspension wheelMount</td></tr>
+<tr><td><code>wheelSupport</code></td><td>Frame_a</td><td>Connects to road contact frame (Road.FL/FR/etc.)</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
         end Tire;
 
         model DrivingTire
@@ -463,6 +922,8 @@ package DDynamics
             Placement(transformation(origin = {-102, -2}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-102, 2}, extent = {{-16, -16}, {16, 16}})));
           Components.TireVisualizer tireVisualizer(rTire = R_wheel) annotation(
             Placement(transformation(origin = {98, 56}, extent = {{-10, -10}, {10, 10}})));
+          Modelica.Mechanics.Rotational.Interfaces.Flange_b brakeFlange "External connection point for DiscBrake" annotation(
+            Placement(transformation(origin = {0, -100}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {0, -102}, extent = {{-10, -10}, {10, 10}})));
         equation
           connect(spinFL.frame_b, wheelFL.frame_a) annotation(
             Line(points = {{42, -2}, {62, -2}}, color = {95, 95, 95}));
@@ -474,9 +935,24 @@ package DDynamics
             Line(points = {{-102, -2}, {22, -2}}));
           connect(tireVisualizer.frame_a, wheelFL.frame_a) annotation(
             Line(points = {{88, 56}, {62, 56}, {62, -2}}, color = {95, 95, 95}));
+          connect(spinFL.axis, brakeFlange);
           annotation(
             Icon(graphics = {Ellipse(origin = {-1, -4}, fillPattern = FillPattern.Solid, extent = {{-97, 94}, {97, -94}}), Ellipse(origin = {-1, -3}, fillColor = {255, 255, 255}, fillPattern = FillPattern.Solid, extent = {{-77, 73}, {77, -73}}), Rectangle(origin = {0, 46}, extent = {{-8, 54}, {8, -54}})}),
-            Diagram(graphics));
+            Diagram(graphics),
+            Documentation(info = "<html>
+<body>
+<h4>DrivingTire (driven)</h4>
+<p>Driven wheel. Same structure as <code>Tire</code> but the <code>Revolute</code> has <code>useAxisFlange = true</code>, accepting a rotational input from the differential. The tire body has mass 20 kg.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>suspMount</code></td><td>Frame_a</td><td>Connects to suspension wheelMount</td></tr>
+<tr><td><code>wheelSupport</code></td><td>Frame_a</td><td>Connects to road contact frame</td></tr>
+<tr><td><code>spinInput</code></td><td>Flange_a</td><td>Driven by SolidAxle.left_out / right_out</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
         end DrivingTire;
 
         package Components
@@ -536,7 +1012,7 @@ package DDynamics
               r_0=frame_a.r_0) if world.enableAnimation and animation annotation (Placement(transformation(extent={{-50,-10},{-30,10}})));
 
           equation
-            // No forces and torques
+// No forces and torques
             frame_a.f = zeros(3);
             frame_a.t = zeros(3);
             annotation (
@@ -549,49 +1025,122 @@ package DDynamics
                   Rectangle(origin = {6.091, 0}, lineColor = {95, 95, 95}, fillColor = {215, 215, 215}, fillPattern = FillPattern.HorizontalCylinder, extent = {{-102.091, -8}, {-19.142, 8}})},
                 coordinateSystem(extent = {{-100, -100}, {100, 100}}, preserveAspectRatio = true)),
               Documentation(info = "<html>
-          <p>
-          Model <strong>VoluminousWheel</strong> provides a simple visualization of a tire using
-          a torus and a pipe shape object. The center of the wheel is located at
-          connector frame_a (visualized by the red coordinate system in the figure below).
-          </p>
-
-          <blockquote>
-          <img src=\"modelica://Modelica/Resources/Images/Mechanics/MultiBody/Visualizers/VoluminousWheel.png\">
-          </blockquote>
-          </html>", revisions="<html>
-            <ul>
-            <li> July 2010 by Martin Otter<br>
-                 Adapted to the new Surface model.</li>
-            <li> July 2005 by Dirk Zimmer (practical training at DLR)<br>
-                 First version to visualize a multi-level tyre wheel model.</li>
-            </ul>
-          </html>"));
+<body>
+<h4>TireVisualizer</h4>
+<p>3D tire visualization using a torus (rubber sidewall) and a pipe shape (rim band). Extends <code>PartialVisualizer</code>. No forces or torques are applied.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>rTire</code></td><td>0.25 m</td><td>Overall tire radius</td></tr>
+<tr><td><code>rRim</code></td><td>0.14 m</td><td>Rim inner radius</td></tr>
+<tr><td><code>width</code></td><td>0.25 m</td><td>Tire width</td></tr>
+<tr><td><code>rCurvature</code></td><td>0.30 m</td><td>Sidewall cross-section radius</td></tr>
+<tr><td><code>color</code></td><td>{64, 64, 64}</td><td>Tire color (RGB)</td></tr>
+<tr><td><code>specularCoefficient</code></td><td>0.5</td><td>Surface reflectivity</td></tr>
+<tr><td><code>n_rTire</code></td><td>40</td><td>Points along tire circumference</td></tr>
+<tr><td><code>n_rCurvature</code></td><td>20</td><td>Points along cross-section</td></tr>
+</tbody>
+</table>
+<p><b>Connector:</b> <code>frame_a</code> (Frame_a, from PartialVisualizer) — attach to wheel body frame.</p>
+</body>
+</html>"));
           end TireVisualizer;
         end Components;
 
       end Tires;
 
+      package Brakes
+
+        model DiscBrake "Smooth Coulomb disc brake using tanh regularization"
+          parameter Real maxBrakeTorque = 2000 "Peak braking torque at u=1 (N.m)";
+          parameter Real sharpness = 10 "tanh knee (rad^-1.s); transition at ~1/sharpness rad/s";
+          Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft "Connection to tire brake flange" annotation(
+            Placement(transformation(extent = {{-110, -10}, {-90, 10}}), iconTransformation(extent = {{-110, -10}, {-90, 10}})));
+          Modelica.Blocks.Interfaces.RealInput u "Brake demand [0=released, 1=fully applied]" annotation(
+            Placement(transformation(origin = {0, 108}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {0, 102}, extent = {{-14, -14}, {14, 14}}, rotation = -90)));
+        protected
+          Modelica.Mechanics.Rotational.Sensors.SpeedSensor speedSensor annotation(
+            Placement(transformation(origin = {-40, -40}, extent = {{-10, -10}, {10, 10}})));
+          Modelica.Mechanics.Rotational.Sources.Torque brakeTorque(useSupport = false) annotation(
+            Placement(transformation(origin = {40, 0}, extent = {{-10, -10}, {10, 10}})));
+          Modelica.Blocks.Sources.RealExpression tauExpr(y = -u * maxBrakeTorque * tanh(sharpness * speedSensor.w)) annotation(
+            Placement(transformation(origin = {-10, 30}, extent = {{-10, -10}, {10, 10}})));
+        equation
+          connect(speedSensor.flange, shaft);
+          connect(brakeTorque.flange, shaft);
+          connect(tauExpr.y, brakeTorque.tau);
+          annotation(
+            Icon(graphics = {Ellipse(fillColor = {200, 200, 200}, fillPattern = FillPattern.Solid, extent = {{-80, 80}, {80, -80}}), Ellipse(fillColor = {120, 120, 120}, fillPattern = FillPattern.Solid, extent = {{-40, 40}, {40, -40}}), Line(points = {{-90, 0}, {-40, 0}}), Text(textColor = {0, 0, 255}, extent = {{-150, 100}, {150, 140}}, textString = "%name")}),
+            Documentation(info = "<html>
+<body>
+<h4>DiscBrake</h4>
+<p>Applies a smooth Coulomb braking torque to a rotational shaft. Connects externally to a
+tire's <code>brakeFlange</code>.</p>
+<p><b>Torque law:</b> &tau; = &minus;u &middot; maxBrakeTorque &middot; tanh(sharpness &middot; &omega;)</p>
+<p>The <code>tanh</code> regularization avoids the discontinuity of <code>sign(&omega;)</code>
+at zero speed, keeping the model C&sup1; continuous and event-free through zero. At
+<code>sharpness=10</code> the transition region is &plusmn;0.1 rad/s.</p>
+<p><code>useSupport=false</code> grounds the reaction torque internally; no external
+<code>Fixed</code> component is needed.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>maxBrakeTorque</code></td><td>2000 N&middot;m</td><td>Peak torque at u=1</td></tr>
+<tr><td><code>sharpness</code></td><td>10 rad<sup>-1</sup>&middot;s</td><td>tanh knee sharpness</td></tr>
+</tbody>
+</table>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>shaft</code></td><td>Flange_b</td><td>Connect to tire brakeFlange</td></tr>
+<tr><td><code>u</code></td><td>RealInput</td><td>Brake demand [0..1]</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
+        end DiscBrake;
+
+      end Brakes;
+
       package Differentials
 
         model SolidAxle
           extends Components.Differential;
+          parameter Real k_drive = 200 "Proportional speed-to-torque gain (N.m.s/rad)";
         equation
-          connect(i, left.w_ref) annotation(
-            Line(points = {{0, 108}, {0, 0}, {-40, 0}}, color = {0, 0, 127}));
-          connect(i, right.w_ref) annotation(
-            Line(points = {{0, 108}, {0, 0}, {38, 0}}, color = {0, 0, 127}));
+          left.tau = k_drive * (i - leftSpeed.w);
+          right.tau = k_drive * (i - rightSpeed.w);
           annotation(
-            Icon(graphics = {Rectangle(lineColor = {134, 159, 156}, fillColor = {185, 192, 194}, fillPattern = FillPattern.Solid, extent = {{-100, 20}, {100, -20}}), Rectangle(origin = {0, 40}, fillPattern = FillPattern.Solid, extent = {{-20, 60}, {20, -60}})}));
+            Icon(graphics = {Rectangle(lineColor = {134, 159, 156}, fillColor = {185, 192, 194}, fillPattern = FillPattern.Solid, extent = {{-100, 20}, {100, -20}}), Rectangle(origin = {0, 40}, fillPattern = FillPattern.Solid, extent = {{-20, 60}, {20, -60}})}),
+            Documentation(info = "<html>
+<body>
+<h4>SolidAxle</h4>
+<p>Rigid rear axle. Both rear wheels receive the same speed setpoint via a proportional
+speed controller: <code>&tau; = k_drive &middot; (i &minus; &omega;)</code>. Because the drive
+uses a <code>Torque</code> source (not an ideal kinematic constraint), a <code>DiscBrake</code>
+connected to the wheel flanges can override the drive torque and decelerate the wheels.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>k_drive</code></td><td>200 N&middot;m&middot;s/rad</td><td>P-controller gain; closed-loop time constant &asymp; J/k &asymp; 0.006 s</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
         end SolidAxle;
 
         package Components
           partial model Differential
             Modelica.Blocks.Interfaces.RealInput i annotation(
               Placement(transformation(origin = {0, 108}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {0, 92}, extent = {{-20, -20}, {20, 20}}, rotation = -90)));
-            Modelica.Mechanics.Rotational.Sources.Speed left annotation(
+            Modelica.Mechanics.Rotational.Sources.Torque left(useSupport = false) annotation(
               Placement(transformation(origin = {-64, 0}, extent = {{-20, -20}, {20, 20}}, rotation = 180)));
-            Modelica.Mechanics.Rotational.Sources.Speed right annotation(
+            Modelica.Mechanics.Rotational.Sources.Torque right(useSupport = false) annotation(
               Placement(transformation(origin = {62, 0}, extent = {{-20, -20}, {20, 20}})));
+            Modelica.Mechanics.Rotational.Sensors.SpeedSensor leftSpeed annotation(
+              Placement(transformation(origin = {-64, -40}, extent = {{10, -10}, {-10, 10}})));
+            Modelica.Mechanics.Rotational.Sensors.SpeedSensor rightSpeed annotation(
+              Placement(transformation(origin = {62, -40}, extent = {{-10, -10}, {10, 10}})));
             Modelica.Mechanics.Rotational.Interfaces.Flange_a left_out annotation(
               Placement(transformation(origin = {-102, 0}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {-102, 0}, extent = {{-10, -10}, {10, 10}})));
             Modelica.Mechanics.Rotational.Interfaces.Flange_a right_out annotation(
@@ -601,8 +1150,35 @@ package DDynamics
               Line(points = {{-102, 0}, {-84, 0}}));
             connect(right.flange, right_out) annotation(
               Line(points = {{82, 0}, {102, 0}}));
+            connect(leftSpeed.flange, left_out) annotation(
+              Line(points = {{-54, -40}, {-102, -40}, {-102, 0}}));
+            connect(rightSpeed.flange, right_out) annotation(
+              Line(points = {{52, -40}, {102, -40}, {102, 0}}));
             annotation(
-              uses(Modelica(version = "4.1.0")));
+              uses(Modelica(version = "4.1.0")),
+              Documentation(info = "<html>
+<body>
+<h4>Differential (partial)</h4>
+<p>Base class for all differential types. Defines the common interface: one speed-setpoint input
+and two rotational outputs. Internally uses two <code>Modelica.Mechanics.Rotational.Sources.Torque</code>
+instances (with <code>useSupport=false</code>) plus <code>SpeedSensor</code>s on each output flange.
+Concrete subclasses implement a speed controller by writing equations of the form
+<code>left.tau = f(i, leftSpeed.w)</code> and <code>right.tau = f(i, rightSpeed.w)</code>.</p>
+<p>Using torque sources instead of ideal speed sources allows brake torque applied to the wheel
+flanges to actually decelerate the wheels — the drive torque and brake torque sum on the shared
+flange rather than the brake being overridden by a kinematic constraint.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>i</code></td><td>RealInput</td><td>Target angular velocity setpoint (rad/s)</td></tr>
+<tr><td><code>left_out</code></td><td>Flange_a</td><td>Left wheel rotational output</td></tr>
+<tr><td><code>right_out</code></td><td>Flange_a</td><td>Right wheel rotational output</td></tr>
+</tbody>
+</table>
+<p>Exposed for subclasses: <code>left.tau</code>, <code>right.tau</code>,
+<code>leftSpeed.w</code>, <code>rightSpeed.w</code>.</p>
+</body>
+</html>"));
           end Differential;
         end Components;
 
@@ -627,6 +1203,28 @@ package DDynamics
             Line(points = {{8, -8}, {100, -8}, {100, -2}}, color = {95, 95, 95}));
           connect(shockRL.frame_b, chassisMount) annotation(
             Line(points = {{6, 22}, {42, 22}, {42, -2}, {100, -2}}, color = {95, 95, 95}));
+          annotation(
+            Documentation(info = "<html>
+<body>
+<h4>SpringDamper</h4>
+<p>Simple single-DOF suspension using a <code>Prismatic</code> joint (travel axis <code>{0,0,-1}</code>) and a parallel <code>SpringDamperParallel</code>.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Value</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>c</code></td><td>30000 N/m</td><td>Spring stiffness</td></tr>
+<tr><td><code>d</code></td><td>2500 N&middot;s/m</td><td>Damping coefficient</td></tr>
+<tr><td><code>s_unstretched</code></td><td>0.3 m</td><td>Free length</td></tr>
+</tbody>
+</table>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>tireConnection</code></td><td>Frame_b</td><td>Outboard (wheel side)</td></tr>
+<tr><td><code>chassisMount</code></td><td>Frame_b</td><td>Inboard (chassis side)</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
         end SpringDamper;
 
         model DoubleWishbone
@@ -678,30 +1276,30 @@ package DDynamics
             Placement(transformation(origin = {-14, -2}, extent = {{-20, -80}, {0, -60}})));
 
         equation
-          // Chassis-side: split into upper and lower mount points
+// Chassis-side: split into upper and lower mount points
           connect(chassisMount, upperChassisOffset.frame_a) annotation(
             Line(points={{-100, 0}, {-80, 0}, {-80, 30}, {-70, 30}}, color={95, 95, 95}));
           connect(chassisMount, lowerChassisOffset.frame_a) annotation(
             Line(points={{-100, 0}, {-80, 0}, {-80, -30}, {-70, -30}}, color={95, 95, 95}));
-          // Tree branch: upper chassis pivot → upper A-arm
+// Tree branch: upper chassis pivot → upper A-arm
           connect(upperChassisOffset.frame_b, upperChassisPivot.frame_a) annotation(
             Line(points={{-50, 30}, {-40, 30}}, color={95, 95, 95}));
           connect(upperChassisPivot.frame_b, upperArm.frame_a) annotation(
             Line(points={{-20, 30}, {-10, 30}}, color={95, 95, 95}));
-          // JointRRR closes the loop analytically
+// JointRRR closes the loop analytically
           connect(upperArm.frame_b, jointLoop.frame_a) annotation(
             Line(points={{10, 30}, {16, 30}, {16, 2}, {70, 2}}, color={95, 95, 95}));
           connect(lowerChassisOffset.frame_b, jointLoop.frame_b) annotation(
             Line(points={{-50, -30}, {30, -30}, {30, 2}}, color={95, 95, 95}));
-          // Hub body at knuckle top (frame_ia = after first revolute of JointRRR)
+// Hub body at knuckle top (frame_ia = after first revolute of JointRRR)
           connect(jointLoop.frame_ia, hub.frame_a) annotation(
             Line(points={{66, -38}, {66, 58}, {88, 58}}, color={95, 95, 95}));
-          // Wheel output at knuckle center (offset down from upper ball joint)
+// Wheel output at knuckle center (offset down from upper ball joint)
           connect(jointLoop.frame_ia, wheelOffset.frame_a) annotation(
             Line(points={{66, -38}, {66, 50}, {60, 50}, {60, 0}}, color={95, 95, 95}));
           connect(wheelOffset.frame_b, steer.frame_a) annotation(
             Line(points = {{80, 0}, {80, 10}, {76, 10}, {76, 18}}, color = {95, 95, 95}));
-          // Shock: top mount above chassis to lower ball-joint point (middle revolute = frame_im)
+// Shock: top mount above chassis to lower ball-joint point (middle revolute = frame_im)
           connect(chassisMount, shockTopMount.frame_a) annotation(
             Line(points={{-100, 0}, {-80, 0}, {-80, 60}, {-70, 60}}, color={95, 95, 95}));
           connect(shockTopMount.frame_b, shock.frame_a) annotation(
@@ -722,7 +1320,25 @@ package DDynamics
             Ellipse(extent={{-6, 6}, {6, -6}}, origin={0, -50}, fillColor={95, 95, 95}, fillPattern=FillPattern.Solid),
             Line(points={{-80, 30}, {-80, -30}}, color={0, 0, 0}, thickness=2),
             Line(points={{-60, 60}, {-40, -60}}, color={0, 128, 0}, pattern=LinePattern.DashDot, thickness=0.5),
-            Text(extent={{-100, -80}, {100, -100}}, textString="%name")}));
+            Text(extent={{-100, -80}, {100, -100}}, textString="%name")}),
+            Documentation(info = "<html>
+<body>
+<h4>DoubleWishbone</h4>
+<p>Double A-arm suspension. Uses a <code>JointRRR</code> assembly to close the four-bar kinematic loop analytically. Front instances (<code>steerable = true</code>) include an active steering revolute; rear instances lock it via <code>steerLock</code>. Extends <code>BaseSuspension</code>.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>sideSign</code></td><td>1</td><td>1 = left side, -1 = right side (mirrors Z geometry)</td></tr>
+<tr><td><code>upperArmLength</code></td><td>0.35 m</td><td>Upper A-arm outboard length</td></tr>
+<tr><td><code>lowerArmLength</code></td><td>0.35 m</td><td>Lower A-arm outboard length</td></tr>
+<tr><td><code>upperMountZ</code></td><td>0.25 m</td><td>Upper ball-joint height above chassis mount</td></tr>
+<tr><td><code>lowerMountZ</code></td><td>0.15 m</td><td>Lower ball-joint depth below chassis mount</td></tr>
+<tr><td><code>shockTopHeight</code></td><td>0.35 m</td><td>Shock absorber top mount height above chassis mount</td></tr>
+</tbody>
+</table>
+<p>Spring/damper parameters come from <code>BaseSuspension</code>: <code>k_spring</code> and <code>d_damper</code>. Shock free length is 0.55 m.</p>
+</body>
+</html>"));
         end DoubleWishbone;
 
         package Components
@@ -739,6 +1355,30 @@ package DDynamics
             parameter Boolean steerable = false "Enable steering revolute at wheel output";
             Modelica.Mechanics.Rotational.Interfaces.Flange_b steerInput if steerable annotation(
               Placement(transformation(extent = {{-10, 90}, {10, 110}}), iconTransformation(extent = {{-10, 90}, {10, 110}})));
+            annotation(
+              Documentation(info = "<html>
+<body>
+<h4>BaseSuspension (partial)</h4>
+<p>Base class for all suspension types. Defines the chassis-to-wheel interface, common tuning parameters, and the optional steering flange.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>k_spring</code></td><td>30000 N/m</td><td>Spring rate</td></tr>
+<tr><td><code>d_damper</code></td><td>2500 N&middot;s/m</td><td>Damping rate</td></tr>
+<tr><td><code>m_hub</code></td><td>15 kg</td><td>Unsprung hub/knuckle mass</td></tr>
+<tr><td><code>steerable</code></td><td>false</td><td>If true, exposes <code>steerInput</code> flange</td></tr>
+</tbody>
+</table>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Condition</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>chassisMount</code></td><td>Frame_a</td><td>always</td><td>Inboard attachment to chassis</td></tr>
+<tr><td><code>wheelMount</code></td><td>Frame_b</td><td>always</td><td>Outboard attachment to tire suspMount</td></tr>
+<tr><td><code>steerInput</code></td><td>Flange_b</td><td>steerable=true only</td><td>Driven by Car&apos;s steerAct actuator</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
           end BaseSuspension;
         end Components;
 
@@ -763,7 +1403,21 @@ package DDynamics
           connect(frame_a, toRear.frame_a);
           connect(toRear.frame_b, box.frame_a);
           annotation(
-            Icon(graphics = {Rectangle(lineColor = {85, 255, 255}, extent = {{-80, 100}, {80, -100}})}));
+            Icon(graphics = {Rectangle(lineColor = {85, 255, 255}, extent = {{-80, 100}, {80, -100}})}),
+            Documentation(info = "<html>
+<body>
+<h4>RectangularChassis</h4>
+<p>Rectangular box chassis body. Extends <code>BaseChassis</code>. Creates a <code>BodyBox</code> with density back-calculated from mass and volume. The box is offset rearward by <code>length/2</code> so <code>frame_a</code> sits at the geometric center.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>length</code></td><td>3.0 m</td><td>Longitudinal (X) extent</td></tr>
+<tr><td><code>width</code></td><td>1.8 m</td><td>Lateral (Z) extent</td></tr>
+<tr><td><code>height</code></td><td>0.3 m</td><td>Vertical (Y) extent</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
         end RectangularChassis;
 
         package Components
@@ -771,8 +1425,23 @@ package DDynamics
             import MultiBody = Modelica.Mechanics.MultiBody;
             parameter Real m = 400 "Total mass [kg]";
             MultiBody.Interfaces.Frame_a frame_a annotation(
-              Placement(transformation(extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));annotation(
-              Icon(graphics = {Rectangle(origin = {0, 80}, extent = {{-50, 20}, {50, -20}}), Rectangle(extent = {{-60, 60}, {60, -60}}), Rectangle(origin = {0, -80}, extent = {{-50, 20}, {50, -20}})}));
+              Placement(transformation(extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+            annotation(
+              Icon(graphics = {Rectangle(origin = {0, 80}, extent = {{-50, 20}, {50, -20}}), Rectangle(extent = {{-60, 60}, {60, -60}}), Rectangle(origin = {0, -80}, extent = {{-50, 20}, {50, -20}})}),
+              Documentation(info = "<html>
+<body>
+<h4>BaseChassis (partial)</h4>
+<p>Base class for all chassis types. Provides the single connection frame and total mass parameter.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Name</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>m</code></td><td>400 kg</td><td>Total chassis mass</td></tr>
+</tbody>
+</table>
+<p><b>Connector:</b> <code>frame_a</code> (Frame_a) — central reference frame; all suspension mounts, FreeMotion, and <code>chassis_pos</code> connect here.</p>
+<p>Extend this class and add <code>BodyBox</code>, <code>BodyCylinder</code>, or any geometry connected to <code>frame_a</code>.</p>
+</body>
+</html>"));
           end BaseChassis;
         end Components;
 
@@ -783,5 +1452,55 @@ package DDynamics
   end Cars;
 
   annotation(
-    uses(Modelica(version = "4.1.0"), Modelica_DeviceDrivers(version = "2.2.0")));
+    uses(Modelica(version = "4.1.0"), Modelica_DeviceDrivers(version = "2.2.0")),
+    Documentation(info = "<html>
+<body>
+<h4>DDynamics</h4>
+<p>A Modelica multibody vehicle dynamics library for simulating 4-wheeled ground vehicles with configurable suspension, terrain, and drivetrain.</p>
+<h4>Quick Start</h4>
+<ol>
+<li>Open <code>DDynamics.mo</code> in OpenModelica or Dymola.</li>
+<li>Simulate <code>DDynamics.Examples.CarExample</code>.</li>
+<li>The example drives a car at 5 m/s with 0.2 rad of steering on a flat terrain at y = 1 m.</li>
+</ol>
+<h4>Package Structure</h4>
+<pre>
+DDynamics
+&#9500;&#9472;&#9472; Examples
+&#9474;   &#9492;&#9472;&#9472; CarExample
+&#9500;&#9472;&#9472; Interfaces
+&#9474;   &#9500;&#9472;&#9472; FrameToReal
+&#9474;   &#9492;&#9472;&#9472; FrameToUDP
+&#9500;&#9472;&#9472; Roads
+&#9474;   &#9500;&#9472;&#9472; Road
+&#9474;   &#9500;&#9472;&#9472; Floors
+&#9474;   &#9474;   &#9500;&#9472;&#9472; Floor4Corners
+&#9474;   &#9474;   &#9492;&#9472;&#9472; Components: GroundSpring, GroundFriction, Floor
+&#9474;   &#9492;&#9472;&#9472; Terrains
+&#9474;       &#9500;&#9472;&#9472; TerrainMap
+&#9474;       &#9492;&#9472;&#9472; Components: terrainSurface, TerrainVisualizer
+&#9492;&#9472;&#9472; Cars
+    &#9500;&#9472;&#9472; Car
+    &#9492;&#9472;&#9472; Parts
+        &#9500;&#9472;&#9472; Tires: Tire, DrivingTire, TireVisualizer
+        &#9500;&#9472;&#9472; Differentials: SolidAxle, Differential (partial)
+        &#9500;&#9472;&#9472; Suspension: SpringDamper, DoubleWishbone, BaseSuspension (partial)
+        &#9492;&#9472;&#9472; Chassis: RectangularChassis, BaseChassis (partial)
+</pre>
+<h4>Inner/Outer Resolution</h4>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>inner declaration</th><th>Declared in</th><th>Resolved by</th></tr></thead>
+<tbody>
+<tr><td><code>parameter Real R_wheel = 0.25</code></td><td><code>Examples.CarExample</code></td><td>Tires.Tire, Tires.DrivingTire, Floors.Floor4Corners, Floors.Components.Floor, GroundSpring, GroundFriction</td></tr>
+<tr><td><code>Roads.Terrains.TerrainMap terrain</code></td><td><code>Roads.Road</code></td><td>Floors.Components.GroundSpring, Floors.Components.GroundFriction</td></tr>
+<tr><td><code>Modelica.Mechanics.MultiBody.World world</code></td><td><code>Roads.Road</code></td><td>Cars.Car, Tires.Components.TireVisualizer, Terrains.Components.TerrainVisualizer</td></tr>
+</tbody>
+</table>
+<h4>Extending the Library</h4>
+<p><b>Custom terrain:</b> Modify <code>Roads.Terrains.TerrainMap.getZ</code>, update <code>terrainSurface</code> and <code>TerrainVisualizer.groundHeight</code> to match.</p>
+<p><b>Custom differential:</b> Extend <code>Cars.Parts.Differentials.Components.Differential</code> and override how <code>i</code> maps to <code>left.w_ref</code> and <code>right.w_ref</code>.</p>
+<p><b>Custom suspension:</b> Extend <code>Cars.Parts.Suspension.Components.BaseSuspension</code> and implement kinematics between <code>chassisMount</code> and <code>wheelMount</code>.</p>
+<p><b>Custom chassis:</b> Extend <code>Cars.Parts.Chassis.Components.BaseChassis</code> and connect geometry to <code>frame_a</code>.</p>
+</body>
+</html>"));
 end DDynamics;
