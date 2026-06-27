@@ -94,6 +94,52 @@ package DDynamics
 </html>"));
     end CivicEKExample;
 
+    model E36Example
+      inner parameter Real R_wheel = 0.31 "Tire radius (m) — 195/65R15, propagated to tires and floor contact";
+      Cars.E36Car car annotation(
+        Placement(transformation(extent = {{-28, -28}, {28, 28}})));
+      Modelica.Blocks.Sources.Constant speed(k = 10) annotation(
+        Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Blocks.Sources.Constant steer(k = 0.1) annotation(
+        Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Roads.Road road annotation(
+        Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Blocks.Sources.Step brake_input(height = 1, startTime = 5) annotation(
+        Placement(transformation(origin = {-68, 58}, extent = {{-10, -10}, {10, 10}})));
+    equation
+      connect(speed.y, car.speedInput) annotation(
+        Line(points = {{-60, 0}, {-28, 0}}, color = {0, 0, 127}));
+      connect(steer.y, car.steerInput) annotation(
+        Line(points = {{52, 0}, {28, 0}}, color = {0, 0, 127}));
+      connect(road.FL, car.frame_FL) annotation(
+        Line(points = {{66, 70}, {66, 86}, {16, 86}, {16, 28}}, color = {95, 95, 95}));
+      connect(road.RL, car.frame_RL) annotation(
+        Line(points = {{54, 70}, {54, 80}, {-22, 80}, {-22, 28}}, color = {95, 95, 95}));
+      connect(road.FR, car.frame_FR) annotation(
+        Line(points = {{66, 50}, {80, 50}, {80, -50}, {16, -50}, {16, -28}}, color = {95, 95, 95}));
+      connect(road.RR, car.frame_RR) annotation(
+        Line(points = {{54, 50}, {54, 26}, {76, 26}, {76, -44}, {-22, -44}, {-22, -28}}, color = {95, 95, 95}));
+      connect(brake_input.y, car.brakeInput) annotation(
+        Line(points = {{-56, 58}, {0, 58}, {0, 28}}, color = {0, 0, 127}));
+      annotation(
+        Documentation(info = "<html>
+<body>
+<h4>E36Example</h4>
+<p>Top-level simulation for the BMW E36 318is. Rear-wheel drive, 1180 kg total, 195/65R15 tires (R = 0.31 m). Front MacPherson struts, rear multi-link Z-axle. Drives at 10 rad/s with 0.1 rad of steering on a flat terrain. Brakes engage at t = 5 s.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Instance</th><th>Type</th><th>Value</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>R_wheel</code></td><td><code>inner parameter Real</code></td><td>0.31 m</td><td>Tire radius &mdash; 195/65R15</td></tr>
+<tr><td><code>car</code></td><td><code>Cars.E36Car</code></td><td>&mdash;</td><td>The E36 vehicle</td></tr>
+<tr><td><code>road</code></td><td><code>Roads.Road</code></td><td>&mdash;</td><td>The road environment</td></tr>
+<tr><td><code>speed</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 10</td><td>Rear wheel angular velocity setpoint (rad/s)</td></tr>
+<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.1</td><td>Front wheel steer angle (rad)</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
+    end E36Example;
+
   end Examples;
 
   package Interfaces
@@ -863,6 +909,159 @@ package DDynamics
 </html>"));
     end CivicEKCar;
 
+    model E36Car
+      Parts.Chassis.RectangularChassis chassis(m = 1000, length = 4.433, width = 1.710, height = 0.4) annotation(
+        Placement(transformation(extent = {{-10, -10}, {10, 10}})));
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFL(r = {1.350, -0.15, 0.710}) annotation(
+        Placement(transformation(origin = {50, 40}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFR(r = {1.350, -0.15, -0.710}) annotation(
+        Placement(transformation(origin = {50, -40}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRL(r = {-1.350, -0.25, 0.710}) annotation(
+        Placement(transformation(origin = {-70, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRR(r = {-1.350, -0.25, -0.710}) annotation(
+        Placement(transformation(origin = {-70, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Parts.Suspension.McPherson mcphersonFL(steerable = true, k_spring = 20000, d_damper = 2200, wheelOffsetY = 0.25, wheelOffsetZ = 0.30) annotation(
+        Placement(transformation(origin = {110, 40}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Suspension.McPherson mcphersonFR(sideSign = -1, steerable = true, k_spring = 20000, d_damper = 2200, wheelOffsetY = 0.25, wheelOffsetZ = 0.30) annotation(
+        Placement(transformation(origin = {110, -40}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Suspension.MultiLink multiLinkRL(k_spring = 16000, d_damper = 2200) annotation(
+        Placement(transformation(origin = {-110, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Parts.Suspension.MultiLink multiLinkRR(sideSign = -1, k_spring = 16000, d_damper = 2200) annotation(
+        Placement(transformation(origin = {-110, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Parts.Tires.Tire tireFL annotation(
+        Placement(transformation(origin = {150, 40}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Tires.Tire tireFR annotation(
+        Placement(transformation(origin = {150, -40}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Tires.DrivingTire tireRL annotation(
+        Placement(transformation(origin = {-150, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Parts.Tires.DrivingTire tireRR annotation(
+        Placement(transformation(origin = {-150, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Parts.Differentials.SolidAxle solidAxle annotation(
+        Placement(transformation(origin = {-152, -2}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
+      Modelica.Mechanics.MultiBody.Joints.FreeMotion freeMotion(r_rel_a(start = {0, 1.35, 0}), v_rel_a(start = {0, 0, 0})) annotation(
+        Placement(transformation(origin = {-4, 44}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Mechanics.Rotational.Sources.Position steerAct annotation(
+        Placement(transformation(origin = {102, 10}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Mechanics.Rotational.Sources.Position steerAct1 annotation(
+        Placement(transformation(origin = {102, -12}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_FL annotation(
+        Placement(transformation(origin = {94, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {60, 98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+      Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_FR annotation(
+        Placement(transformation(origin = {94, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {60, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+      Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_RL annotation(
+        Placement(transformation(origin = {-150, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {-80, 98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+      Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_RR annotation(
+        Placement(transformation(origin = {-150, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {-80, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+      Modelica.Mechanics.MultiBody.Interfaces.Frame_a chassis_pos annotation(
+        Placement(transformation(origin = {-2, -102}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {2, 0}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+      Modelica.Blocks.Interfaces.RealInput steerInput annotation(
+        Placement(transformation(origin = {42, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {98, -2}, extent = {{-14, -14}, {14, 14}}, rotation = 180)));
+      Modelica.Blocks.Interfaces.RealInput speedInput annotation(
+        Placement(transformation(origin = {-80, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {-97, -1}, extent = {{-13, -13}, {13, 13}})));
+      Modelica.Blocks.Interfaces.RealInput brakeInput "Brake demand [0=released, 1=fully applied]" annotation(
+        Placement(transformation(origin = {0, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {0, 98}, extent = {{-14, -14}, {14, 14}}, rotation = -90)));
+      Parts.Brakes.DiscBrake brakeFL(maxBrakeTorque = 2500) annotation(
+        Placement(transformation(origin = {164, 64}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Brakes.DiscBrake brakeFR(maxBrakeTorque = 2500) annotation(
+        Placement(transformation(origin = {148, -16}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Brakes.DiscBrake brakeRL(maxBrakeTorque = 3000) annotation(
+        Placement(transformation(origin = {-128, 58}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Brakes.DiscBrake brakeRR(maxBrakeTorque = 3000) annotation(
+        Placement(transformation(origin = {-118, -64}, extent = {{-10, -10}, {10, 10}})));
+      outer Modelica.Mechanics.MultiBody.World world;
+    equation
+      connect(mountFL.frame_b, mcphersonFL.chassisMount) annotation(
+        Line(points = {{60, 40}, {100, 40}}, color = {95, 95, 95}));
+      connect(mountFR.frame_b, mcphersonFR.chassisMount) annotation(
+        Line(points = {{60, -40}, {100, -40}}, color = {95, 95, 95}));
+      connect(mcphersonFL.wheelMount, tireFL.suspMount) annotation(
+        Line(points = {{120, 40}, {140, 40}}, color = {95, 95, 95}));
+      connect(mcphersonFR.wheelMount, tireFR.suspMount) annotation(
+        Line(points = {{120, -40}, {140, -40}}, color = {95, 95, 95}));
+      connect(multiLinkRL.wheelMount, tireRL.suspMount) annotation(
+        Line(points = {{-120, 40}, {-140, 40}}, color = {95, 95, 95}));
+      connect(multiLinkRR.wheelMount, tireRR.suspMount) annotation(
+        Line(points = {{-120, -40}, {-140, -40}}, color = {95, 95, 95}));
+      connect(multiLinkRL.chassisMount, mountRL.frame_b) annotation(
+        Line(points = {{-100, 40}, {-80, 40}}, color = {95, 95, 95}));
+      connect(multiLinkRR.chassisMount, mountRR.frame_b) annotation(
+        Line(points = {{-100, -40}, {-80, -40}}, color = {95, 95, 95}));
+      connect(solidAxle.right_out, tireRR.spinInput) annotation(
+        Line(points = {{-152, -12}, {-152, -22}, {-174, -22}, {-174, -58}, {-154, -58}, {-154, -50}}));
+      connect(solidAxle.left_out, tireRL.spinInput) annotation(
+        Line(points = {{-152, 8}, {-152, 19}, {-154, 19}, {-154, 30}}));
+      connect(steerAct1.flange, mcphersonFR.steerInput) annotation(
+        Line(points = {{112, -12}, {124, -12}, {124, -26}, {110, -26}, {110, -30}}));
+      connect(steerAct.flange, mcphersonFL.steerInput) annotation(
+        Line(points = {{112, 10}, {128, 10}, {128, 60}, {110, 60}, {110, 50}}));
+      connect(tireFL.wheelSupport, frame_FL) annotation(
+        Line(points = {{160, 40}, {180, 40}, {180, 82}, {94, 82}, {94, 100}}, color = {95, 95, 95}));
+      connect(tireFR.wheelSupport, frame_FR) annotation(
+        Line(points = {{160, -40}, {174, -40}, {174, -100}, {94, -100}}, color = {95, 95, 95}));
+      connect(tireRL.wheelSupport, frame_RL) annotation(
+        Line(points = {{-160, 40}, {-180, 40}, {-180, 80}, {-150, 80}, {-150, 100}}, color = {95, 95, 95}));
+      connect(tireRR.wheelSupport, frame_RR) annotation(
+        Line(points = {{-160, -40}, {-202, -40}, {-202, -100}, {-150, -100}}, color = {95, 95, 95}));
+      connect(steerInput, steerAct.phi_ref) annotation(
+        Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, 10}, {90, 10}}, color = {0, 0, 127}));
+      connect(steerInput, steerAct1.phi_ref) annotation(
+        Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, -12}, {90, -12}}, color = {0, 0, 127}));
+      connect(speedInput, solidAxle.i) annotation(
+        Line(points = {{-80, 110}, {-80, -2}, {-142, -2}}, color = {0, 0, 127}));
+      connect(brakeFL.shaft, tireFL.brakeFlange) annotation(
+        Line(points = {{154, 64}, {154, 52}, {150, 52}, {150, 40}}));
+      connect(brakeFR.shaft, tireFR.brakeFlange) annotation(
+        Line(points = {{138, -16}, {138, -40}, {150, -40}}));
+      connect(brakeRL.shaft, tireRL.brakeFlange) annotation(
+        Line(points = {{-138, 58}, {-168, 58}, {-168, 40}, {-150, 40}}));
+      connect(brakeRR.shaft, tireRR.brakeFlange) annotation(
+        Line(points = {{-128, -64}, {-128, -51}, {-150, -51}, {-150, -40}}));
+      connect(brakeInput, brakeFL.u) annotation(
+        Line(points = {{0, 110}, {0, 80}, {164, 80}, {164, 74}}, color = {0, 0, 127}));
+      connect(brakeInput, brakeFR.u) annotation(
+        Line(points = {{0, 110}, {0, 80}, {148, 80}, {148, -6}}, color = {0, 0, 127}));
+      connect(brakeInput, brakeRL.u) annotation(
+        Line(points = {{0, 110}, {0, 80}, {-128, 80}, {-128, 68}}, color = {0, 0, 127}));
+      connect(brakeInput, brakeRR.u) annotation(
+        Line(points = {{0, 110}, {0, 80}, {-118, 80}, {-118, -54}}, color = {0, 0, 127}));
+      connect(world.frame_b, freeMotion.frame_a) annotation(
+        Line(points = {{-20, 100}, {-20, 44}, {-14, 44}}));
+      connect(chassis_pos, chassis.frame_a) annotation(
+        Line(points = {{-2, -102}, {0, -102}, {0, -10}}));
+      connect(mountRL.frame_a, chassis.frame_a) annotation(
+        Line(points = {{-60, 40}, {-26, 40}, {-26, -10}, {0, -10}}, color = {95, 95, 95}));
+      connect(mountRR.frame_a, chassis.frame_a) annotation(
+        Line(points = {{-60, -40}, {0, -40}, {0, -10}}, color = {95, 95, 95}));
+      connect(mountFR.frame_a, chassis.frame_a) annotation(
+        Line(points = {{40, -40}, {0, -40}, {0, -10}}, color = {95, 95, 95}));
+      connect(mountFL.frame_a, chassis.frame_a) annotation(
+        Line(points = {{40, 40}, {20, 40}, {20, -10}, {0, -10}}, color = {95, 95, 95}));
+      connect(freeMotion.frame_b, chassis.frame_a) annotation(
+        Line(points = {{6, 44}, {16, 44}, {16, -10}, {0, -10}}, color = {95, 95, 95}));
+      annotation(
+        Icon(graphics = {Line(points = {{-80, 60}, {-80, -60}, {80, -60}, {80, 60}, {-80, 60}, {-80, 60}}), Line(origin = {-2, 0}, points = {{-58, 40}, {-58, -40}, {62, -40}, {62, 40}, {-58, 40}, {-58, 40}, {-58, 40}}), Line(origin = {-0.193375, 0.27735}, points = {{-59.8066, 39.7226}, {-29.8066, 19.7226}, {-29.8066, -20.2774}, {-59.8066, -40.2774}, {-29.8066, -20.2774}, {40.1934, -20.2774}, {40.1934, 19.7226}, {-29.8066, 19.7226}, {40.1934, 19.7226}, {60.1934, 39.7226}, {40.1934, 19.7226}, {40.1934, -20.2774}, {60.1934, -40.2774}, {60.1934, -38.2774}})}),
+        Documentation(info = "<html>
+<body>
+<h4>E36Car</h4>
+<p>BMW E36 318is vehicle model. Rear-wheel drive. Dimensions: 4433 mm long, 1710 mm wide, 2700 mm wheelbase, 1180 kg total mass (1000 kg sprung). Front: <code>McPherson</code> strut (steerable, 20 kN/m, 2200 N&middot;s/m). Rear: <code>MultiLink</code> Z-axle (16 kN/m, 2200 N&middot;s/m). <code>DrivingTire</code> on rear axle, passive <code>Tire</code> on front. Tire: 195/65R15 (R = 0.31 m).</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>frame_FL</code></td><td>Frame_a</td><td>Front-left ground contact &mdash; connect to Road.FL</td></tr>
+<tr><td><code>frame_FR</code></td><td>Frame_a</td><td>Front-right ground contact &mdash; connect to Road.FR</td></tr>
+<tr><td><code>frame_RL</code></td><td>Frame_a</td><td>Rear-left ground contact &mdash; connect to Road.RL</td></tr>
+<tr><td><code>frame_RR</code></td><td>Frame_a</td><td>Rear-right ground contact &mdash; connect to Road.RR</td></tr>
+<tr><td><code>chassis_pos</code></td><td>Frame_a</td><td>Chassis reference frame</td></tr>
+<tr><td><code>speedInput</code></td><td>RealInput</td><td>Rear wheel angular velocity setpoint (rad/s)</td></tr>
+<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front wheel steer angle (rad)</td></tr>
+<tr><td><code>brakeInput</code></td><td>RealInput</td><td>Brake demand [0=released, 1=fully applied]</td></tr>
+</tbody>
+</table>
+<p><code>outer World world</code> is resolved from <code>Road</code>.</p>
+</body>
+</html>"));
+    end E36Car;
+
     package Parts
 
       package Tires
@@ -1340,6 +1539,210 @@ flange rather than the brake being overridden by a kinematic constraint.</p>
 </body>
 </html>"));
         end DoubleWishbone;
+
+        model McPherson
+          extends Components.BaseSuspension;
+          import MultiBody = Modelica.Mechanics.MultiBody;
+          parameter Real sideSign = 1 "1 for left side, -1 for right side";
+          parameter Modelica.Units.SI.Length shockTopHeight = 0.28 "Spring seat height above chassis attachment";
+          // Wheel offset from strut bottom: compensates for the missing lower arm geometry.
+          // wheelOffsetY lifts the wheel above the strut bottom (knuckle height effect).
+          // wheelOffsetZ moves the wheel outboard to restore the correct track width.
+          // Set these in the car model to match the lateral and vertical extent of the
+          // rear suspension links so front and rear tracks/ride heights are consistent.
+          parameter Modelica.Units.SI.Length wheelOffsetY = 0 "Wheel center height above strut bottom";
+          parameter Modelica.Units.SI.Length wheelOffsetZ = 0 "Lateral outboard offset from strut to wheel center";
+          // --- Shock top mount on chassis ---
+          MultiBody.Parts.FixedTranslation shockTopMount(r = {0, shockTopHeight, 0}) annotation(
+            Placement(transformation(extent = {{-60, 40}, {-40, 60}})));
+          // --- Strut: purely vertical Prismatic, no kinematic loop ---
+          MultiBody.Joints.Prismatic strutTravel(n = {0, -1, 0},
+            s(start = 0.30, fixed = false),
+            v(start = 0, fixed = false)) annotation(
+            Placement(transformation(extent = {{-20, -10}, {0, 10}})));
+          // --- Knuckle offset: lateral + vertical displacement from strut bottom to wheel center ---
+          // Represents the effect of the lower control arm (lateral) and knuckle height (vertical).
+          MultiBody.Parts.FixedTranslation knuckleOffset(r = {0, wheelOffsetY, sideSign * wheelOffsetZ}) annotation(
+            Placement(transformation(extent = {{10, -10}, {30, 10}})));
+          // --- Hub/knuckle mass at wheel center ---
+          MultiBody.Parts.Body hub(m = m_hub,
+            r_CM = {0, 0, 0},
+            I_11 = 0.1, I_22 = 0.1, I_33 = 0.1) annotation(
+            Placement(transformation(extent = {{40, 10}, {60, 30}})));
+          // --- Steering revolute ---
+          MultiBody.Joints.Revolute steer(
+            n = {0, 1, 0},
+            useAxisFlange = true) annotation(
+            Placement(transformation(extent = {{60, -10}, {80, 10}})));
+          Modelica.Mechanics.Rotational.Components.Fixed steerLock if not steerable annotation(
+            Placement(transformation(extent = {{60, 20}, {80, 40}})));
+          // --- Spring-damper: shock top mount to strut bottom (not wheel center) ---
+          // Free length = sqrt(shockTopHeight^2 + s_rest^2) = sqrt(0.28^2+0.30^2) ~ 0.41 m
+          MultiBody.Forces.SpringDamperParallel shock(c = k_spring, d = d_damper, s_unstretched = 0.41) annotation(
+            Placement(transformation(extent = {{-40, -40}, {-20, -20}})));
+
+        equation
+          connect(chassisMount, strutTravel.frame_a) annotation(
+            Line(points = {{-100, 0}, {-20, 0}}, color = {95, 95, 95}));
+          connect(strutTravel.frame_b, knuckleOffset.frame_a) annotation(
+            Line(points = {{0, 0}, {10, 0}}, color = {95, 95, 95}));
+          connect(knuckleOffset.frame_b, hub.frame_a) annotation(
+            Line(points = {{30, 0}, {40, 20}}, color = {95, 95, 95}));
+          connect(knuckleOffset.frame_b, steer.frame_a) annotation(
+            Line(points = {{30, 0}, {60, 0}}, color = {95, 95, 95}));
+          connect(steer.frame_b, wheelMount) annotation(
+            Line(points = {{80, 0}, {100, 0}}, color = {95, 95, 95}));
+          connect(chassisMount, shockTopMount.frame_a) annotation(
+            Line(points = {{-100, 0}, {-80, 0}, {-80, 50}, {-60, 50}}, color = {95, 95, 95}));
+          connect(shockTopMount.frame_b, shock.frame_a) annotation(
+            Line(points = {{-40, 50}, {-30, 50}, {-30, -20}}, color = {95, 95, 95}));
+          connect(strutTravel.frame_b, shock.frame_b) annotation(
+            Line(points = {{0, 0}, {10, 0}, {10, -30}, {-20, -30}}, color = {95, 95, 95}));
+          connect(steerInput, steer.axis) annotation(
+            Line(points = {{0, 100}, {70, 100}, {70, 10}}));
+          connect(steer.axis, steerLock.flange) annotation(
+            Line(points = {{70, 10}, {70, 20}}));
+          annotation(Icon(graphics = {
+            Line(points = {{-80, -30}, {0, -50}}, color = {95, 95, 95}, thickness = 1),
+            Line(points = {{-20, 60}, {0, -50}}, color = {95, 95, 95}, thickness = 1.5),
+            Ellipse(extent = {{-6, 6}, {6, -6}}, origin = {0, -50}, fillColor = {95, 95, 95}, fillPattern = FillPattern.Solid),
+            Ellipse(extent = {{-6, 6}, {6, -6}}, origin = {-20, 60}, fillColor = {95, 95, 95}, fillPattern = FillPattern.Solid),
+            Line(points = {{-80, -30}, {-80, 20}}, color = {0, 0, 0}, thickness = 2),
+            Line(points = {{-22, 55}, {-18, 55}, {-20, 60}, {-22, 65}, {-18, 65}}, color = {0, 128, 0}, thickness = 0.75),
+            Text(extent = {{-100, -80}, {100, -100}}, textString = "%name")}),
+            Documentation(info = "<html>
+<body>
+<h4>McPherson</h4>
+<p>Simplified MacPherson strut suspension. Vertical wheel travel is a single <code>Prismatic</code> joint (strut DOF). A <code>knuckleOffset</code> <code>FixedTranslation</code> then displaces the wheel centre upward by <code>wheelOffsetY</code> and outboard by <code>wheelOffsetZ</code> to compensate for the lower control arm geometry that is not modelled kinematically. Set these two parameters in the car model so that front and rear track widths and ride heights are consistent with the rear suspension link lengths. The spring-damper connects the fixed top mount to the strut bottom (not the wheel centre), keeping the force direction along the strut axis. Extends <code>BaseSuspension</code>.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>sideSign</code></td><td>1</td><td>1 = left side, -1 = right side</td></tr>
+<tr><td><code>shockTopHeight</code></td><td>0.28 m</td><td>Spring seat height above chassis attachment point</td></tr>
+<tr><td><code>wheelOffsetY</code></td><td>0 m</td><td>Wheel centre height above strut bottom (knuckle height effect)</td></tr>
+<tr><td><code>wheelOffsetZ</code></td><td>0 m</td><td>Lateral outboard offset from strut to wheel centre (lower arm lateral effect)</td></tr>
+</tbody>
+</table>
+<p>Spring/damper from <code>BaseSuspension</code>: <code>k_spring</code>, <code>d_damper</code>. Natural length 0.41 m (zero spring force at s &asymp; 0.30 m strut compression).</p>
+</body>
+</html>"));
+        end McPherson;
+
+        model MultiLink
+          extends Components.BaseSuspension;
+          import MultiBody = Modelica.Mechanics.MultiBody;
+          // --- Geometry parameters ---
+          parameter Real sideSign = 1 "1 for left side, -1 for right side";
+          parameter Modelica.Units.SI.Length upperLinkLength = 0.30 "Upper transverse link length";
+          parameter Modelica.Units.SI.Length lowerLinkLength = 0.38 "Lower link length";
+          parameter Modelica.Units.SI.Length upperMountZ = 0.22 "Upper link height above chassis mount";
+          parameter Modelica.Units.SI.Length lowerMountZ = 0.12 "Lower link height below chassis mount";
+          parameter Modelica.Units.SI.Length rearLinkOffset = 0.08 "Fore-aft offset of lower link chassis pivot (X)";
+          parameter Modelica.Units.SI.Length shockTopHeight = 0.32 "Shock top mount height above chassis mount";
+          // --- Chassis-side offsets ---
+          MultiBody.Parts.FixedTranslation upperChassisOffset(r = {0, upperMountZ, 0}) annotation(
+            Placement(transformation(extent = {{-70, 20}, {-50, 40}})));
+          MultiBody.Parts.FixedTranslation lowerChassisOffset(r = {rearLinkOffset, -lowerMountZ, 0}) annotation(
+            Placement(transformation(extent = {{-70, -40}, {-50, -20}})));
+          // --- Upper link (tree branch) ---
+          MultiBody.Joints.Revolute upperLinkPivot(n = {1, 0, 0}) annotation(
+            Placement(transformation(extent = {{-40, 20}, {-20, 40}})));
+          MultiBody.Parts.BodyCylinder upperLink(r = {0, 0, sideSign * upperLinkLength}, diameter = 0.025) annotation(
+            Placement(transformation(extent = {{-10, 20}, {10, 40}})));
+          // --- Loop closure via JointRRR (same assembly as DoubleWishbone) ---
+          MultiBody.Joints.Assemblies.JointRRR lowerLoop(
+            rRod1_ia = {0, -(upperMountZ + lowerMountZ), 0},
+            rRod2_ib = {0, 0, sideSign * lowerLinkLength},
+            n_a = {1, 0, 0}) annotation(
+            Placement(transformation(origin = {90, 2}, extent = {{20, -40}, {60, 40}}, rotation = 180)));
+          // --- Hub/knuckle mass ---
+          MultiBody.Parts.Body hub(m = m_hub,
+            r_CM = {0, -(upperMountZ + lowerMountZ) / 2, 0},
+            I_11 = 0.1, I_22 = 0.1, I_33 = 0.1) annotation(
+            Placement(transformation(origin = {18, 28}, extent = {{70, 20}, {90, 40}})));
+          // --- Shock top mount ---
+          MultiBody.Parts.FixedTranslation shockTopMount(r = {0, shockTopHeight, 0}) annotation(
+            Placement(transformation(extent = {{-70, 50}, {-50, 70}})));
+          // --- Wheel center offset ---
+          MultiBody.Parts.FixedTranslation wheelOffset(r = {0, -(upperMountZ + lowerMountZ) / 2, 0}) annotation(
+            Placement(transformation(origin = {20, -26}, extent = {{60, -10}, {80, 10}})));
+          // --- Steering revolute (locked when steerable=false) ---
+          MultiBody.Joints.Revolute steer(
+            n = {0, 1, 0},
+            useAxisFlange = true) annotation(
+            Placement(transformation(origin = {-6, 18}, extent = {{82, -10}, {102, 10}})));
+          Modelica.Mechanics.Rotational.Components.Fixed steerLock if not steerable annotation(
+            Placement(transformation(origin = {76, 40}, extent = {{-6, -6}, {6, 6}})));
+          // --- Spring-damper ---
+          MultiBody.Forces.SpringDamperParallel shock(c = k_spring, d = d_damper, s_unstretched = 0.50) annotation(
+            Placement(transformation(origin = {-14, -2}, extent = {{-20, -80}, {0, -60}})));
+
+        equation
+// Chassis-side: upper and lower link mounts
+          connect(chassisMount, upperChassisOffset.frame_a) annotation(
+            Line(points = {{-100, 0}, {-80, 0}, {-80, 30}, {-70, 30}}, color = {95, 95, 95}));
+          connect(chassisMount, lowerChassisOffset.frame_a) annotation(
+            Line(points = {{-100, 0}, {-80, 0}, {-80, -30}, {-70, -30}}, color = {95, 95, 95}));
+// Tree branch: upper transverse link
+          connect(upperChassisOffset.frame_b, upperLinkPivot.frame_a) annotation(
+            Line(points = {{-50, 30}, {-40, 30}}, color = {95, 95, 95}));
+          connect(upperLinkPivot.frame_b, upperLink.frame_a) annotation(
+            Line(points = {{-20, 30}, {-10, 30}}, color = {95, 95, 95}));
+// JointRRR closes the lower link loop
+          connect(upperLink.frame_b, lowerLoop.frame_a) annotation(
+            Line(points = {{10, 30}, {16, 30}, {16, 2}, {70, 2}}, color = {95, 95, 95}));
+          connect(lowerChassisOffset.frame_b, lowerLoop.frame_b) annotation(
+            Line(points = {{-50, -30}, {30, -30}, {30, 2}}, color = {95, 95, 95}));
+// Hub and wheel output
+          connect(lowerLoop.frame_ia, hub.frame_a) annotation(
+            Line(points = {{66, -38}, {66, 58}, {88, 58}}, color = {95, 95, 95}));
+          connect(lowerLoop.frame_ia, wheelOffset.frame_a) annotation(
+            Line(points = {{66, -38}, {66, -25}, {80, -25}, {80, -26}}, color = {95, 95, 95}));
+          connect(wheelOffset.frame_b, steer.frame_a) annotation(
+            Line(points = {{100, -26}, {100, 10}, {76, 10}, {76, 18}}, color = {95, 95, 95}));
+          connect(steer.frame_b, wheelMount) annotation(
+            Line(points = {{96, 18}, {114, 18}, {114, 0}, {100, 0}}, color = {95, 95, 95}));
+// Shock: top mount to lower ball joint (frame_im)
+          connect(chassisMount, shockTopMount.frame_a) annotation(
+            Line(points = {{-100, 0}, {-80, 0}, {-80, 60}, {-70, 60}}, color = {95, 95, 95}));
+          connect(shockTopMount.frame_b, shock.frame_a) annotation(
+            Line(points = {{-50, 60}, {-34, 60}, {-34, -72}}, color = {95, 95, 95}));
+          connect(lowerLoop.frame_im, shock.frame_b) annotation(
+            Line(points = {{50, -38}, {50, -56}, {-14, -56}, {-14, -72}}, color = {95, 95, 95}));
+// Steering
+          connect(steerInput, steer.axis) annotation(
+            Line(points = {{0, 100}, {0, 44}, {86, 44}, {86, 28}}));
+          connect(steer.axis, steerLock.flange) annotation(
+            Line(points = {{86, 28}, {86, 40}, {82, 40}}));
+          annotation(Icon(graphics = {
+            Line(points = {{-80, 30}, {0, 50}}, color = {95, 95, 95}, thickness = 0.75),
+            Line(points = {{-70, 0}, {0, 50}}, color = {95, 95, 95}, thickness = 0.75),
+            Line(points = {{-80, -30}, {0, -50}}, color = {95, 95, 95}, thickness = 0.75),
+            Line(points = {{0, 50}, {0, -50}}, color = {0, 0, 0}, thickness = 1.5),
+            Ellipse(extent = {{-6, 6}, {6, -6}}, origin = {0, 50}, fillColor = {95, 95, 95}, fillPattern = FillPattern.Solid),
+            Ellipse(extent = {{-6, 6}, {6, -6}}, origin = {0, -50}, fillColor = {95, 95, 95}, fillPattern = FillPattern.Solid),
+            Line(points = {{-80, 30}, {-80, -30}}, color = {0, 0, 0}, thickness = 2),
+            Text(extent = {{-100, -80}, {100, -100}}, textString = "%name")}),
+            Documentation(info = "<html>
+<body>
+<h4>MultiLink</h4>
+<p>Multi-link suspension. Separate upper and lower transverse links replace the wide A-arms of a double wishbone. The <code>rearLinkOffset</code> parameter shifts the lower link inboard pivot fore/aft, producing characteristic multi-link toe/caster geometry. Uses a <code>JointRRR</code> for loop closure, same as <code>DoubleWishbone</code>. Extends <code>BaseSuspension</code>.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>sideSign</code></td><td>1</td><td>1 = left side, -1 = right side</td></tr>
+<tr><td><code>upperLinkLength</code></td><td>0.30 m</td><td>Upper transverse link length</td></tr>
+<tr><td><code>lowerLinkLength</code></td><td>0.38 m</td><td>Lower link length</td></tr>
+<tr><td><code>upperMountZ</code></td><td>0.22 m</td><td>Upper link height above chassis mount</td></tr>
+<tr><td><code>lowerMountZ</code></td><td>0.12 m</td><td>Lower link height below chassis mount</td></tr>
+<tr><td><code>rearLinkOffset</code></td><td>0.08 m</td><td>Fore-aft offset of lower link chassis pivot (X direction)</td></tr>
+<tr><td><code>shockTopHeight</code></td><td>0.32 m</td><td>Shock absorber top mount height</td></tr>
+</tbody>
+</table>
+<p>Spring/damper parameters from <code>BaseSuspension</code>: <code>k_spring</code>, <code>d_damper</code>. Shock free length 0.50 m.</p>
+</body>
+</html>"));
+        end MultiLink;
 
         package Components
           partial model BaseSuspension
