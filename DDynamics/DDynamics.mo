@@ -140,6 +140,77 @@ package DDynamics
 </html>"));
     end E36Example;
 
+    model CarExampleUDP
+      inner parameter Real R_wheel = 0.25 "Tire radius (m) — propagated to tires and floor contact";
+      Cars.Car car annotation(
+        Placement(transformation(extent = {{-28, -28}, {28, 28}})));
+      Modelica.Blocks.Sources.Constant speed(k = 5) annotation(
+        Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Blocks.Sources.Sine steer(amplitude = 0.3, f = 0.2) annotation(
+        Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+      Roads.Road road annotation(
+        Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Blocks.Sources.Constant brake_input(k = 0) annotation(
+        Placement(transformation(origin = {-68, 58}, extent = {{-10, -10}, {10, 10}})));
+      // One UDP streamer per rigid body. Each uses its own port so the Unity
+      // receiver can bind one GameObject (chassis / wheel) per port.
+      Interfaces.FrameToUDPOrientation udpChassis(port_send = 12345) annotation(
+        Placement(transformation(origin = {-60, -54}, extent = {{-10, -10}, {10, 10}})));
+      Interfaces.FrameToUDPOrientation udpFL(port_send = 12346) annotation(
+        Placement(transformation(origin = {-18, -72}, extent = {{-10, -10}, {10, 10}})));
+      Interfaces.FrameToUDPOrientation udpFR(port_send = 12347) annotation(
+        Placement(transformation(origin = {24, -74}, extent = {{-10, -10}, {10, 10}})));
+      Interfaces.FrameToUDPOrientation udpRL(port_send = 12348) annotation(
+        Placement(transformation(origin = {60, -70}, extent = {{-10, -10}, {10, 10}})));
+      Interfaces.FrameToUDPOrientation udpRR(port_send = 12349) annotation(
+        Placement(transformation(origin = {100, -70}, extent = {{-10, -10}, {10, 10}})));
+    equation
+      connect(speed.y, car.speedInput) annotation(
+        Line(points = {{-60, 0}, {-28, 0}}, color = {0, 0, 127}));
+      connect(steer.y, car.steerInput) annotation(
+        Line(points = {{52, 0}, {28, 0}}, color = {0, 0, 127}));
+      connect(road.FL, car.frame_FL) annotation(
+        Line(points = {{66, 70}, {66, 86}, {16, 86}, {16, 28}}, color = {95, 95, 95}));
+      connect(road.RL, car.frame_RL) annotation(
+        Line(points = {{54, 70}, {54, 80}, {-22, 80}, {-22, 28}}, color = {95, 95, 95}));
+      connect(road.FR, car.frame_FR) annotation(
+        Line(points = {{66, 50}, {80, 50}, {80, -50}, {16, -50}, {16, -28}}, color = {95, 95, 95}));
+      connect(road.RR, car.frame_RR) annotation(
+        Line(points = {{54, 50}, {54, 26}, {76, 26}, {76, -44}, {-22, -44}, {-22, -28}}, color = {95, 95, 95}));
+      connect(brake_input.y, car.brakeInput) annotation(
+        Line(points = {{-56, 58}, {0, 58}, {0, 28}}, color = {0, 0, 127}));
+// Tap chassis + each wheel frame for streaming. These are pure sensors
+// (zero force/torque) so they do not alter the vehicle dynamics.
+      connect(car.chassis_pos, udpChassis.frame_a) annotation(
+        Line(points = {{0, -28}, {0, -54}, {-70, -54}}, color = {95, 95, 95}));
+      connect(car.frame_FL, udpFL.frame_a) annotation(
+        Line(points = {{16, 28}, {16, -72}, {-28, -72}}, color = {95, 95, 95}));
+      connect(car.frame_FR, udpFR.frame_a) annotation(
+        Line(points = {{16, -28}, {16, -50}, {14, -50}, {14, -74}}, color = {95, 95, 95}));
+      connect(car.frame_RL, udpRL.frame_a) annotation(
+        Line(points = {{-22, 28}, {60, 28}, {60, -60}}, color = {95, 95, 95}));
+      connect(car.frame_RR, udpRR.frame_a) annotation(
+        Line(points = {{-22, -28}, {100, -28}, {100, -60}}, color = {95, 95, 95}));
+      annotation(
+        Documentation(info = "<html>
+<body>
+<h4>CarExampleUDP</h4>
+<p>Same vehicle as <code>CarExample</code>, but streams the pose (position + orientation) of the chassis and all four wheels to a Unity visualizer over UDP via <code>Interfaces.FrameToUDPOrientation</code>. A sinusoidal steer input makes the front wheels sweep so the steering can be verified visually in Unity.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Streamer</th><th>Frame</th><th>UDP port</th></tr></thead>
+<tbody>
+<tr><td><code>udpChassis</code></td><td><code>car.chassis_pos</code></td><td>12345</td></tr>
+<tr><td><code>udpFL</code></td><td><code>car.frame_FL</code></td><td>12346</td></tr>
+<tr><td><code>udpFR</code></td><td><code>car.frame_FR</code></td><td>12347</td></tr>
+<tr><td><code>udpRL</code></td><td><code>car.frame_RL</code></td><td>12348</td></tr>
+<tr><td><code>udpRR</code></td><td><code>car.frame_RR</code></td><td>12349</td></tr>
+</tbody>
+</table>
+<p>The wheel frames sit on the spinning revolute output, so the transmitted orientation includes steer <b>and</b> spin. Attach the <code>Test2</code> script (<code>Assets/Scripts/Test2.cs</code>) to each Unity GameObject and set its <code>listenPort</code> to match.</p>
+</body>
+</html>"));
+    end CarExampleUDP;
+
   end Examples;
 
   package Interfaces
@@ -236,6 +307,181 @@ package DDynamics
 </body>
 </html>"));
     end FrameToUDP;
+
+    model FrameToRealOrientation
+      Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
+        Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
+      // World-frame position (m)
+      Modelica.Blocks.Interfaces.RealOutput x_out annotation(
+        Placement(transformation(origin = {110, 80}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {102, 80}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Blocks.Interfaces.RealOutput y_out annotation(
+        Placement(transformation(origin = {110, 55}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {102, 53}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Blocks.Interfaces.RealOutput z_out annotation(
+        Placement(transformation(origin = {110, 30}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {102, 26}, extent = {{-10, -10}, {10, 10}})));
+      // Orientation of frame_a as a unit quaternion [x, y, z, w] (vector part first, scalar last),
+      // in the Modelica convention Q = [sin(angle/2)*axis; cos(angle/2)].
+      Modelica.Blocks.Interfaces.RealOutput q_out[4] annotation(
+        Placement(transformation(origin = {110, -40}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {102, -40}, extent = {{-10, -10}, {10, 10}})));
+    equation
+      frame_a.r_0[1] = x_out;
+      frame_a.r_0[2] = y_out;
+      frame_a.r_0[3] = z_out;
+// Quaternion of the orientation object R (world -> body coordinate transform).
+      q_out = Modelica.Mechanics.MultiBody.Frames.to_Q(frame_a.R);
+// Sensor only: no force, no torque.
+      frame_a.f = zeros(3);
+      frame_a.t = zeros(3);
+      annotation(
+        Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 127}), Text(extent = {{-90, 40}, {90, -40}}, textString = "R,q"), Text(textColor = {0, 0, 255}, extent = {{-150, 150}, {150, 110}}, textString = "%name")}),
+        Documentation(info = "<html>
+<body>
+<h4>FrameToRealOrientation</h4>
+<p>Reads both the world-frame <b>position</b> and <b>orientation</b> of a multibody <code>Frame_a</code> and exposes them as <code>RealOutput</code> signals. Extends the idea of <code>FrameToReal</code> (position only) with a 4-element unit quaternion taken directly from the frame's orientation object via <code>Frames.to_Q(frame_a.R)</code>. Sets zero force and torque (sensor only, no mechanical effect).</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Direction</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>frame_a</code></td><td>Frame_a</td><td>in</td><td>MultiBody frame to read</td></tr>
+<tr><td><code>x_out</code>/<code>y_out</code>/<code>z_out</code></td><td>RealOutput</td><td>out</td><td>World position (m)</td></tr>
+<tr><td><code>q_out[4]</code></td><td>RealOutput</td><td>out</td><td>Orientation quaternion [x, y, z, w] of <code>frame_a.R</code></td></tr>
+</tbody>
+</table>
+<p><b>Note:</b> <code>q_out = Frames.to_Q(frame_a.R)</code> is, working through Modelica's <code>Frames.from_T</code>, the body&rarr;world rotation of the frame expressed as an active quaternion. The Unity receiver converts this right-handed rotation to Unity's left-handed frame with the same axis flip used for position (negating the x and y components of the vector part); see <code>FrameToUDPOrientation</code> and the Unity receiver.</p>
+</body>
+</html>"));
+    end FrameToRealOrientation;
+
+    model FrameToUDPOrientation
+      parameter Integer port_send = 12345 "UDP destination port";
+      parameter Modelica.Units.SI.Time sampleTime = 0.01 "Transmit period (s)";
+      Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
+        Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-102, -2}, extent = {{-16, -16}, {16, 16}})));
+      FrameToRealOrientation frameToReal annotation(
+        Placement(transformation(origin = {-44, 0}, extent = {{-26, -26}, {26, 26}})));
+      Modelica_DeviceDrivers.Blocks.Packaging.SerialPackager.Packager packager annotation(
+        Placement(transformation(origin = {48, 60}, extent = {{-10, -10}, {10, 10}})));
+      // One AddFloat per value, chained (mirrors the proven FrameToUDP structure).
+      // NOTE: each AddFloat adds exactly one float (default n = 1). Do NOT set the
+      // AddFloat "n" modifier — under OpenModelica 1.25.5 a modifier on n triggers an
+      // instantiation internal error, so use the default and chain instead.
+      Modelica_DeviceDrivers.Blocks.Packaging.SerialPackager.AddFloat addFloat(nu = 1) annotation(
+        Placement(transformation(origin = {48, 44}, extent = {{-10, -10}, {10, 10}})));
+      Modelica_DeviceDrivers.Blocks.Packaging.SerialPackager.AddFloat addFloat1(nu = 1) annotation(
+        Placement(transformation(origin = {48, 28}, extent = {{-10, -10}, {10, 10}})));
+      Modelica_DeviceDrivers.Blocks.Packaging.SerialPackager.AddFloat addFloat2(nu = 1) annotation(
+        Placement(transformation(origin = {48, 12}, extent = {{-10, -10}, {10, 10}})));
+      Modelica_DeviceDrivers.Blocks.Packaging.SerialPackager.AddFloat addFloat3(nu = 1) annotation(
+        Placement(transformation(origin = {48, -4}, extent = {{-10, -10}, {10, 10}})));
+      Modelica_DeviceDrivers.Blocks.Packaging.SerialPackager.AddFloat addFloat4(nu = 1) annotation(
+        Placement(transformation(origin = {48, -20}, extent = {{-10, -10}, {10, 10}})));
+      Modelica_DeviceDrivers.Blocks.Packaging.SerialPackager.AddFloat addFloat5(nu = 1) annotation(
+        Placement(transformation(origin = {48, -36}, extent = {{-10, -10}, {10, 10}})));
+      Modelica_DeviceDrivers.Blocks.Packaging.SerialPackager.AddFloat addFloat6(nu = 1) annotation(
+        Placement(transformation(origin = {48, -52}, extent = {{-10, -10}, {10, 10}})));
+      Modelica_DeviceDrivers.Blocks.Communication.UDPSend uDPSend(port_send = port_send, sampleTime = sampleTime) annotation(
+        Placement(transformation(origin = {48, -80}, extent = {{-10, -10}, {10, 10}})));
+      Modelica_DeviceDrivers.Blocks.OperatingSystem.RealtimeSynchronize realtimeSynchronize annotation(
+        Placement(transformation(origin = {-72, 82}, extent = {{-10, -10}, {10, 10}})));
+    equation
+      connect(frame_a, frameToReal.frame_a) annotation(
+        Line(points = {{-100, 0}, {-70, 0}}));
+      connect(packager.pkgOut, addFloat.pkgIn) annotation(
+        Line(points = {{48, 49}, {48, 45}}));
+      connect(addFloat.pkgOut[1], addFloat1.pkgIn) annotation(
+        Line(points = {{48, 33}, {48, 29}}));
+      connect(addFloat1.pkgOut[1], addFloat2.pkgIn) annotation(
+        Line(points = {{48, 17}, {48, 13}}));
+      connect(addFloat2.pkgOut[1], addFloat3.pkgIn) annotation(
+        Line(points = {{48, 1}, {48, -3}}));
+      connect(addFloat3.pkgOut[1], addFloat4.pkgIn) annotation(
+        Line(points = {{48, -15}, {48, -19}}));
+      connect(addFloat4.pkgOut[1], addFloat5.pkgIn) annotation(
+        Line(points = {{48, -31}, {48, -35}}));
+      connect(addFloat5.pkgOut[1], addFloat6.pkgIn) annotation(
+        Line(points = {{48, -47}, {48, -51}}));
+      connect(addFloat6.pkgOut[1], uDPSend.pkgIn) annotation(
+        Line(points = {{48, -63}, {48, -70}}));
+      connect(frameToReal.x_out, addFloat.u[1]) annotation(
+        Line(points = {{-18, 8}, {36, 8}, {36, 44}}, color = {0, 0, 127}));
+      connect(frameToReal.y_out, addFloat1.u[1]) annotation(
+        Line(points = {{-18, 5}, {34, 5}, {34, 28}}, color = {0, 0, 127}));
+      connect(frameToReal.z_out, addFloat2.u[1]) annotation(
+        Line(points = {{-18, 3}, {32, 3}, {32, 12}}, color = {0, 0, 127}));
+      connect(frameToReal.q_out[1], addFloat3.u[1]) annotation(
+        Line(points = {{-18, -4}, {30, -4}}, color = {0, 0, 127}));
+      connect(frameToReal.q_out[2], addFloat4.u[1]) annotation(
+        Line(points = {{-18, -6}, {28, -6}, {28, -20}}, color = {0, 0, 127}));
+      connect(frameToReal.q_out[3], addFloat5.u[1]) annotation(
+        Line(points = {{-18, -8}, {26, -8}, {26, -36}}, color = {0, 0, 127}));
+      connect(frameToReal.q_out[4], addFloat6.u[1]) annotation(
+        Line(points = {{-18, -10}, {24, -10}, {24, -52}}, color = {0, 0, 127}));
+      annotation(
+        Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {95, 95, 95}), Text(extent = {{-80, 40}, {80, -40}}, textString = "UDP\npos+quat"), Text(textColor = {0, 0, 255}, extent = {{-150, 150}, {150, 110}}, textString = "%name"), Text(extent = {{-90, -60}, {90, -90}}, textString = "port=%port_send")}),
+        Documentation(info = "<html>
+<body>
+<h4>FrameToUDPOrientation</h4>
+<p>Sends the world-frame <b>position and orientation</b> of a <code>Frame_a</code> over UDP using <code>Modelica_DeviceDrivers</code>. Internally chains <code>FrameToRealOrientation &rarr; Packager &rarr; 7 &times; AddFloat &rarr; UDPSend</code>. Unlike <code>FrameToUDP</code>, the destination <code>port_send</code> is a parameter, so several instances (chassis + each wheel) can stream to distinct ports simultaneously.</p>
+<p><b>Packet format</b> &mdash; 28 bytes, 7 &times; float32 (little-endian), sent at <code>1/sampleTime</code> Hz:</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Bytes</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>0&ndash;3</td><td>X position (m)</td></tr>
+<tr><td>4&ndash;7</td><td>Y position (m)</td></tr>
+<tr><td>8&ndash;11</td><td>Z position (m)</td></tr>
+<tr><td>12&ndash;15</td><td>quaternion x (vector part)</td></tr>
+<tr><td>16&ndash;19</td><td>quaternion y (vector part)</td></tr>
+<tr><td>20&ndash;23</td><td>quaternion z (vector part)</td></tr>
+<tr><td>24&ndash;27</td><td>quaternion w (scalar part)</td></tr>
+</tbody>
+</table>
+<p>All values are raw Modelica world-frame quantities (right-handed, Y-up in the <code>Cars</code>/<code>Roads</code> package). The Unity receiver performs the right-handed&rarr;left-handed conversion.</p>
+</body>
+</html>"));
+    end FrameToUDPOrientation;
+
+    model UDPInput
+    parameter Integer udpPort = 12347;
+    parameter Real sampleFreq = 0.1;
+  Modelica_DeviceDrivers.Blocks.Communication.UDPReceive uDPReceive(sampleTime = sampleFreq, port_recv = udpPort)  annotation(
+        Placement(transformation(origin = {-74, -24}, extent = {{-10, -10}, {10, 10}})));
+  Modelica_DeviceDrivers.Blocks.Packaging.SerialPackager.GetFloat getFloat(nu = 1)  annotation(
+        Placement(transformation(origin = {-30, -24}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+  Modelica_DeviceDrivers.Blocks.Packaging.SerialPackager.GetFloat getFloat1(nu = 1)  annotation(
+        Placement(transformation(origin = {8, -24}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+  Modelica_DeviceDrivers.Blocks.Packaging.SerialPackager.GetFloat getFloat2(nu = 1)  annotation(
+        Placement(transformation(origin = {42, -24}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+  Modelica_DeviceDrivers.Blocks.Packaging.SerialPackager.GetFloat getFloat3 annotation(
+        Placement(transformation(origin = {74, -24}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+  Modelica.Blocks.Interfaces.RealOutput steer annotation(
+        Placement(transformation(origin = {-30, 106}, extent = {{-10, -10}, {10, 10}}, rotation = 90), iconTransformation(origin = {104, 60}, extent = {{-10, -10}, {10, 10}})));
+  Modelica_DeviceDrivers.Blocks.OperatingSystem.RealtimeSynchronize realtimeSynchronize annotation(
+        Placement(transformation(origin = {-82, 78}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Blocks.Interfaces.RealOutput throttle annotation(
+        Placement(transformation(origin = {8, 106}, extent = {{-10, -10}, {10, 10}}, rotation = 90), iconTransformation(origin = {104, -60}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Blocks.Interfaces.RealOutput brake annotation(
+        Placement(transformation(origin = {42, 106}, extent = {{-10, -10}, {10, 10}}, rotation = 90), iconTransformation(origin = {104, -20}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Blocks.Interfaces.RealOutput clutch annotation(
+        Placement(transformation(origin = {74, 106}, extent = {{-10, -10}, {10, 10}}, rotation = 90), iconTransformation(origin = {104, 20}, extent = {{-10, -10}, {10, 10}})));
+    equation
+  connect(uDPReceive.pkgOut, getFloat.pkgIn) annotation(
+        Line(points = {{-63.2, -24}, {-39.2, -24}}));
+  connect(getFloat.pkgOut[1], getFloat1.pkgIn) annotation(
+        Line(points = {{-19.2, -24}, {-1.2, -24}}));
+  connect(getFloat1.pkgOut[1], getFloat2.pkgIn) annotation(
+        Line(points = {{18.8, -24}, {32.8, -24}}));
+  connect(getFloat2.pkgOut[1], getFloat3.pkgIn) annotation(
+        Line(points = {{52.8, -24}, {63.8, -24}}));
+  connect(getFloat.y[1], steer) annotation(
+        Line(points = {{-30, -12}, {-30, 106}}, color = {0, 0, 127}));
+  connect(getFloat1.y[1], throttle) annotation(
+        Line(points = {{8, -12}, {8, 106}}, color = {0, 0, 127}));
+  connect(getFloat2.y[1], brake) annotation(
+        Line(points = {{42, -12}, {42, 106}}, color = {0, 0, 127}));
+  connect(getFloat3.y[1], clutch) annotation(
+        Line(points = {{74, -12}, {74, 106}}, color = {0, 0, 127}));
+    annotation(
+        Icon(graphics = {Ellipse(origin = {65, 61}, extent = {{-17, 17}, {17, -17}}), Line(origin = {65, 53}, points = {{-17, 9}, {15, 9}, {17, 9}, {17, 9}, {17, 5}, {-17, 5}, {-17, 9}, {-17, 5}, {-1, 5}, {-1, -9}, {3, -9}, {3, 5}, {5, 5}}), Rectangle(origin = {66, 19}, lineColor = {111, 255, 1}, fillColor = {111, 255, 1}, fillPattern = FillPattern.Solid, extent = {{-6, 15}, {6, -15}}), Rectangle(origin = {66, -19}, lineColor = {255, 0, 4}, fillColor = {255, 0, 4}, fillPattern = FillPattern.Solid, extent = {{-6, 15}, {6, -15}}), Rectangle(origin = {66, -61}, lineColor = {3, 20, 255}, fillColor = {3, 20, 255}, fillPattern = FillPattern.Solid, extent = {{-6, 15}, {6, -15}}), Text(origin = {-17, -2}, extent = {{-69, 28}, {69, -28}}, textString = "UDP")}),
+  Diagram(graphics));
+end UDPInput;
 
   end Interfaces;
 
@@ -1865,15 +2111,19 @@ flange rather than the brake being overridden by a kinematic constraint.</p>
 <li>Open <code>DDynamics.mo</code> in OpenModelica or Dymola.</li>
 <li>Simulate <code>DDynamics.Examples.CarExample</code>.</li>
 <li>The example drives a car at 5 m/s with 0.2 rad of steering on a flat terrain at y = 1 m.</li>
+<li>For real-time visualization in Unity, simulate <code>DDynamics.Examples.CarExampleUDP</code> instead: it streams the pose (position + orientation) of the chassis and four wheels over UDP via <code>Interfaces.FrameToUDPOrientation</code>.</li>
 </ol>
 <h4>Package Structure</h4>
 <pre>
 DDynamics
 &#9500;&#9472;&#9472; Examples
-&#9474;   &#9492;&#9472;&#9472; CarExample
+&#9474;   &#9500;&#9472;&#9472; CarExample
+&#9474;   &#9492;&#9472;&#9472; CarExampleUDP
 &#9500;&#9472;&#9472; Interfaces
 &#9474;   &#9500;&#9472;&#9472; FrameToReal
-&#9474;   &#9492;&#9472;&#9472; FrameToUDP
+&#9474;   &#9500;&#9472;&#9472; FrameToUDP
+&#9474;   &#9500;&#9472;&#9472; FrameToRealOrientation
+&#9474;   &#9492;&#9472;&#9472; FrameToUDPOrientation
 &#9500;&#9472;&#9472; Roads
 &#9474;   &#9500;&#9472;&#9472; Road
 &#9474;   &#9500;&#9472;&#9472; Floors
