@@ -5,7 +5,7 @@ package DDynamics
       inner parameter Real R_wheel = 0.25 "Tire radius (m) — propagated to tires and floor contact";
       Cars.Car car annotation(
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
-      Modelica.Blocks.Sources.Constant speed(k = 5) annotation(
+      Modelica.Blocks.Sources.Constant speed(k = 1) annotation(
         Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
       Modelica.Blocks.Sources.Constant steer(k = 0.2)  annotation(
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
@@ -14,7 +14,7 @@ package DDynamics
   Modelica.Blocks.Sources.Step brake_input(height = 1, startTime = 3)  annotation(
         Placement(transformation(origin = {-68, 58}, extent = {{-10, -10}, {10, 10}})));
     equation
-      connect(speed.y, car.speedInput) annotation(
+      connect(speed.y, car.throttleInput) annotation(
         Line(points = {{-60, 0}, {-28, 0}}, color = {0, 0, 127}));
       connect(steer.y, car.steerInput) annotation(
         Line(points = {{52, 0}, {28, 0}}, color = {0, 0, 127}));
@@ -32,18 +32,18 @@ package DDynamics
         Documentation(info = "<html>
 <body>
 <h4>CarExample</h4>
-<p>Top-level simulation entry point. Instantiates a <code>Car</code> and a <code>Road</code>, drives them with constant speed and steering signals. The example drives a car at 5 m/s with 0.2 rad of steering on a flat terrain at y = 1 m.</p>
+<p>Top-level simulation entry point. Instantiates a <code>Car</code> and a <code>Road</code>, drives them with constant throttle and steering signals. The example applies full throttle (throttle = 1) with a 0.2 steer command on a flat terrain at y = 1 m; the brake steps to 1 at t = 3 s.</p>
 <table border=\"1\" cellspacing=\"0\">
 <thead><tr><th>Instance</th><th>Type</th><th>Value</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><code>R_wheel</code></td><td><code>inner parameter Real</code></td><td>0.25 m</td><td>Tire radius &mdash; propagated to all sub-models via <code>outer</code></td></tr>
 <tr><td><code>car</code></td><td><code>Cars.Car</code></td><td>&mdash;</td><td>The vehicle</td></tr>
 <tr><td><code>road</code></td><td><code>Roads.Road</code></td><td>&mdash;</td><td>The road environment (owns World and terrain)</td></tr>
-<tr><td><code>speed</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 5</td><td>Wheel angular velocity setpoint (rad/s)</td></tr>
-<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.2</td><td>Front wheel steer angle (rad)</td></tr>
+<tr><td><code>speed</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 1</td><td>Throttle command [0..1] &rarr; <code>car.throttleInput</code> (1 = full drive torque)</td></tr>
+<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.2</td><td>Steer command &rarr; <code>car.steerInput</code> (applied as rad)</td></tr>
 </tbody>
 </table>
-<p><b>Connections:</b> speed.y &rarr; car.speedInput &bull; steer.y &rarr; car.steerInput &bull; road.FL/FR/RL/RR &harr; car.frame_FL/FR/RL/RR</p>
+<p><b>Connections:</b> speed.y &rarr; car.throttleInput &bull; steer.y &rarr; car.steerInput &bull; road.FL/FR/RL/RR &harr; car.frame_FL/FR/RL/RR</p>
 </body>
 </html>"));
     end CarExample;
@@ -52,7 +52,7 @@ package DDynamics
       inner parameter Real R_wheel = 0.30 "Tire radius (m) — 185/65R14, propagated to tires and floor contact";
       Cars.CivicEKCar car annotation(
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
-      Modelica.Blocks.Sources.Constant speed(k = 10) annotation(
+      Modelica.Blocks.Sources.Constant speed(k = 1) annotation(
         Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
       Modelica.Blocks.Sources.Constant steer(k = 0.1) annotation(
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
@@ -61,7 +61,7 @@ package DDynamics
       Modelica.Blocks.Sources.Step brake_input(height = 1, startTime = 5) annotation(
         Placement(transformation(origin = {-68, 58}, extent = {{-10, -10}, {10, 10}})));
     equation
-      connect(speed.y, car.speedInput) annotation(
+      connect(speed.y, car.throttleInput) annotation(
         Line(points = {{-60, 0}, {-28, 0}}, color = {0, 0, 127}));
       connect(steer.y, car.steerInput) annotation(
         Line(points = {{52, 0}, {28, 0}}, color = {0, 0, 127}));
@@ -79,15 +79,15 @@ package DDynamics
         Documentation(info = "<html>
 <body>
 <h4>CivicEKExample</h4>
-<p>Top-level simulation for the Honda Civic EK hatchback. Front-wheel drive, 1130 kg, 185/65R14 tires (R = 0.30 m). Drives at 5 rad/s with 0.1 rad of steering on a flat terrain. Brakes engage at t = 5 s.</p>
+<p>Top-level simulation for the Honda Civic EK hatchback. Front-wheel drive, 1130 kg, 185/65R14 tires (R = 0.30 m). Applies full throttle (throttle = 1) with a 0.1 steer command on a flat terrain. Brakes engage at t = 5 s.</p>
 <table border=\"1\" cellspacing=\"0\">
 <thead><tr><th>Instance</th><th>Type</th><th>Value</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><code>R_wheel</code></td><td><code>inner parameter Real</code></td><td>0.30 m</td><td>Tire radius &mdash; 185/65R14</td></tr>
 <tr><td><code>car</code></td><td><code>Cars.CivicEKCar</code></td><td>&mdash;</td><td>The Civic EK vehicle</td></tr>
 <tr><td><code>road</code></td><td><code>Roads.Road</code></td><td>&mdash;</td><td>The road environment</td></tr>
-<tr><td><code>speed</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 5</td><td>Front wheel angular velocity setpoint (rad/s)</td></tr>
-<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.1</td><td>Front wheel steer angle (rad)</td></tr>
+<tr><td><code>speed</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 1</td><td>Throttle command [0..1] &rarr; <code>car.throttleInput</code> (1 = full drive torque)</td></tr>
+<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.1</td><td>Steer command &rarr; <code>car.steerInput</code> (applied as rad)</td></tr>
 </tbody>
 </table>
 </body>
@@ -98,7 +98,7 @@ package DDynamics
       inner parameter Real R_wheel = 0.31 "Tire radius (m) — 195/65R15, propagated to tires and floor contact";
       Cars.E36Car car annotation(
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
-      Modelica.Blocks.Sources.Constant speed(k = 10) annotation(
+      Modelica.Blocks.Sources.Constant speed(k = 1) annotation(
         Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
       Modelica.Blocks.Sources.Constant steer(k = 0.1) annotation(
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
@@ -107,7 +107,7 @@ package DDynamics
       Modelica.Blocks.Sources.Step brake_input(height = 1, startTime = 5) annotation(
         Placement(transformation(origin = {-68, 58}, extent = {{-10, -10}, {10, 10}})));
     equation
-      connect(speed.y, car.speedInput) annotation(
+      connect(speed.y, car.throttleInput) annotation(
         Line(points = {{-60, 0}, {-28, 0}}, color = {0, 0, 127}));
       connect(steer.y, car.steerInput) annotation(
         Line(points = {{52, 0}, {28, 0}}, color = {0, 0, 127}));
@@ -125,15 +125,15 @@ package DDynamics
         Documentation(info = "<html>
 <body>
 <h4>E36Example</h4>
-<p>Top-level simulation for the BMW E36 318is. Rear-wheel drive, 1180 kg total, 195/65R15 tires (R = 0.31 m). Front MacPherson struts, rear multi-link Z-axle. Drives at 10 rad/s with 0.1 rad of steering on a flat terrain. Brakes engage at t = 5 s.</p>
+<p>Top-level simulation for the BMW E36 318is. Rear-wheel drive, 1180 kg total, 195/65R15 tires (R = 0.31 m). Front MacPherson struts, rear multi-link Z-axle. Applies full throttle (throttle = 1) with a 0.1 steer command on a flat terrain. Brakes engage at t = 5 s.</p>
 <table border=\"1\" cellspacing=\"0\">
 <thead><tr><th>Instance</th><th>Type</th><th>Value</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td><code>R_wheel</code></td><td><code>inner parameter Real</code></td><td>0.31 m</td><td>Tire radius &mdash; 195/65R15</td></tr>
 <tr><td><code>car</code></td><td><code>Cars.E36Car</code></td><td>&mdash;</td><td>The E36 vehicle</td></tr>
 <tr><td><code>road</code></td><td><code>Roads.Road</code></td><td>&mdash;</td><td>The road environment</td></tr>
-<tr><td><code>speed</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 10</td><td>Rear wheel angular velocity setpoint (rad/s)</td></tr>
-<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.1</td><td>Front wheel steer angle (rad)</td></tr>
+<tr><td><code>speed</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 1</td><td>Throttle command [0..1] &rarr; <code>car.throttleInput</code> (1 = full drive torque)</td></tr>
+<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.1</td><td>Steer command &rarr; <code>car.steerInput</code> (applied as rad)</td></tr>
 </tbody>
 </table>
 </body>
@@ -165,7 +165,7 @@ package DDynamics
       Interfaces.FrameToUDPOrientation udpRR(port_send = 12349) annotation(
         Placement(transformation(origin = {100, -70}, extent = {{-10, -10}, {10, 10}})));
     equation
-      connect(speed.y, car.speedInput) annotation(
+      connect(speed.y, car.throttleInput) annotation(
         Line(points = {{-60, 0}, {-28, 0}}, color = {0, 0, 127}));
       connect(steer.y, car.steerInput) annotation(
         Line(points = {{52, 0}, {28, 0}}, color = {0, 0, 127}));
@@ -895,9 +895,9 @@ end UDPInput;
         Placement(transformation(origin = {-150, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {-80, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a chassis_pos annotation(
         Placement(transformation(origin = {-2, -102}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation( origin = {2, 0},extent = {{-16, -16}, {16, 16}}, rotation = -90)));
-      Modelica.Blocks.Interfaces.RealInput steerInput annotation(
+      Modelica.Blocks.Interfaces.RealInput steerInput "Front-wheel steer command [-1..1]: -1 = full left, +1 = full right (applied as steer angle in rad)" annotation(
         Placement(transformation(origin = {42, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {98, -2}, extent = {{-14, -14}, {14, 14}}, rotation = 180)));
-      Modelica.Blocks.Interfaces.RealInput speedInput annotation(
+      Modelica.Blocks.Interfaces.RealInput throttleInput "Throttle command [0=idle, 1=full drive torque]" annotation(
         Placement(transformation(origin = {-80, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {-97, -1}, extent = {{-13, -13}, {13, 13}})));
       Modelica.Blocks.Interfaces.RealInput brakeInput "Brake demand [0=released, 1=fully applied]" annotation(
         Placement(transformation(origin = {0, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {0, 98}, extent = {{-14, -14}, {14, 14}}, rotation = -90)));
@@ -910,6 +910,8 @@ end UDPInput;
       Parts.Brakes.DiscBrake brakeRR(maxBrakeTorque = 2000) annotation(
         Placement(transformation(origin = {-118, -64}, extent = {{-10, -10}, {10, 10}})));
       outer Modelica.Mechanics.MultiBody.World world;
+  Parts.Transmission.MockTransmission mockTransmission annotation(
+        Placement(transformation(origin = {-80, -4}, extent = {{-10, -10}, {10, 10}})));
     equation
       connect(mountFL.frame_b, doubleWishboneFL.chassisMount) annotation(
         Line(points = {{60, 40}, {100, 40}}, color = {95, 95, 95}));
@@ -947,8 +949,8 @@ end UDPInput;
         Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, 10}, {90, 10}}, color = {0, 0, 127}));
       connect(steerInput, steerAct1.phi_ref) annotation(
         Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, -12}, {90, -12}}, color = {0, 0, 127}));
-      connect(speedInput, solidAxle.i) annotation(
-        Line(points = {{-80, 110}, {-80, -2}, {-142, -2}}, color = {0, 0, 127}));
+      //connect(throttleInput, solidAxle.i) annotation(
+        //Line(points = {{-80, 110}, {-80, -2}, {-142, -2}}, color = {0, 0, 127}));
       connect(brakeFL.shaft, ttireFL.brakeFlange) annotation(
         Line(points = {{154, 64}, {154, 52}, {150, 52}, {150, 40}}));
       connect(brakeFR.shaft, tireFR.brakeFlange) annotation(
@@ -979,6 +981,10 @@ end UDPInput;
         Line(points = {{40, 40}, {20, 40}, {20, -10}, {0, -10}}, color = {95, 95, 95}));
       connect(freeMotion.frame_b, chassis.frame_a) annotation(
         Line(points = {{6, 44}, {16, 44}, {16, -10}, {0, -10}}, color = {95, 95, 95}));
+  connect(throttleInput, mockTransmission.pedalInput) annotation(
+        Line(points = {{-80, 110}, {-80, 5}}, color = {0, 0, 127}));
+  connect(mockTransmission.torqueOut, solidAxle.pedalInput) annotation(
+        Line(points = {{-80, -14}, {-142, -14}, {-142, -2}}));
       annotation(
         Icon(graphics = {Line(points = {{-80, 60}, {-80, -60}, {80, -60}, {80, 60}, {-80, 60}, {-80, 60}}), Line(origin = {-2, 0}, points = {{-58, 40}, {-58, -40}, {62, -40}, {62, 40}, {-58, 40}, {-58, 40}, {-58, 40}}), Line(origin = {-0.193375, 0.27735}, points = {{-59.8066, 39.7226}, {-29.8066, 19.7226}, {-29.8066, -20.2774}, {-59.8066, -40.2774}, {-29.8066, -20.2774}, {40.1934, -20.2774}, {40.1934, 19.7226}, {-29.8066, 19.7226}, {40.1934, 19.7226}, {60.1934, 39.7226}, {40.1934, 19.7226}, {40.1934, -20.2774}, {60.1934, -40.2774}, {60.1934, -38.2774}})}),
         Documentation(info = "<html>
@@ -993,8 +999,9 @@ end UDPInput;
 <tr><td><code>frame_RL</code></td><td>Frame_a</td><td>Rear-left ground contact &mdash; connect to Road.RL</td></tr>
 <tr><td><code>frame_RR</code></td><td>Frame_a</td><td>Rear-right ground contact &mdash; connect to Road.RR</td></tr>
 <tr><td><code>chassis_pos</code></td><td>Frame_a</td><td>Chassis reference frame (for external position reading)</td></tr>
-<tr><td><code>speedInput</code></td><td>RealInput</td><td>Rear wheel angular velocity setpoint (rad/s)</td></tr>
-<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front wheel steer angle (rad)</td></tr>
+<tr><td><code>throttleInput</code></td><td>RealInput</td><td>Throttle command [0..1] &mdash; 0 = idle, 1 = full drive torque</td></tr>
+<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front-wheel steer command [-1..1] &mdash; &minus;1 = full left, +1 = full right (applied as steer angle in rad)</td></tr>
+<tr><td><code>brakeInput</code></td><td>RealInput</td><td>Brake demand [0..1] &mdash; 0 = released, 1 = fully applied</td></tr>
 </tbody>
 </table>
 <p><code>outer World world</code> is resolved from <code>Road</code>.</p>
@@ -1024,13 +1031,13 @@ end UDPInput;
       Parts.Tires.DrivingTire tireFL annotation(
         Placement(transformation(origin = {150, 40}, extent = {{-10, -10}, {10, 10}})));
       Parts.Tires.DrivingTire tireFR annotation(
-        Placement(transformation(origin = {150, -40}, extent = {{-10, -10}, {10, 10}})));
+        Placement(transformation(origin = {148, -40}, extent = {{-10, -10}, {10, 10}})));
       Parts.Tires.Tire tireRL annotation(
         Placement(transformation(origin = {-150, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Parts.Tires.Tire tireRR annotation(
         Placement(transformation(origin = {-150, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Parts.Differentials.SolidAxle solidAxle annotation(
-        Placement(transformation(origin = {152, -2}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
+        Placement(transformation(origin = {164, -2}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
       Modelica.Mechanics.MultiBody.Joints.FreeMotion freeMotion(r_rel_a(start = {0, 1.4, 0}), v_rel_a(start = {0, 0, 0})) annotation(
         Placement(transformation(origin = {-4, 44}, extent = {{-10, -10}, {10, 10}})));
       Modelica.Mechanics.Rotational.Sources.Position steerAct annotation(
@@ -1047,9 +1054,9 @@ end UDPInput;
         Placement(transformation(origin = {-150, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {-80, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a chassis_pos annotation(
         Placement(transformation(origin = {-2, -102}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {2, 0}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
-      Modelica.Blocks.Interfaces.RealInput steerInput annotation(
+      Modelica.Blocks.Interfaces.RealInput steerInput "Front-wheel steer command [-1..1]: -1 = full left, +1 = full right (applied as steer angle in rad)" annotation(
         Placement(transformation(origin = {42, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {98, -2}, extent = {{-14, -14}, {14, 14}}, rotation = 180)));
-      Modelica.Blocks.Interfaces.RealInput speedInput annotation(
+      Modelica.Blocks.Interfaces.RealInput throttleInput "Throttle command [0=idle, 1=full drive torque]" annotation(
         Placement(transformation(origin = {-80, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {-97, -1}, extent = {{-13, -13}, {13, 13}})));
       Modelica.Blocks.Interfaces.RealInput brakeInput "Brake demand [0=released, 1=fully applied]" annotation(
         Placement(transformation(origin = {0, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {0, 98}, extent = {{-14, -14}, {14, 14}}, rotation = -90)));
@@ -1062,13 +1069,15 @@ end UDPInput;
       Parts.Brakes.DiscBrake brakeRR(maxBrakeTorque = 2000) annotation(
         Placement(transformation(origin = {-118, -64}, extent = {{-10, -10}, {10, 10}})));
       outer Modelica.Mechanics.MultiBody.World world;
+  Parts.Transmission.MockTransmission mockTransmission annotation(
+        Placement(transformation(origin = {-26, 64}, extent = {{-10, -10}, {10, 10}})));
     equation
       connect(mountFL.frame_b, doubleWishboneFL.chassisMount) annotation(
         Line(points = {{60, 40}, {100, 40}}, color = {95, 95, 95}));
       connect(mountFR.frame_b, doubleWishboneFR.chassisMount) annotation(
         Line(points = {{60, -40}, {100, -40}}, color = {95, 95, 95}));
       connect(doubleWishboneFR.wheelMount, tireFR.suspMount) annotation(
-        Line(points = {{120, -40}, {140, -40}}, color = {95, 95, 95}));
+        Line(points = {{120, -40}, {138, -40}}, color = {95, 95, 95}));
       connect(doubleWishboneFL.wheelMount, tireFL.suspMount) annotation(
         Line(points = {{120, 40}, {140, 40}}, color = {95, 95, 95}));
       connect(doubleWishboneRL.wheelMount, tireRL.suspMount) annotation(
@@ -1076,9 +1085,9 @@ end UDPInput;
       connect(doubleWishboneRR.wheelMount, tireRR.suspMount) annotation(
         Line(points = {{-120, -40}, {-140, -40}}, color = {95, 95, 95}));
       connect(solidAxle.right_out, tireFR.spinInput) annotation(
-        Line(points = {{152, -12}, {152, -22}, {174, -22}, {174, -58}, {154, -58}, {154, -50}}));
+        Line(points = {{164, 8}, {164, -22}, {174, -22}, {174, -58}, {148, -58}, {148, -30}}));
       connect(solidAxle.left_out, tireFL.spinInput) annotation(
-        Line(points = {{152, 8}, {152, 19}, {154, 19}, {154, 30}}));
+        Line(points = {{164, -12}, {164, 13}, {154, 13}, {154, 30}}));
       connect(doubleWishboneRL.chassisMount, mountRL.frame_b) annotation(
         Line(points = {{-100, 40}, {-80, 40}}, color = {95, 95, 95}));
       connect(doubleWishboneRR.chassisMount, mountRR.frame_b) annotation(
@@ -1090,7 +1099,7 @@ end UDPInput;
       connect(tireFL.wheelSupport, frame_FL) annotation(
         Line(points = {{160, 40}, {180, 40}, {180, 82}, {94, 82}, {94, 100}}, color = {95, 95, 95}));
       connect(tireFR.wheelSupport, frame_FR) annotation(
-        Line(points = {{160, -40}, {174, -40}, {174, -100}, {94, -100}}, color = {95, 95, 95}));
+        Line(points = {{158, -40}, {174, -40}, {174, -100}, {94, -100}}, color = {95, 95, 95}));
       connect(tireRL.wheelSupport, frame_RL) annotation(
         Line(points = {{-160, 40}, {-180, 40}, {-180, 80}, {-150, 80}, {-150, 100}}, color = {95, 95, 95}));
       connect(tireRR.wheelSupport, frame_RR) annotation(
@@ -1099,12 +1108,10 @@ end UDPInput;
         Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, 10}, {90, 10}}, color = {0, 0, 127}));
       connect(steerInput, steerAct1.phi_ref) annotation(
         Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, -12}, {90, -12}}, color = {0, 0, 127}));
-      connect(speedInput, solidAxle.i) annotation(
-        Line(points = {{-80, 110}, {-80, -2}, {142, -2}}, color = {0, 0, 127}));
       connect(brakeFL.shaft, tireFL.brakeFlange) annotation(
         Line(points = {{154, 64}, {154, 52}, {150, 52}, {150, 40}}));
       connect(brakeFR.shaft, tireFR.brakeFlange) annotation(
-        Line(points = {{138, -16}, {138, -40}, {150, -40}}));
+        Line(points = {{138, -16}, {138, -50}, {148, -50}}));
       connect(brakeRL.shaft, tireRL.brakeFlange) annotation(
         Line(points = {{-138, 58}, {-168, 58}, {-168, 40}, {-150, 40}}));
       connect(brakeRR.shaft, tireRR.brakeFlange) annotation(
@@ -1131,6 +1138,10 @@ end UDPInput;
         Line(points = {{40, 40}, {20, 40}, {20, -10}, {0, -10}}, color = {95, 95, 95}));
       connect(freeMotion.frame_b, chassis.frame_a) annotation(
         Line(points = {{6, 44}, {16, 44}, {16, -10}, {0, -10}}, color = {95, 95, 95}));
+  connect(throttleInput, mockTransmission.pedalInput) annotation(
+        Line(points = {{-80, 110}, {-80, 86}, {-26, 86}, {-26, 74}}, color = {0, 0, 127}));
+  connect(mockTransmission.torqueOut, solidAxle.pedalInput) annotation(
+        Line(points = {{-26, 54}, {134, 54}, {134, -2}, {154, -2}}));
       annotation(
         Icon(graphics = {Line(points = {{-80, 60}, {-80, -60}, {80, -60}, {80, 60}, {-80, 60}, {-80, 60}}), Line(origin = {-2, 0}, points = {{-58, 40}, {-58, -40}, {62, -40}, {62, 40}, {-58, 40}, {-58, 40}, {-58, 40}}), Line(origin = {-0.193375, 0.27735}, points = {{-59.8066, 39.7226}, {-29.8066, 19.7226}, {-29.8066, -20.2774}, {-59.8066, -40.2774}, {-29.8066, -20.2774}, {40.1934, -20.2774}, {40.1934, 19.7226}, {-29.8066, 19.7226}, {40.1934, 19.7226}, {60.1934, 39.7226}, {40.1934, 19.7226}, {40.1934, -20.2774}, {60.1934, -40.2774}, {60.1934, -38.2774}})}),
         Documentation(info = "<html>
@@ -1145,8 +1156,8 @@ end UDPInput;
 <tr><td><code>frame_RL</code></td><td>Frame_a</td><td>Rear-left ground contact &mdash; connect to Road.RL</td></tr>
 <tr><td><code>frame_RR</code></td><td>Frame_a</td><td>Rear-right ground contact &mdash; connect to Road.RR</td></tr>
 <tr><td><code>chassis_pos</code></td><td>Frame_a</td><td>Chassis reference frame</td></tr>
-<tr><td><code>speedInput</code></td><td>RealInput</td><td>Front wheel angular velocity setpoint (rad/s)</td></tr>
-<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front wheel steer angle (rad)</td></tr>
+<tr><td><code>throttleInput</code></td><td>RealInput</td><td>Throttle command [0..1] &mdash; 0 = idle, 1 = full drive torque</td></tr>
+<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front-wheel steer command [-1..1] &mdash; &minus;1 = full left, +1 = full right (applied as steer angle in rad)</td></tr>
 <tr><td><code>brakeInput</code></td><td>RealInput</td><td>Brake demand [0=released, 1=fully applied]</td></tr>
 </tbody>
 </table>
@@ -1200,9 +1211,9 @@ end UDPInput;
         Placement(transformation(origin = {-150, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {-80, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a chassis_pos annotation(
         Placement(transformation(origin = {-2, -102}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {2, 0}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
-      Modelica.Blocks.Interfaces.RealInput steerInput annotation(
+      Modelica.Blocks.Interfaces.RealInput steerInput "Front-wheel steer command [-1..1]: -1 = full left, +1 = full right (applied as steer angle in rad)" annotation(
         Placement(transformation(origin = {42, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {98, -2}, extent = {{-14, -14}, {14, 14}}, rotation = 180)));
-      Modelica.Blocks.Interfaces.RealInput speedInput annotation(
+      Modelica.Blocks.Interfaces.RealInput throttleInput "Throttle command [0=idle, 1=full drive torque]" annotation(
         Placement(transformation(origin = {-80, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {-97, -1}, extent = {{-13, -13}, {13, 13}})));
       Modelica.Blocks.Interfaces.RealInput brakeInput "Brake demand [0=released, 1=fully applied]" annotation(
         Placement(transformation(origin = {0, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {0, 98}, extent = {{-14, -14}, {14, 14}}, rotation = -90)));
@@ -1215,6 +1226,8 @@ end UDPInput;
       Parts.Brakes.DiscBrake brakeRR(maxBrakeTorque = 3000) annotation(
         Placement(transformation(origin = {-118, -64}, extent = {{-10, -10}, {10, 10}})));
       outer Modelica.Mechanics.MultiBody.World world;
+  Parts.Transmission.MockTransmission mockTransmission annotation(
+        Placement(transformation(origin = {-82, 2}, extent = {{-10, -10}, {10, 10}})));
     equation
       connect(mountFL.frame_b, mcphersonFL.chassisMount) annotation(
         Line(points = {{60, 40}, {100, 40}}, color = {95, 95, 95}));
@@ -1252,8 +1265,8 @@ end UDPInput;
         Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, 10}, {90, 10}}, color = {0, 0, 127}));
       connect(steerInput, steerAct1.phi_ref) annotation(
         Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, -12}, {90, -12}}, color = {0, 0, 127}));
-      connect(speedInput, solidAxle.i) annotation(
-        Line(points = {{-80, 110}, {-80, -2}, {-142, -2}}, color = {0, 0, 127}));
+      //connect(throttleInput, solidAxle.i) annotation(
+        //Line(points = {{-80, 110}, {-80, -2}, {-142, -2}}, color = {0, 0, 127}));
       connect(brakeFL.shaft, tireFL.brakeFlange) annotation(
         Line(points = {{154, 64}, {154, 52}, {150, 52}, {150, 40}}));
       connect(brakeFR.shaft, tireFR.brakeFlange) annotation(
@@ -1284,6 +1297,10 @@ end UDPInput;
         Line(points = {{40, 40}, {20, 40}, {20, -10}, {0, -10}}, color = {95, 95, 95}));
       connect(freeMotion.frame_b, chassis.frame_a) annotation(
         Line(points = {{6, 44}, {16, 44}, {16, -10}, {0, -10}}, color = {95, 95, 95}));
+  connect(throttleInput, mockTransmission.pedalInput) annotation(
+        Line(points = {{-80, 110}, {-82, 110}, {-82, 12}}, color = {0, 0, 127}));
+  connect(mockTransmission.torqueOut, solidAxle.pedalInput) annotation(
+        Line(points = {{-82, -8}, {-142, -8}, {-142, -2}}));
       annotation(
         Icon(graphics = {Line(points = {{-80, 60}, {-80, -60}, {80, -60}, {80, 60}, {-80, 60}, {-80, 60}}), Line(origin = {-2, 0}, points = {{-58, 40}, {-58, -40}, {62, -40}, {62, 40}, {-58, 40}, {-58, 40}, {-58, 40}}), Line(origin = {-0.193375, 0.27735}, points = {{-59.8066, 39.7226}, {-29.8066, 19.7226}, {-29.8066, -20.2774}, {-59.8066, -40.2774}, {-29.8066, -20.2774}, {40.1934, -20.2774}, {40.1934, 19.7226}, {-29.8066, 19.7226}, {40.1934, 19.7226}, {60.1934, 39.7226}, {40.1934, 19.7226}, {40.1934, -20.2774}, {60.1934, -40.2774}, {60.1934, -38.2774}})}),
         Documentation(info = "<html>
@@ -1298,8 +1315,8 @@ end UDPInput;
 <tr><td><code>frame_RL</code></td><td>Frame_a</td><td>Rear-left ground contact &mdash; connect to Road.RL</td></tr>
 <tr><td><code>frame_RR</code></td><td>Frame_a</td><td>Rear-right ground contact &mdash; connect to Road.RR</td></tr>
 <tr><td><code>chassis_pos</code></td><td>Frame_a</td><td>Chassis reference frame</td></tr>
-<tr><td><code>speedInput</code></td><td>RealInput</td><td>Rear wheel angular velocity setpoint (rad/s)</td></tr>
-<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front wheel steer angle (rad)</td></tr>
+<tr><td><code>throttleInput</code></td><td>RealInput</td><td>Throttle command [0..1] &mdash; 0 = idle, 1 = full drive torque</td></tr>
+<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front-wheel steer command [-1..1] &mdash; &minus;1 = full left, +1 = full right (applied as steer angle in rad)</td></tr>
 <tr><td><code>brakeInput</code></td><td>RealInput</td><td>Brake demand [0=released, 1=fully applied]</td></tr>
 </tbody>
 </table>
@@ -1551,77 +1568,63 @@ at zero speed, keeping the model C&sup1; continuous and event-free through zero.
 
         model SolidAxle
           extends Components.Differential;
-          parameter Real k_drive = 200 "Proportional speed-to-torque gain (N.m.s/rad)";
         equation
-          left.tau = k_drive * (i - leftSpeed.w);
-          right.tau = k_drive * (i - rightSpeed.w);
+          connect(pedalInput, left_out);
+          connect(pedalInput, right_out);
           annotation(
             Icon(graphics = {Rectangle(lineColor = {134, 159, 156}, fillColor = {185, 192, 194}, fillPattern = FillPattern.Solid, extent = {{-100, 20}, {100, -20}}), Rectangle(origin = {0, 40}, fillPattern = FillPattern.Solid, extent = {{-20, 60}, {20, -60}})}),
             Documentation(info = "<html>
 <body>
 <h4>SolidAxle</h4>
-<p>Rigid rear axle. Both rear wheels receive the same speed setpoint via a proportional
-speed controller: <code>&tau; = k_drive &middot; (i &minus; &omega;)</code>. Because the drive
-uses a <code>Torque</code> source (not an ideal kinematic constraint), a <code>DiscBrake</code>
-connected to the wheel flanges can override the drive torque and decelerate the wheels.</p>
-<table border=\"1\" cellspacing=\"0\">
-<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><code>k_drive</code></td><td>200 N&middot;m&middot;s/rad</td><td>P-controller gain; closed-loop time constant &asymp; J/k &asymp; 0.006 s</td></tr>
-</tbody>
-</table>
+<p>Rigid (locked) rear axle. The drive-torque input flange <code>pedalInput</code> is connected
+directly to both wheel output flanges, so the two rear wheels and the transmission output share a
+single rotational node &mdash; equal angular velocity, no differential (speed-difference) action.
+The torque delivered by the transmission flows mechanically through this node into the wheels; it
+is not split or imposed by an internal source.</p>
+<p>Because the coupling is a plain flange connection, any torque applied to the wheel flanges sums
+on the shared node. A <code>DiscBrake</code> on a wheel flange therefore subtracts from the drive
+torque and decelerates the axle, exactly as a real brake would.</p>
+<p>This model has no parameters &mdash; drive effort is set upstream by the transmission
+(<code>Parts.Transmission.MockTransmission.torqueValue</code>).</p>
 </body>
 </html>"));
         end SolidAxle;
 
         package Components
           partial model Differential
-            Modelica.Blocks.Interfaces.RealInput i annotation(
+            Modelica.Mechanics.Rotational.Interfaces.Flange_a pedalInput annotation(
               Placement(transformation(origin = {0, 108}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {0, 92}, extent = {{-20, -20}, {20, 20}}, rotation = -90)));
-            Modelica.Mechanics.Rotational.Sources.Torque left(useSupport = false) annotation(
-              Placement(transformation(origin = {-64, 0}, extent = {{-20, -20}, {20, 20}}, rotation = 180)));
-            Modelica.Mechanics.Rotational.Sources.Torque right(useSupport = false) annotation(
-              Placement(transformation(origin = {62, 0}, extent = {{-20, -20}, {20, 20}})));
-            Modelica.Mechanics.Rotational.Sensors.SpeedSensor leftSpeed annotation(
-              Placement(transformation(origin = {-64, -40}, extent = {{10, -10}, {-10, 10}})));
-            Modelica.Mechanics.Rotational.Sensors.SpeedSensor rightSpeed annotation(
-              Placement(transformation(origin = {62, -40}, extent = {{-10, -10}, {10, 10}})));
             Modelica.Mechanics.Rotational.Interfaces.Flange_a left_out annotation(
               Placement(transformation(origin = {-102, 0}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {-102, 0}, extent = {{-10, -10}, {10, 10}})));
             Modelica.Mechanics.Rotational.Interfaces.Flange_a right_out annotation(
               Placement(transformation(origin = {102, 0}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {102, 0}, extent = {{-10, -10}, {10, 10}})));
           equation
-            connect(left_out, left.flange) annotation(
-              Line(points = {{-102, 0}, {-84, 0}}));
-            connect(right.flange, right_out) annotation(
-              Line(points = {{82, 0}, {102, 0}}));
-            connect(leftSpeed.flange, left_out) annotation(
-              Line(points = {{-54, -40}, {-102, -40}, {-102, 0}}));
-            connect(rightSpeed.flange, right_out) annotation(
-              Line(points = {{52, -40}, {102, -40}, {102, 0}}));
             annotation(
               uses(Modelica(version = "4.1.0")),
               Documentation(info = "<html>
 <body>
 <h4>Differential (partial)</h4>
-<p>Base class for all differential types. Defines the common interface: one speed-setpoint input
-and two rotational outputs. Internally uses two <code>Modelica.Mechanics.Rotational.Sources.Torque</code>
-instances (with <code>useSupport=false</code>) plus <code>SpeedSensor</code>s on each output flange.
-Concrete subclasses implement a speed controller by writing equations of the form
-<code>left.tau = f(i, leftSpeed.w)</code> and <code>right.tau = f(i, rightSpeed.w)</code>.</p>
-<p>Using torque sources instead of ideal speed sources allows brake torque applied to the wheel
-flanges to actually decelerate the wheels — the drive torque and brake torque sum on the shared
-flange rather than the brake being overridden by a kinematic constraint.</p>
+<p>Base class for all differential / final-drive types. Defines only the common mechanical
+interface: one rotational <b>torque input</b> flange (<code>pedalInput</code>, driven by the
+transmission) and two rotational <b>wheel output</b> flanges (<code>left_out</code>,
+<code>right_out</code>). It contains no equations &mdash; a concrete subclass decides how the input
+torque reaches the two wheels.</p>
+<p>Because all three connectors are rotational <code>Flange</code>s, torque flows through the
+differential mechanically (the wheels' own inertia and the road contact determine the resulting
+speed). This is what allows brake torque applied to the wheel flanges to sum with the drive torque
+rather than being overridden by a kinematic speed constraint.</p>
 <table border=\"1\" cellspacing=\"0\">
 <thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><code>i</code></td><td>RealInput</td><td>Target angular velocity setpoint (rad/s)</td></tr>
+<tr><td><code>pedalInput</code></td><td>Flange_a</td><td>Drive-torque input from the transmission</td></tr>
 <tr><td><code>left_out</code></td><td>Flange_a</td><td>Left wheel rotational output</td></tr>
 <tr><td><code>right_out</code></td><td>Flange_a</td><td>Right wheel rotational output</td></tr>
 </tbody>
 </table>
-<p>Exposed for subclasses: <code>left.tau</code>, <code>right.tau</code>,
-<code>leftSpeed.w</code>, <code>rightSpeed.w</code>.</p>
+<p>Subclass example: <code>SolidAxle</code> connects <code>pedalInput</code> rigidly to both
+outputs. An open or limited-slip differential would instead route the input through an
+<code>IdealPlanetary</code> (or torque-split equations) to allow a speed difference between the two
+wheels.</p>
 </body>
 </html>"));
           end Differential;
@@ -2096,6 +2099,73 @@ flange rather than the brake being overridden by a kinematic constraint.</p>
 
       end Chassis;
 
+      package Transmission 
+   model MockTransmission
+          extends Components.BaseTransmission;
+          Modelica.Mechanics.Rotational.Sources.Torque drive(useSupport = false);
+          parameter Real torqueValue = 200 "Drive torque per unit pedal input (N.m)";
+   equation
+          drive.tau = torqueValue*pedalInput;
+          connect(drive.flange, torqueOut);
+          annotation(
+            Icon(graphics = {Ellipse(origin = {-2, -4}, extent = {{-58, 58}, {58, -58}}), Line(origin = {-3.06292, -0.980762}, points = {{-52.9371, 56.9808}, {-50.9371, 40.9808}, {-62.9371, 26.9808}, {-72.9371, 18.9808}, {-72.9371, -3.01924}, {-62.9371, -11.0192}, {-54.9371, -35.0192}, {-52.9371, -55.0192}, {-38.9371, -65.0192}, {-26.9371, -63.0192}, {-6.93708, -69.0192}, {5.06292, -77.0192}, {29.0629, -73.0192}, {37.0629, -57.0192}, {53.0629, -43.0192}, {67.0629, -41.0192}, {75.0629, -15.0192}, {65.0629, -3.01924}, {61.0629, 22.9808}, {63.0629, 38.9808}, {51.0629, 58.9808}, {37.0629, 54.9808}, {21.0629, 62.9808}, {15.0629, 74.9808}, {-8.9371, 74.9808}, {-18.9371, 64.9808}, {-36.9371, 68.9808}, {-52.9371, 56.9808}, {-52.9371, 56.9808}})}),
+            Documentation(info = "<html>
+<body>
+<h4>MockTransmission</h4>
+<p>Simplified stand-in for an engine + gearbox. Converts the driver pedal command
+<code>pedalInput</code> into a mechanical drive torque on <code>torqueOut</code> via a single
+synthetic relation:</p>
+<pre>drive.tau = torqueValue &middot; pedalInput</pre>
+<p>The torque is applied through a <code>Modelica.Mechanics.Rotational.Sources.Torque</code>
+(<code>useSupport = false</code>, so the reaction goes to the inertial frame), and
+<code>torqueOut</code> is a real rotational flange &mdash; the emitted torque flows into the
+differential and on to the wheels. There is no speed feedback: for a constant pedal the torque is
+constant, and the vehicle accelerates until traction and drag balance it.</p>
+<p><b>Extending to a real driveline.</b> Because the output is a torque-carrying flange, a proper
+engine/gearbox model can replace <code>MockTransmission</code> without touching the differential,
+tires, or brakes &mdash; it only has to keep the same interface (<code>pedalInput</code> in,
+<code>torqueOut</code> flange out) inherited from <code>Components.BaseTransmission</code>. Such a
+model would compute torque from engine speed (a torque map), add flywheel inertia, and apply gear
+ratios.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>torqueValue</code></td><td>200 N&middot;m</td><td>Drive torque per unit pedal input</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
+   end MockTransmission;
+
+        package Components
+  model BaseTransmission
+  Modelica.Blocks.Interfaces.RealInput pedalInput annotation(
+           Placement(transformation(origin = {0, 106}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {0, 92}, extent = {{-20, -20}, {20, 20}}, rotation = -90)));
+         Modelica.Mechanics.Rotational.Interfaces.Flange_a torqueOut annotation(
+           Placement(transformation(origin = {0, -100}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {0, -98}, extent = {{-10, -10}, {10, 10}})));
+  equation
+
+  annotation(
+    Documentation(info = "<html>
+<body>
+<h4>BaseTransmission (base)</h4>
+<p>Base class defining the transmission interface shared by every drivetrain model: a scalar driver
+command in, and a mechanical drive torque out. Extend this to build any engine/gearbox model;
+downstream components (differential, wheels) connect only to these connectors, so implementations
+are interchangeable.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>pedalInput</code></td><td>RealInput</td><td>Driver pedal / throttle command</td></tr>
+<tr><td><code>torqueOut</code></td><td>Flange_a</td><td>Mechanical drive-torque output to the differential</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
+  end BaseTransmission;
+        end Components;
+      end Transmission;
+
     end Parts;
 
   end Cars;
@@ -2110,7 +2180,7 @@ flange rather than the brake being overridden by a kinematic constraint.</p>
 <ol>
 <li>Open <code>DDynamics.mo</code> in OpenModelica or Dymola.</li>
 <li>Simulate <code>DDynamics.Examples.CarExample</code>.</li>
-<li>The example drives a car at 5 m/s with 0.2 rad of steering on a flat terrain at y = 1 m.</li>
+<li>The example applies full throttle (<code>throttleInput</code> = 1) with a 0.2 steer command on a flat terrain at y = 1 m.</li>
 <li>For real-time visualization in Unity, simulate <code>DDynamics.Examples.CarExampleUDP</code> instead: it streams the pose (position + orientation) of the chassis and four wheels over UDP via <code>Interfaces.FrameToUDPOrientation</code>.</li>
 </ol>
 <h4>Package Structure</h4>
@@ -2137,6 +2207,7 @@ DDynamics
     &#9492;&#9472;&#9472; Parts
         &#9500;&#9472;&#9472; Tires: Tire, DrivingTire, TireVisualizer
         &#9500;&#9472;&#9472; Differentials: SolidAxle, Differential (partial)
+        &#9500;&#9472;&#9472; Transmission: MockTransmission, BaseTransmission
         &#9500;&#9472;&#9472; Suspension: SpringDamper, DoubleWishbone, BaseSuspension (partial)
         &#9492;&#9472;&#9472; Chassis: RectangularChassis, BaseChassis (partial)
 </pre>
@@ -2151,7 +2222,8 @@ DDynamics
 </table>
 <h4>Extending the Library</h4>
 <p><b>Custom terrain:</b> Modify <code>Roads.Terrains.TerrainMap.getZ</code>, update <code>terrainSurface</code> and <code>TerrainVisualizer.groundHeight</code> to match.</p>
-<p><b>Custom differential:</b> Extend <code>Cars.Parts.Differentials.Components.Differential</code> and override how <code>i</code> maps to <code>left.w_ref</code> and <code>right.w_ref</code>.</p>
+<p><b>Custom differential:</b> Extend <code>Cars.Parts.Differentials.Components.Differential</code> and wire <code>pedalInput</code> to <code>left_out</code>/<code>right_out</code> (rigidly, as in <code>SolidAxle</code>, or through an <code>IdealPlanetary</code> for an open diff).</p>
+<p><b>Custom transmission:</b> Extend <code>Cars.Parts.Transmission.Components.BaseTransmission</code> and compute <code>torqueOut</code> from <code>pedalInput</code> (for a real engine, derive torque from engine speed via a torque map, add flywheel inertia, and apply gear ratios).</p>
 <p><b>Custom suspension:</b> Extend <code>Cars.Parts.Suspension.Components.BaseSuspension</code> and implement kinematics between <code>chassisMount</code> and <code>wheelMount</code>.</p>
 <p><b>Custom chassis:</b> Extend <code>Cars.Parts.Chassis.Components.BaseChassis</code> and connect geometry to <code>frame_a</code>.</p>
 </body>

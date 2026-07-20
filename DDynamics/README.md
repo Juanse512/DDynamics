@@ -12,14 +12,18 @@ A Modelica multibody vehicle dynamics library for simulating 4-wheeled ground ve
 
 1. Open `DDynamics.mo` in OpenModelica or Dymola.
 2. Simulate `DDynamics.Examples.CarExample`.
-3. The example drives a car at 5 m/s with 0.2 rad of steering on a flat terrain at y = 1 m.
+3. The example applies full throttle (`throttleInput` = 1) with a 0.2 steer command on a flat terrain at y = 1 m; the brake steps to 1 at t = 3 s.
+
+The driver inputs are normalized commands. `throttleInput` and `brakeInput` run **0 to 1.0** (0 = idle/released, 1 = full drive torque / fully applied). `steerInput` is **bipolar, −1.0 to +1.0** (−1 = full left, +1 = full right), applied directly as the steer-joint angle in radians — so ±1.0 ≈ ±1 rad ≈ ±57°.
+
+For real-time visualization in Unity, simulate `DDynamics.Examples.CarExampleUDP` instead: it streams the pose (position + orientation) of the chassis and four wheels over UDP. See [`CarExampleUDP`](#carexampleudp) and `FrameToUDPOrientation` below.
 
 **Top-level connection diagram**
 
 ```
-Constant(speed=5) ──speedInput──┐
-                                 Car ──frame_FL/FR/RL/RR── Road
-Constant(steer=0.2) ─steerInput─┘
+Constant(throttle=1) ──throttleInput──┐
+                                       Car ──frame_FL/FR/RL/RR── Road
+Constant(steer=0.2) ───steerInput─────┘
 ```
 
 `CarExample` also owns the `inner R_wheel = 0.25` declaration that all sub-models resolve via `outer`.
@@ -31,10 +35,13 @@ Constant(steer=0.2) ─steerInput─┘
 ```
 DDynamics
 ├── Examples
-│   └── CarExample
+│   ├── CarExample
+│   └── CarExampleUDP
 ├── Interfaces
 │   ├── FrameToReal
-│   └── FrameToUDP
+│   ├── FrameToUDP
+│   ├── FrameToRealOrientation
+│   └── FrameToUDPOrientation
 ├── Roads
 │   ├── Road
 │   ├── Floors
@@ -60,6 +67,10 @@ DDynamics
         │   ├── SolidAxle
         │   └── Components
         │       └── Differential        ← partial
+        ├── Transmission
+        │   ├── MockTransmission
+        │   └── Components
+        │       └── BaseTransmission    ← base interface
         ├── Suspension
         │   ├── SpringDamper
         │   ├── DoubleWishbone
@@ -86,13 +97,29 @@ Top-level simulation entry point. Instantiates a `Car` and a `Road`, drives them
 | `R_wheel` | `inner parameter Real` | 0.25 m | Tire radius — propagated to all sub-models via `outer` |
 | `car` | `Cars.Car` | — | The vehicle |
 | `road` | `Roads.Road` | — | The road environment (owns `World` and terrain) |
-| `speed` | `Modelica.Blocks.Sources.Constant` | k = 5 | Wheel angular velocity setpoint (rad/s) |
-| `steer` | `Modelica.Blocks.Sources.Constant` | k = 0.2 | Front wheel steer angle (rad) |
+| `speed` | `Modelica.Blocks.Sources.Constant` | k = 1 | Throttle command [0..1] → `car.throttleInput` (1 = full drive torque) |
+| `steer` | `Modelica.Blocks.Sources.Constant` | k = 0.2 | Steer command → `car.steerInput` (applied as rad) |
+| `brake_input` | `Modelica.Blocks.Sources.Step` | height = 1, t = 3 s | Brake command [0..1] → `car.brakeInput` |
 
 Connections:
-- `speed.y → car.speedInput`
+- `speed.y → car.throttleInput`
 - `steer.y → car.steerInput`
+- `brake_input.y → car.brakeInput`
 - `road.FL ↔ car.frame_FL`, `road.FR ↔ car.frame_FR`, `road.RL ↔ car.frame_RL`, `road.RR ↔ car.frame_RR`
+
+#### `CarExampleUDP`
+
+Same vehicle as `CarExample`, but additionally streams the **pose** (position **and** orientation) of the chassis and all four wheels to a Unity visualizer over UDP via `Interfaces.FrameToUDPOrientation`. The steer input is a sine sweep (`amplitude = 0.3`, `f = 0.2`) so the front wheels visibly steer in Unity. Each streamer taps a frame as a zero-force sensor, so the vehicle dynamics are unchanged.
+
+| Streamer | Frame tapped | UDP port |
+|---|---|---|
+| `udpChassis` | `car.chassis_pos` | 12345 |
+| `udpFL` | `car.frame_FL` | 12346 |
+| `udpFR` | `car.frame_FR` | 12347 |
+| `udpRL` | `car.frame_RL` | 12348 |
+| `udpRR` | `car.frame_RR` | 12349 |
+
+The wheel frames sit on the spinning revolute output, so the transmitted orientation includes both steer and spin. On the Unity side, attach the `Test2` script (`Assets/Scripts/Test2.cs`) to each GameObject and set its `listenPort` to match the table above.
 
 ---
 
@@ -130,6 +157,46 @@ Sends the X and Y world-frame position of a `Frame_a` over UDP using `Modelica_D
 All three axes are packed, each by a separate `AddFloat(nu=1)` block in sequence: `packager → addFloat(X) → addFloat1(Y) → addFloat11(Z) → uDPSend`.
 
 `RealtimeSynchronize` locks simulation time to wall-clock time, so the 100 Hz sample rate corresponds to real seconds on the receiving end.
+
+#### `FrameToRealOrientation`
+
+Like `FrameToReal`, but also exposes the frame's **orientation** as a unit quaternion. In addition to the three position outputs it emits `q_out[4]`, taken directly from the frame's orientation object via `Frames.to_Q(frame_a.R)`. Still a pure sensor (zero force and torque).
+
+| Connector | Type | Direction | Description |
+|---|---|---|---|
+| `frame_a` | `Frame_a` | in | MultiBody frame to read |
+| `x_out` / `y_out` / `z_out` | `RealOutput` | out | World position (m) |
+| `q_out[4]` | `RealOutput` | out | Orientation quaternion `[x, y, z, w]` of `frame_a.R` |
+
+Equations: `frame_a.r_0[1..3] = x_out/y_out/z_out`, `q_out = Frames.to_Q(frame_a.R)`, `frame_a.f = {0,0,0}`, `frame_a.t = {0,0,0}`.
+
+> **Convention note.** `q_out = Frames.to_Q(frame_a.R)` (Modelica convention `Q = [sin(θ/2)·axis; cos(θ/2)]`, scalar part last). Working through Modelica's `Frames.from_T`, this is the *body→world* rotation of the frame as an active quaternion. The Unity receiver converts this right-handed rotation into Unity's left-handed frame using the **same** axis flip as position — it negates the **x and y** components of the vector part and keeps z and w: `(qx,qy,qz,qw) → Quaternion(-qx,-qy,qz,qw)`. (Negating z instead gives the inverse rotation, which makes a spinning wheel's axle precess — a subtle bug to avoid.)
+
+#### `FrameToUDPOrientation`
+
+Sends the world-frame **position and orientation** of a `Frame_a` over UDP. Internally chains `FrameToRealOrientation → SerialPackager → AddFloat × 7 → UDPSend`. Unlike `FrameToUDP`, the destination port is a **parameter** (`port_send`), so several instances (chassis + each wheel) can stream to distinct ports simultaneously; `sampleTime` is also a parameter.
+
+| Connector / Parameter | Type | Description |
+|---|---|---|
+| `frame_a` | `Frame_a` | Frame whose pose is transmitted |
+| `port_send` | `Integer` | UDP destination port (default 12345) |
+| `sampleTime` | `Time` | Transmit period, s (default 0.01 → 100 Hz) |
+
+**Packet format** — 28 bytes, 7 × `float32` (little-endian):
+
+| Bytes | Value |
+|---|---|
+| 0 – 3 | X position (m) |
+| 4 – 7 | Y position (m) |
+| 8 – 11 | Z position (m) |
+| 12 – 15 | quaternion x (vector part) |
+| 16 – 19 | quaternion y (vector part) |
+| 20 – 23 | quaternion z (vector part) |
+| 24 – 27 | quaternion w (scalar part) |
+
+All values are raw Modelica world-frame quantities (right-handed, Y-up in the `Cars`/`Roads` package); the Unity receiver performs the right-handed→left-handed conversion.
+
+> **Implementation note.** Each value is packed by its own `AddFloat` block (default `n = 1`), chained `packager → addFloat → … → addFloat6 → uDPSend`. Do **not** collapse these into a single `AddFloat(n = 7)`: under OpenModelica 1.25.5, applying a modifier to `AddFloat.n` triggers an instantiation internal error with no diagnostic. Leaving `n` at its default and chaining avoids the bug.
 
 ---
 
@@ -305,7 +372,8 @@ Complete 4-wheeled vehicle assembly. Contains:
 - 4 × `DoubleWishbone` suspension (front pair steerable)
 - 2 × `Tire` (passive front)
 - 2 × `DrivingTire` (driven rear)
-- `SolidAxle` differential
+- `MockTransmission` → `SolidAxle` differential drivetrain
+- 4 × `DiscBrake`
 - `FreeMotion` joint (initial height y = 1.2 m)
 - 2 × `Position` actuators for steering
 
@@ -318,8 +386,9 @@ Complete 4-wheeled vehicle assembly. Contains:
 | `frame_RL` | `Frame_a` | Rear-left ground contact — connect to `Road.RL` |
 | `frame_RR` | `Frame_a` | Rear-right ground contact — connect to `Road.RR` |
 | `chassis_pos` | `Frame_a` | Chassis reference frame (for external position reading) |
-| `speedInput` | `RealInput` | Rear wheel angular velocity setpoint (rad/s) |
-| `steerInput` | `RealInput` | Front wheel steer angle (rad) |
+| `throttleInput` | `RealInput` | Throttle command [0..1] — 0 = idle, 1 = full drive torque (→ `MockTransmission`) |
+| `steerInput` | `RealInput` | Front-wheel steer command [−1..1] — −1 = full left, +1 = full right (applied as steer angle in rad) |
+| `brakeInput` | `RealInput` | Brake demand [0..1] — 0 = released, 1 = fully applied |
 
 `outer World world` is resolved from `Road`.
 
@@ -373,21 +442,57 @@ Driven wheel. Same structure as `Tire` but the `Revolute` has `useAxisFlange = t
 
 #### `Parts.Differentials.SolidAxle`
 
-Rigid rear axle. Both rear wheels receive exactly the same angular velocity as `speedInput` (no torque split). Extends `Differential`.
+Rigid (locked) rear axle. Connects the drive-torque input flange `pedalInput` directly to both wheel output flanges, so the two rear wheels and the transmission output form a single rotational node — equal speed, no differential (speed-difference) action. Drive torque from the transmission flows mechanically into the wheels; brake torque applied to the wheel flanges sums on the same node and decelerates the axle. No parameters (drive effort is set by the transmission). Extends `Differential`.
 
 ---
 
 #### `Parts.Differentials.Components.Differential` *(partial)*
 
-Base class for all differential types. Defines the common interface: one speed input, two rotational outputs. Internally uses two `Modelica.Mechanics.Rotational.Sources.Speed` instances.
+Base class for all differential / final-drive types. Defines only the mechanical interface — one rotational **torque input** flange and two **wheel output** flanges — and contains no equations. A concrete subclass decides how the input torque reaches the wheels. Because all three connectors are rotational flanges, torque flows through mechanically (wheel inertia + road contact set the resulting speed), which lets brake torque on the wheel flanges sum with drive torque instead of being overridden by a kinematic constraint.
 
 | Connector | Type | Description |
 |---|---|---|
-| `i` | `RealInput` | Target angular velocity (rad/s) |
+| `pedalInput` | `Flange_a` | Drive-torque input from the transmission |
 | `left_out` | `Flange_a` | Left wheel rotational output |
 | `right_out` | `Flange_a` | Right wheel rotational output |
 
-To implement a custom differential (e.g., open, limited-slip), extend this partial and override how `i` maps to `left.w_ref` and `right.w_ref`.
+To implement a custom differential (e.g., open, limited-slip), extend this partial and wire `pedalInput` to `left_out`/`right_out` — rigidly (as `SolidAxle` does) or through an `IdealPlanetary` / torque-split equations for speed-difference behavior.
+
+---
+
+### `DDynamics.Cars.Parts.Transmission`
+
+#### `Parts.Transmission.MockTransmission`
+
+Simplified stand-in for an engine + gearbox. Converts the driver pedal command into a mechanical drive torque via a single synthetic relation:
+
+```
+drive.tau = torqueValue · pedalInput
+```
+
+The torque is applied through a `Rotational.Sources.Torque` (`useSupport = false`, reaction to the inertial frame) and emitted on the `torqueOut` **flange**, so it flows into the differential and on to the wheels. There is no speed feedback — for a constant pedal the torque is constant and the vehicle accelerates until traction and drag balance it.
+
+| Parameter | Default | Description |
+|---|---|---|
+| `torqueValue` | 200 N·m | Drive torque per unit pedal input |
+
+| Connector | Type | Description |
+|---|---|---|
+| `pedalInput` | `RealInput` | Driver pedal / throttle command (inherited from `BaseTransmission`) |
+| `torqueOut` | `Flange_a` | Mechanical drive-torque output → `SolidAxle.pedalInput` |
+
+Because the output is a torque-carrying flange, a full engine/gearbox model can replace this one **without changing the differential, tires, or brakes** — it only needs to keep the `BaseTransmission` interface and would add an engine torque map, flywheel inertia, and gear ratios.
+
+---
+
+#### `Parts.Transmission.Components.BaseTransmission`
+
+Base class defining the transmission interface shared by every drivetrain model: a scalar driver command in, a mechanical drive torque out. Extend it to build any engine/gearbox; downstream components connect only to these connectors, so implementations are interchangeable.
+
+| Connector | Type | Description |
+|---|---|---|
+| `pedalInput` | `RealInput` | Driver pedal / throttle command |
+| `torqueOut` | `Flange_a` | Mechanical drive-torque output to the differential |
 
 ---
 
@@ -508,7 +613,10 @@ DDynamics uses Modelica's `inner`/`outer` mechanism so shared values are declare
 3. Update `Roads.Terrains.Components.TerrainVisualizer.groundHeight` to match the new height.
 
 ### Custom differential
-Extend `Cars.Parts.Differentials.Components.Differential` and override the equations that map `i` to `left.w_ref` and `right.w_ref` (e.g., add a torque bias or slip model).
+Extend `Cars.Parts.Differentials.Components.Differential` and wire the `pedalInput` torque flange to `left_out`/`right_out` — rigidly (as `SolidAxle` does) or through an `IdealPlanetary` / torque-split for open or limited-slip behavior.
+
+### Custom transmission
+Extend `Cars.Parts.Transmission.Components.BaseTransmission` and compute `torqueOut` from `pedalInput`. `MockTransmission` uses a one-line synthetic torque law; a realistic model would derive torque from engine speed via a torque map, add flywheel inertia, and apply gear ratios — all without touching the differential, tires, or brakes.
 
 ### Custom suspension
 Extend `Cars.Parts.Suspension.Components.BaseSuspension` and implement the kinematics between `chassisMount` and `wheelMount`. The `steerable` parameter and `steerInput` flange are already wired in the base.
