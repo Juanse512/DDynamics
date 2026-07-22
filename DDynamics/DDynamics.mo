@@ -7,7 +7,7 @@ package DDynamics
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
       Modelica.Blocks.Sources.Constant speed(k = 1) annotation(
         Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Blocks.Sources.Constant steer(k = 0.2)  annotation(
+      Modelica.Blocks.Sources.Constant steer(k = 1)  annotation(
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Roads.Road road annotation(
         Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
@@ -15,7 +15,7 @@ package DDynamics
         Placement(transformation(origin = {-68, 58}, extent = {{-10, -10}, {10, 10}})));
     equation
       connect(speed.y, car.throttleInput) annotation(
-        Line(points = {{-60, 0}, {-28, 0}}, color = {0, 0, 127}));
+        Line(points = {{-60, 0}, {-28, 0}}, color = {0, 1, 127}));
       connect(steer.y, car.steerInput) annotation(
         Line(points = {{52, 0}, {28, 0}}, color = {0, 0, 127}));
       connect(road.FL, car.frame_FL) annotation(
@@ -40,7 +40,7 @@ package DDynamics
 <tr><td><code>car</code></td><td><code>Cars.Car</code></td><td>&mdash;</td><td>The vehicle</td></tr>
 <tr><td><code>road</code></td><td><code>Roads.Road</code></td><td>&mdash;</td><td>The road environment (owns World and terrain)</td></tr>
 <tr><td><code>speed</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 1</td><td>Throttle command [0..1] &rarr; <code>car.throttleInput</code> (1 = full drive torque)</td></tr>
-<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.2</td><td>Steer command &rarr; <code>car.steerInput</code> (applied as rad)</td></tr>
+<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.2</td><td>Steer command &rarr; <code>car.steerInput</code> (normalized [-1..1]; MockSteering maps it to rad)</td></tr>
 </tbody>
 </table>
 <p><b>Connections:</b> speed.y &rarr; car.throttleInput &bull; steer.y &rarr; car.steerInput &bull; road.FL/FR/RL/RR &harr; car.frame_FL/FR/RL/RR</p>
@@ -54,7 +54,7 @@ package DDynamics
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
       Modelica.Blocks.Sources.Constant speed(k = 1) annotation(
         Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Blocks.Sources.Constant steer(k = 0.1) annotation(
+      Modelica.Blocks.Sources.Constant steer(k = -1) annotation(
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Roads.Road road annotation(
         Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
@@ -87,7 +87,7 @@ package DDynamics
 <tr><td><code>car</code></td><td><code>Cars.CivicEKCar</code></td><td>&mdash;</td><td>The Civic EK vehicle</td></tr>
 <tr><td><code>road</code></td><td><code>Roads.Road</code></td><td>&mdash;</td><td>The road environment</td></tr>
 <tr><td><code>speed</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 1</td><td>Throttle command [0..1] &rarr; <code>car.throttleInput</code> (1 = full drive torque)</td></tr>
-<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.1</td><td>Steer command &rarr; <code>car.steerInput</code> (applied as rad)</td></tr>
+<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.1</td><td>Steer command &rarr; <code>car.steerInput</code> (normalized [-1..1]; MockSteering maps it to rad)</td></tr>
 </tbody>
 </table>
 </body>
@@ -100,7 +100,7 @@ package DDynamics
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
       Modelica.Blocks.Sources.Constant speed(k = 1) annotation(
         Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Blocks.Sources.Constant steer(k = 0.1) annotation(
+      Modelica.Blocks.Sources.Constant steer(k = 1) annotation(
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Roads.Road road annotation(
         Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
@@ -133,7 +133,7 @@ package DDynamics
 <tr><td><code>car</code></td><td><code>Cars.E36Car</code></td><td>&mdash;</td><td>The E36 vehicle</td></tr>
 <tr><td><code>road</code></td><td><code>Roads.Road</code></td><td>&mdash;</td><td>The road environment</td></tr>
 <tr><td><code>speed</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 1</td><td>Throttle command [0..1] &rarr; <code>car.throttleInput</code> (1 = full drive torque)</td></tr>
-<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.1</td><td>Steer command &rarr; <code>car.steerInput</code> (applied as rad)</td></tr>
+<tr><td><code>steer</code></td><td><code>Modelica.Blocks.Sources.Constant</code></td><td>k = 0.1</td><td>Steer command &rarr; <code>car.steerInput</code> (normalized [-1..1]; MockSteering maps it to rad)</td></tr>
 </tbody>
 </table>
 </body>
@@ -146,7 +146,7 @@ package DDynamics
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
       Modelica.Blocks.Sources.Constant speed(k = 5) annotation(
         Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Blocks.Sources.Sine steer(amplitude = 0.3, f = 0.2) annotation(
+      Modelica.Blocks.Sources.Sine steer(amplitude = 1, f = 0.2) annotation(
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Roads.Road road annotation(
         Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
@@ -550,6 +550,7 @@ end UDPInput;
         parameter Real ground_d  = 5000   "Floor damping (N.s/m)";
         parameter Real ground_mu = 10000  "Longitudinal viscous friction coefficient (N.s/m)";
         parameter Real mu_lat    = 100000 "Lateral viscous friction coefficient (N.s/m)";
+        parameter Real mu_peak   = 1.0    "Peak friction coefficient (friction-circle limit): |F| <= mu_peak*normalLoad. Lower to reduce grip.";
         outer parameter Real R_wheel   "Wheel radius (m)";
         MultiBody.Interfaces.Frame_b wheelContactFL annotation(
           Placement(transformation(origin = {100, 60}, extent = {{-16, -16}, {16, 16}}),
@@ -563,13 +564,13 @@ end UDPInput;
         MultiBody.Interfaces.Frame_b wheelContactRR annotation(
           Placement(transformation(origin = {100, -60}, extent = {{-16, -16}, {16, 16}}),
           iconTransformation(origin = {-60, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
-        Components.Floor floorFL(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat) annotation(
+        Components.Floor floorFL(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, mu_peak = mu_peak) annotation(
           Placement(transformation(origin = {0, 60}, extent = {{-10, -10}, {10, 10}})));
-        Components.Floor floorFR(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat) annotation(
+        Components.Floor floorFR(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, mu_peak = mu_peak) annotation(
           Placement(transformation(origin = {0, 20}, extent = {{-10, -10}, {10, 10}})));
-        Components.Floor floorRL(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat) annotation(
+        Components.Floor floorRL(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, mu_peak = mu_peak) annotation(
           Placement(transformation(origin = {0, -20}, extent = {{-10, -10}, {10, 10}})));
-        Components.Floor floorRR(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat) annotation(
+        Components.Floor floorRR(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, mu_peak = mu_peak) annotation(
           Placement(transformation(origin = {0, -60}, extent = {{-10, -10}, {10, 10}})));
       equation
         connect(floorFL.wheelContact, wheelContactFL);
@@ -589,7 +590,8 @@ end UDPInput;
 <tr><td><code>ground_c</code></td><td>1e5</td><td>Floor stiffness (N/m)</td></tr>
 <tr><td><code>ground_d</code></td><td>5000</td><td>Floor damping (N&middot;s/m)</td></tr>
 <tr><td><code>ground_mu</code></td><td>10000</td><td>Longitudinal friction coefficient (N&middot;s/m)</td></tr>
-<tr><td><code>mu_lat</code></td><td>100000</td><td>Lateral friction coefficient (N&middot;s/m)</td></tr>
+<tr><td><code>mu_lat</code></td><td>100000</td><td>Lateral slip-force rate (N&middot;s/m) before saturation</td></tr>
+<tr><td><code>mu_peak</code></td><td>1.0</td><td>Peak friction coefficient (friction-circle grip limit for all 4 wheels); lower to reduce grip</td></tr>
 <tr><td><code>R_wheel</code></td><td>outer</td><td>Tire radius &mdash; resolved from CarExample</td></tr>
 </tbody>
 </table>
@@ -652,6 +654,9 @@ end UDPInput;
           import MultiBody = Modelica.Mechanics.MultiBody;
           parameter Real ground_mu = 10000 "Longitudinal viscous friction coefficient (N.s/m)";
           parameter Real mu_lat = 100000 "Lateral viscous friction coefficient (N.s/m)";
+          parameter Real ground_c = 1e5 "Floor stiffness (N/m) - used to estimate the normal load";
+          parameter Real ground_d = 5000 "Floor damping (N.s/m) - used to estimate the normal load";
+          parameter Real mu_peak = 1.0 "Peak friction coefficient; total contact force is capped at mu_peak*normalLoad (friction circle). Set <1 to reduce grip.";
           outer parameter Real R_wheel "Wheel radius (m)";
           outer DDynamics.Roads.Terrains.TerrainMap terrain;
           MultiBody.Interfaces.Frame_b wheelContact annotation(
@@ -664,6 +669,11 @@ end UDPInput;
           Real vWorld[3], axleWorld[3], headingWorld[3], contactDepth, frictionScale;
           Real vLong, vLat;
           Real frictionVec[3];
+          Real vyc "Vertical contact velocity (for normal-load estimate)";
+          Real Nload "Estimated normal load at the contact patch (N)";
+          Real fRaw[3] "Unsaturated (viscous) friction demand";
+          Real fMag "Magnitude of fRaw";
+          Real fMax "Friction-circle limit = mu_peak*Nload";
         equation
           connect(frictionForce.frame_b, wheelContact);
           vWorld = der(wheelContact.r_0);
@@ -677,9 +687,19 @@ end UDPInput;
           vLat  = vWorld * axleWorld;
           contactDepth = noEvent(max(0, terrain.getZ(wheelContact.r_0[1], wheelContact.r_0[3]) + R_wheel - wheelContact.r_0[2]));
           frictionScale = noEvent(min(1, contactDepth / contactRampDepth));
-          frictionVec = frictionScale * (
+// Normal load at the patch (same spring-damper law as GroundSpring), used as the grip budget.
+          vyc = der(wheelContact.r_0[2]);
+          Nload = noEvent(max(0, ground_c * (terrain.getZ(wheelContact.r_0[1], wheelContact.r_0[3]) + R_wheel - wheelContact.r_0[2]) - ground_d * vyc));
+// Unsaturated demand: slip-based longitudinal + viscous lateral (as before).
+          fRaw = frictionScale * (
             -ground_mu * (vLong - (wheelContact.R.w * {0, 0, -1}) * R_wheel) * headingWorld
             - mu_lat * vLat * axleWorld);
+// Friction circle: the combined contact force cannot exceed mu_peak*Nload. Beyond that the tire
+// slides and the force saturates instead of growing without bound. Longitudinal and lateral share
+// one budget, so hard acceleration eats into cornering grip (and vice-versa), as with a real tire.
+          fMag = sqrt(fRaw * fRaw + 1e-12);
+          fMax = mu_peak * Nload;
+          frictionVec = noEvent(if fMag > fMax then fRaw * (fMax / fMag) else fRaw);
           frictionForce.force  = frictionVec;
 // Torque from applying friction at the contact patch (offset R_wheel below wheel center).
 // cross({0,-R,0}, F) gives the rolling torque that spins the free revolute on non-driven wheels.
@@ -690,17 +710,30 @@ end UDPInput;
 <h4>GroundFriction</h4>
 <p>Applies longitudinal (slip-based) and lateral (viscous) friction forces at the contact patch, plus the rolling torque from applying friction below the wheel center.</p>
 <p>Heading and axle directions are computed from the wheel rotation matrix (spin-invariant: uses <code>resolve1(R, {0,0,-1})</code> and <code>cross(axle, {0,1,0})</code>).</p>
+<p><b>Friction circle.</b> <code>ground_mu</code> and <code>mu_lat</code> set how fast force builds with slip
+(viscous demand). That demand is then saturated so the <i>combined</i> longitudinal+lateral force cannot exceed
+<code>mu_peak &middot; N</code>, where <code>N</code> is the normal load (recomputed here from the same spring-damper
+law as <code>GroundSpring</code>). Below the limit behaviour is unchanged; above it the tire slides and the force
+saturates instead of growing without bound. This bounds lateral grip (preventing unphysical grip-driven rollover) and
+couples the two directions (hard acceleration reduces available cornering force). Lower <code>mu_peak</code> to reduce
+overall grip; the default 1.0 is a typical dry tire-road peak.</p>
+<pre>N = max(0, ground_c*(getZ + R - y) - ground_d*vy);   F = min(|F_demand|, mu_peak*N) in F_demand's direction</pre>
 <table border=\"1\" cellspacing=\"0\">
 <thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><code>ground_mu</code></td><td>10000</td><td>Longitudinal friction coefficient (N&middot;s/m)</td></tr>
-<tr><td><code>mu_lat</code></td><td>100000</td><td>Lateral friction coefficient (N&middot;s/m)</td></tr>
+<tr><td><code>ground_mu</code></td><td>10000</td><td>Longitudinal slip-force rate (N&middot;s/m) before saturation</td></tr>
+<tr><td><code>mu_lat</code></td><td>100000</td><td>Lateral slip-force rate (N&middot;s/m) before saturation</td></tr>
+<tr><td><code>mu_peak</code></td><td>1.0</td><td>Peak friction coefficient; caps |F| at <code>mu_peak&middot;N</code> (friction circle). Lower = less grip</td></tr>
+<tr><td><code>ground_c</code></td><td>1e5</td><td>Floor stiffness (N/m) &mdash; for the normal-load estimate</td></tr>
+<tr><td><code>ground_d</code></td><td>5000</td><td>Floor damping (N&middot;s/m) &mdash; for the normal-load estimate</td></tr>
 <tr><td><code>R_wheel</code></td><td>outer</td><td>Tire radius</td></tr>
 <tr><td><code>terrain</code></td><td>outer</td><td>Terrain height function</td></tr>
 <tr><td><code>contactRampDepth</code></td><td>0.001 m (protected)</td><td>Penetration depth over which friction scales from 0 to full</td></tr>
 </tbody>
 </table>
 <p><b>Connector:</b> <code>wheelContact</code> (Frame_b).</p>
+<p><b>Note:</b> <code>ground_c</code>/<code>ground_d</code> must match the <code>GroundSpring</code> values for the
+normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code> pass the same values to both.</p>
 </body>
 </html>"));
         end GroundFriction;
@@ -711,13 +744,14 @@ end UDPInput;
           parameter Real ground_d = 5000 "Floor damping (N.s/m)";
           parameter Real ground_mu = 10000 "Longitudinal viscous friction coefficient (N.s/m)";
           parameter Real mu_lat = 100000 "Lateral viscous friction coefficient (N.s/m)";
+          parameter Real mu_peak = 1.0 "Peak friction coefficient (friction-circle limit): |F| <= mu_peak*normalLoad. Lower to reduce grip.";
           outer parameter Real R_wheel "Wheel radius (m)";
           MultiBody.Interfaces.Frame_b wheelContact annotation(
             Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
             iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
           GroundSpring gs(ground_c = ground_c, ground_d = ground_d) annotation(
             Placement(transformation(origin = {0, 30}, extent = {{-10, -10}, {10, 10}})));
-          GroundFriction gf(ground_mu = ground_mu, mu_lat = mu_lat) annotation(
+          GroundFriction gf(ground_mu = ground_mu, mu_lat = mu_lat, ground_c = ground_c, ground_d = ground_d, mu_peak = mu_peak) annotation(
             Placement(transformation(origin = {0, -30}, extent = {{-10, -10}, {10, 10}})));
         equation
           connect(gs.wheelContact, wheelContact);
@@ -727,7 +761,7 @@ end UDPInput;
 <body>
 <h4>Floor</h4>
 <p>Composite model combining <code>GroundSpring</code> (normal force) and <code>GroundFriction</code> (friction + torque) into a single wheel-ground contact. Both sub-models share the same <code>wheelContact</code> frame.</p>
-<p><b>Parameters:</b> <code>ground_c</code>, <code>ground_d</code>, <code>ground_mu</code>, <code>mu_lat</code> plus <code>outer R_wheel</code>.</p>
+<p><b>Parameters:</b> <code>ground_c</code>, <code>ground_d</code>, <code>ground_mu</code>, <code>mu_lat</code>, <code>mu_peak</code> plus <code>outer R_wheel</code>. <code>ground_c</code>/<code>ground_d</code> are shared with <code>GroundSpring</code> and reused by <code>GroundFriction</code> for the friction-circle normal load.</p>
 <p><b>Connector:</b> <code>wheelContact</code> (Frame_b).</p>
 </body>
 </html>"));
@@ -885,6 +919,8 @@ end UDPInput;
         Placement(transformation(origin = {102, 10}, extent = {{-10, -10}, {10, 10}})));
       Modelica.Mechanics.Rotational.Sources.Position steerAct1 annotation(
         Placement(transformation(origin = {102, -12}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Steering.MockSteering mockSteering annotation(
+        Placement(transformation(origin = {60, 24}, extent = {{-9, -9}, {9, 9}})));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_FL annotation(
         Placement(transformation(origin = {94, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {60, 98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_FR annotation(
@@ -895,7 +931,7 @@ end UDPInput;
         Placement(transformation(origin = {-150, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {-80, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a chassis_pos annotation(
         Placement(transformation(origin = {-2, -102}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation( origin = {2, 0},extent = {{-16, -16}, {16, 16}}, rotation = -90)));
-      Modelica.Blocks.Interfaces.RealInput steerInput "Front-wheel steer command [-1..1]: -1 = full left, +1 = full right (applied as steer angle in rad)" annotation(
+      Modelica.Blocks.Interfaces.RealInput steerInput "Front-wheel steer command [-1..1]: -1 = full left, +1 = full right (normalized; mapped to a road-wheel angle in rad by MockSteering)" annotation(
         Placement(transformation(origin = {42, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {98, -2}, extent = {{-14, -14}, {14, 14}}, rotation = 180)));
       Modelica.Blocks.Interfaces.RealInput throttleInput "Throttle command [0=idle, 1=full drive torque]" annotation(
         Placement(transformation(origin = {-80, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {-97, -1}, extent = {{-13, -13}, {13, 13}})));
@@ -945,12 +981,14 @@ end UDPInput;
         Line(points = {{-160, 40}, {-180, 40}, {-180, 80}, {-150, 80}, {-150, 100}}, color = {95, 95, 95}));
       connect(tireRR.wheelSupport, frame_RR) annotation(
         Line(points = {{-160, -40}, {-202, -40}, {-202, -100}, {-150, -100}}, color = {95, 95, 95}));
-      connect(steerInput, steerAct.phi_ref) annotation(
-        Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, 10}, {90, 10}}, color = {0, 0, 127}));
-      connect(steerInput, steerAct1.phi_ref) annotation(
-        Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, -12}, {90, -12}}, color = {0, 0, 127}));
-      //connect(throttleInput, solidAxle.i) annotation(
-        //Line(points = {{-80, 110}, {-80, -2}, {-142, -2}}, color = {0, 0, 127}));
+      connect(steerInput, mockSteering.steerCmd) annotation(
+        Line(points = {{42, 110}, {42, 24}, {51, 24}}, color = {0, 0, 127}));
+      connect(mockSteering.steerAngle, steerAct.phi_ref) annotation(
+        Line(points = {{69, 24}, {80, 24}, {80, 10}, {90, 10}}, color = {0, 0, 127}));
+      connect(mockSteering.steerAngle, steerAct1.phi_ref) annotation(
+        Line(points = {{69, 24}, {80, 24}, {80, -12}, {90, -12}}, color = {0, 0, 127}));
+//connect(throttleInput, solidAxle.i) annotation(
+//Line(points = {{-80, 110}, {-80, -2}, {-142, -2}}, color = {0, 0, 127}));
       connect(brakeFL.shaft, ttireFL.brakeFlange) annotation(
         Line(points = {{154, 64}, {154, 52}, {150, 52}, {150, 40}}));
       connect(brakeFR.shaft, tireFR.brakeFlange) annotation(
@@ -1000,7 +1038,7 @@ end UDPInput;
 <tr><td><code>frame_RR</code></td><td>Frame_a</td><td>Rear-right ground contact &mdash; connect to Road.RR</td></tr>
 <tr><td><code>chassis_pos</code></td><td>Frame_a</td><td>Chassis reference frame (for external position reading)</td></tr>
 <tr><td><code>throttleInput</code></td><td>RealInput</td><td>Throttle command [0..1] &mdash; 0 = idle, 1 = full drive torque</td></tr>
-<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front-wheel steer command [-1..1] &mdash; &minus;1 = full left, +1 = full right (applied as steer angle in rad)</td></tr>
+<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front-wheel steer command [-1..1] &mdash; &minus;1 = full left, +1 = full right (normalized; mapped to a road-wheel angle in rad by MockSteering)</td></tr>
 <tr><td><code>brakeInput</code></td><td>RealInput</td><td>Brake demand [0..1] &mdash; 0 = released, 1 = fully applied</td></tr>
 </tbody>
 </table>
@@ -1044,6 +1082,8 @@ end UDPInput;
         Placement(transformation(origin = {102, 10}, extent = {{-10, -10}, {10, 10}})));
       Modelica.Mechanics.Rotational.Sources.Position steerAct1 annotation(
         Placement(transformation(origin = {102, -12}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Steering.MockSteering mockSteering annotation(
+        Placement(transformation(origin = {60, 24}, extent = {{-9, -9}, {9, 9}})));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_FL annotation(
         Placement(transformation(origin = {94, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {60, 98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_FR annotation(
@@ -1054,7 +1094,7 @@ end UDPInput;
         Placement(transformation(origin = {-150, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {-80, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a chassis_pos annotation(
         Placement(transformation(origin = {-2, -102}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {2, 0}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
-      Modelica.Blocks.Interfaces.RealInput steerInput "Front-wheel steer command [-1..1]: -1 = full left, +1 = full right (applied as steer angle in rad)" annotation(
+      Modelica.Blocks.Interfaces.RealInput steerInput "Front-wheel steer command [-1..1]: -1 = full left, +1 = full right (normalized; mapped to a road-wheel angle in rad by MockSteering)" annotation(
         Placement(transformation(origin = {42, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {98, -2}, extent = {{-14, -14}, {14, 14}}, rotation = 180)));
       Modelica.Blocks.Interfaces.RealInput throttleInput "Throttle command [0=idle, 1=full drive torque]" annotation(
         Placement(transformation(origin = {-80, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {-97, -1}, extent = {{-13, -13}, {13, 13}})));
@@ -1104,10 +1144,12 @@ end UDPInput;
         Line(points = {{-160, 40}, {-180, 40}, {-180, 80}, {-150, 80}, {-150, 100}}, color = {95, 95, 95}));
       connect(tireRR.wheelSupport, frame_RR) annotation(
         Line(points = {{-160, -40}, {-202, -40}, {-202, -100}, {-150, -100}}, color = {95, 95, 95}));
-      connect(steerInput, steerAct.phi_ref) annotation(
-        Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, 10}, {90, 10}}, color = {0, 0, 127}));
-      connect(steerInput, steerAct1.phi_ref) annotation(
-        Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, -12}, {90, -12}}, color = {0, 0, 127}));
+      connect(steerInput, mockSteering.steerCmd) annotation(
+        Line(points = {{42, 110}, {42, 24}, {51, 24}}, color = {0, 0, 127}));
+      connect(mockSteering.steerAngle, steerAct.phi_ref) annotation(
+        Line(points = {{69, 24}, {80, 24}, {80, 10}, {90, 10}}, color = {0, 0, 127}));
+      connect(mockSteering.steerAngle, steerAct1.phi_ref) annotation(
+        Line(points = {{69, 24}, {80, 24}, {80, -12}, {90, -12}}, color = {0, 0, 127}));
       connect(brakeFL.shaft, tireFL.brakeFlange) annotation(
         Line(points = {{154, 64}, {154, 52}, {150, 52}, {150, 40}}));
       connect(brakeFR.shaft, tireFR.brakeFlange) annotation(
@@ -1157,7 +1199,7 @@ end UDPInput;
 <tr><td><code>frame_RR</code></td><td>Frame_a</td><td>Rear-right ground contact &mdash; connect to Road.RR</td></tr>
 <tr><td><code>chassis_pos</code></td><td>Frame_a</td><td>Chassis reference frame</td></tr>
 <tr><td><code>throttleInput</code></td><td>RealInput</td><td>Throttle command [0..1] &mdash; 0 = idle, 1 = full drive torque</td></tr>
-<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front-wheel steer command [-1..1] &mdash; &minus;1 = full left, +1 = full right (applied as steer angle in rad)</td></tr>
+<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front-wheel steer command [-1..1] &mdash; &minus;1 = full left, +1 = full right (normalized; mapped to a road-wheel angle in rad by MockSteering)</td></tr>
 <tr><td><code>brakeInput</code></td><td>RealInput</td><td>Brake demand [0=released, 1=fully applied]</td></tr>
 </tbody>
 </table>
@@ -1201,6 +1243,8 @@ end UDPInput;
         Placement(transformation(origin = {102, 10}, extent = {{-10, -10}, {10, 10}})));
       Modelica.Mechanics.Rotational.Sources.Position steerAct1 annotation(
         Placement(transformation(origin = {102, -12}, extent = {{-10, -10}, {10, 10}})));
+      Parts.Steering.MockSteering mockSteering annotation(
+        Placement(transformation(origin = {60, 24}, extent = {{-9, -9}, {9, 9}})));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_FL annotation(
         Placement(transformation(origin = {94, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {60, 98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_FR annotation(
@@ -1211,7 +1255,7 @@ end UDPInput;
         Placement(transformation(origin = {-150, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {-80, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
       Modelica.Mechanics.MultiBody.Interfaces.Frame_a chassis_pos annotation(
         Placement(transformation(origin = {-2, -102}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {2, 0}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
-      Modelica.Blocks.Interfaces.RealInput steerInput "Front-wheel steer command [-1..1]: -1 = full left, +1 = full right (applied as steer angle in rad)" annotation(
+      Modelica.Blocks.Interfaces.RealInput steerInput "Front-wheel steer command [-1..1]: -1 = full left, +1 = full right (normalized; mapped to a road-wheel angle in rad by MockSteering)" annotation(
         Placement(transformation(origin = {42, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {98, -2}, extent = {{-14, -14}, {14, 14}}, rotation = 180)));
       Modelica.Blocks.Interfaces.RealInput throttleInput "Throttle command [0=idle, 1=full drive torque]" annotation(
         Placement(transformation(origin = {-80, 110}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {-97, -1}, extent = {{-13, -13}, {13, 13}})));
@@ -1261,12 +1305,14 @@ end UDPInput;
         Line(points = {{-160, 40}, {-180, 40}, {-180, 80}, {-150, 80}, {-150, 100}}, color = {95, 95, 95}));
       connect(tireRR.wheelSupport, frame_RR) annotation(
         Line(points = {{-160, -40}, {-202, -40}, {-202, -100}, {-150, -100}}, color = {95, 95, 95}));
-      connect(steerInput, steerAct.phi_ref) annotation(
-        Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, 10}, {90, 10}}, color = {0, 0, 127}));
-      connect(steerInput, steerAct1.phi_ref) annotation(
-        Line(points = {{42, 110}, {42, 0}, {80, 0}, {80, -12}, {90, -12}}, color = {0, 0, 127}));
-      //connect(throttleInput, solidAxle.i) annotation(
-        //Line(points = {{-80, 110}, {-80, -2}, {-142, -2}}, color = {0, 0, 127}));
+      connect(steerInput, mockSteering.steerCmd) annotation(
+        Line(points = {{42, 110}, {42, 24}, {51, 24}}, color = {0, 0, 127}));
+      connect(mockSteering.steerAngle, steerAct.phi_ref) annotation(
+        Line(points = {{69, 24}, {80, 24}, {80, 10}, {90, 10}}, color = {0, 0, 127}));
+      connect(mockSteering.steerAngle, steerAct1.phi_ref) annotation(
+        Line(points = {{69, 24}, {80, 24}, {80, -12}, {90, -12}}, color = {0, 0, 127}));
+//connect(throttleInput, solidAxle.i) annotation(
+//Line(points = {{-80, 110}, {-80, -2}, {-142, -2}}, color = {0, 0, 127}));
       connect(brakeFL.shaft, tireFL.brakeFlange) annotation(
         Line(points = {{154, 64}, {154, 52}, {150, 52}, {150, 40}}));
       connect(brakeFR.shaft, tireFR.brakeFlange) annotation(
@@ -1316,7 +1362,7 @@ end UDPInput;
 <tr><td><code>frame_RR</code></td><td>Frame_a</td><td>Rear-right ground contact &mdash; connect to Road.RR</td></tr>
 <tr><td><code>chassis_pos</code></td><td>Frame_a</td><td>Chassis reference frame</td></tr>
 <tr><td><code>throttleInput</code></td><td>RealInput</td><td>Throttle command [0..1] &mdash; 0 = idle, 1 = full drive torque</td></tr>
-<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front-wheel steer command [-1..1] &mdash; &minus;1 = full left, +1 = full right (applied as steer angle in rad)</td></tr>
+<tr><td><code>steerInput</code></td><td>RealInput</td><td>Front-wheel steer command [-1..1] &mdash; &minus;1 = full left, +1 = full right (normalized; mapped to a road-wheel angle in rad by MockSteering)</td></tr>
 <tr><td><code>brakeInput</code></td><td>RealInput</td><td>Brake demand [0=released, 1=fully applied]</td></tr>
 </tbody>
 </table>
@@ -1685,6 +1731,17 @@ wheels.</p>
           parameter Modelica.Units.SI.Length upperMountZ = 0.25 "Upper mount height above chassis mount";
           parameter Modelica.Units.SI.Length lowerMountZ = 0.15 "Lower mount height below chassis mount";
           parameter Modelica.Units.SI.Length shockTopHeight = 0.35 "Shock top mount height above chassis mount";
+          // --- Elastic travel limiters (bump/droop stops) ---
+          // The four-bar loop is closed by the analytic JointRRR, which loses a DOF (singular
+          // position, jointUSR.revolute.k1a -> 0) if the suspension travels far enough. These
+          // one-sided ElastoGap springs on the shock line halt travel before that geometry is
+          // reached, so an overloaded corner bottoms/tops out instead of crashing the solver.
+          parameter Boolean useEndStops = true "Enable elastic bump/droop travel limiters on the shock line";
+          parameter Modelica.Units.SI.Length shockBumpLength = 0.28 "Shock length at which the bump (compression) stop engages";
+          parameter Modelica.Units.SI.Length shockDroopLength = 0.66 "Shock length at which the droop (extension) stop engages";
+          parameter Modelica.Units.SI.TranslationalSpringConstant endStopStiffness = 1e7 "Contact stiffness of the end-stops (N/m) - stiff so penetration stays small under large loads";
+          parameter Modelica.Units.SI.TranslationalDampingConstant endStopDamping = 15000 "Contact damping of the end-stops (N.s/m)";
+          parameter Real endStopExponent(min = 1) = 1 "End-stop contact force exponent (1 = linear, bounded penetration)";
           // --- Chassis-side offsets ---
           MultiBody.Parts.FixedTranslation upperChassisOffset(r={0, upperMountZ, 0}) annotation(
             Placement(transformation(extent={{-70, 20}, {-50, 40}})));
@@ -1722,6 +1779,16 @@ wheels.</p>
           // --- Spring-damper ---
           MultiBody.Forces.SpringDamperParallel shock(c=k_spring, d=d_damper, s_unstretched=0.55) annotation(
             Placement(transformation(origin = {-14, -2}, extent = {{-20, -80}, {0, -60}})));
+          // --- End-stops: a massless line force on the shock axis carrying two one-sided springs.
+          //     LineForceWithMass exposes flange_a.s = 0 and flange_b.s = (shock length), so an
+          //     ElastoGap across the flanges resists compression (bump); reversing the flanges and
+          //     negating s_rel0 makes a second ElastoGap resist extension (droop). ---
+          MultiBody.Forces.LineForceWithMass endStop(m = 0, animateLine = false, animateMass = false) if useEndStops annotation(
+            Placement(transformation(origin = {30, -52}, extent = {{-10, -10}, {10, 10}})));
+          Modelica.Mechanics.Translational.Components.ElastoGap bumpStop(c = endStopStiffness, d = endStopDamping, s_rel0 = shockBumpLength, n = endStopExponent) if useEndStops annotation(
+            Placement(transformation(origin = {30, -76}, extent = {{-10, -10}, {10, 10}})));
+          Modelica.Mechanics.Translational.Components.ElastoGap droopStop(c = endStopStiffness, d = endStopDamping, s_rel0 = -shockDroopLength, n = endStopExponent) if useEndStops annotation(
+            Placement(transformation(origin = {30, -96}, extent = {{-10, -10}, {10, 10}})));
 
         equation
 // Chassis-side: split into upper and lower mount points
@@ -1754,6 +1821,15 @@ wheels.</p>
             Line(points={{-50, 60}, {-34, 60}, {-34, -72}}, color={95, 95, 95}));
           connect(jointLoop.frame_im, shock.frame_b) annotation(
             Line(points={{50, -38}, {50, -56}, {-14, -56}, {-14, -72}}, color={95, 95, 95}));
+// End-stops: same two frames as the shock; ElastoGaps act on the 1-D flanges.
+          connect(shockTopMount.frame_b, endStop.frame_a) annotation(
+            Line(points={{-50, 60}, {20, 60}, {20, -52}}, color={95, 95, 95}));
+          connect(endStop.frame_b, jointLoop.frame_im) annotation(
+            Line(points={{40, -52}, {50, -52}, {50, -38}}, color={95, 95, 95}));
+          connect(bumpStop.flange_a, endStop.flange_a);
+          connect(bumpStop.flange_b, endStop.flange_b);
+          connect(droopStop.flange_a, endStop.flange_b);
+          connect(droopStop.flange_b, endStop.flange_a);
           connect(steerInput, steer.axis) annotation(
             Line(points = {{0, 100}, {0, 44}, {86, 44}, {86, 28}}));
           connect(steer.axis, steerLock.flange) annotation(
@@ -1782,9 +1858,23 @@ wheels.</p>
 <tr><td><code>upperMountZ</code></td><td>0.25 m</td><td>Upper ball-joint height above chassis mount</td></tr>
 <tr><td><code>lowerMountZ</code></td><td>0.15 m</td><td>Lower ball-joint depth below chassis mount</td></tr>
 <tr><td><code>shockTopHeight</code></td><td>0.35 m</td><td>Shock absorber top mount height above chassis mount</td></tr>
+<tr><td><code>useEndStops</code></td><td>true</td><td>Enable the elastic bump/droop travel limiters</td></tr>
+<tr><td><code>shockBumpLength</code></td><td>0.28 m</td><td>Shock length at which the bump (compression) stop engages</td></tr>
+<tr><td><code>shockDroopLength</code></td><td>0.66 m</td><td>Shock length at which the droop (extension) stop engages</td></tr>
+<tr><td><code>endStopStiffness</code></td><td>1&times;10<sup>7</sup> N/m</td><td>Contact stiffness of the end-stops (stiff, so penetration stays small)</td></tr>
+<tr><td><code>endStopDamping</code></td><td>15000 N&middot;s/m</td><td>Contact damping of the end-stops</td></tr>
+<tr><td><code>endStopExponent</code></td><td>1</td><td>Contact force exponent (1 = linear, bounded penetration)</td></tr>
 </tbody>
 </table>
 <p>Spring/damper parameters come from <code>BaseSuspension</code>: <code>k_spring</code> and <code>d_damper</code>. Shock free length is 0.55 m.</p>
+<p><b>Travel limiters.</b> The analytic <code>JointRRR</code> loses a degree of freedom (singular position,
+<code>jointUSR.revolute.k1a</code> &rarr; 0) if the suspension is driven far enough into bump or droop &mdash; e.g.
+under a very large drive torque a corner can compress until the wishbone arms approach the singular geometry, which
+aborts the solver. Two one-sided <code>ElastoGap</code> springs mounted on the shock line (via a massless
+<code>LineForceWithMass</code>) halt travel before that geometry is reached: the corner bottoms/tops out on a stiff
+elastic stop instead of crashing. They act only outside the normal travel band, so ride behaviour is unchanged. Set
+<code>useEndStops = false</code> to disable them, or widen <code>shockBumpLength</code>/<code>shockDroopLength</code> to
+change where they engage.</p>
 </body>
 </html>"));
         end DoubleWishbone;
@@ -1801,6 +1891,17 @@ wheels.</p>
           // rear suspension links so front and rear tracks/ride heights are consistent.
           parameter Modelica.Units.SI.Length wheelOffsetY = 0 "Wheel center height above strut bottom";
           parameter Modelica.Units.SI.Length wheelOffsetZ = 0 "Lateral outboard offset from strut to wheel center";
+          // --- Elastic travel limiters (bump/droop stops) ---
+          // The strut is a plain Prismatic joint, so there is no analytic-loop singularity here, but an
+          // unbounded strut can over-travel (the wheel is pulled up through the chassis, strut s -> 0 or
+          // negative, under heavy load). These one-sided ElastoGap springs on the shock line bound the
+          // travel so the strut bottoms/tops out on an elastic stop instead.
+          parameter Boolean useEndStops = true "Enable elastic bump/droop travel limiters on the shock line";
+          parameter Modelica.Units.SI.Length shockBumpLength = 0.31 "Shock length at which the bump (compression) stop engages";
+          parameter Modelica.Units.SI.Length shockDroopLength = 0.62 "Shock length at which the droop (extension) stop engages";
+          parameter Modelica.Units.SI.TranslationalSpringConstant endStopStiffness = 1e7 "Contact stiffness of the end-stops (N/m) - stiff so penetration stays small under large loads";
+          parameter Modelica.Units.SI.TranslationalDampingConstant endStopDamping = 15000 "Contact damping of the end-stops (N.s/m)";
+          parameter Real endStopExponent(min = 1) = 1 "End-stop contact force exponent (1 = linear, bounded penetration)";
           // --- Shock top mount on chassis ---
           MultiBody.Parts.FixedTranslation shockTopMount(r = {0, shockTopHeight, 0}) annotation(
             Placement(transformation(extent = {{-60, 40}, {-40, 60}})));
@@ -1829,6 +1930,13 @@ wheels.</p>
           // Free length = sqrt(shockTopHeight^2 + s_rest^2) = sqrt(0.28^2+0.30^2) ~ 0.41 m
           MultiBody.Forces.SpringDamperParallel shock(c = k_spring, d = d_damper, s_unstretched = 0.41) annotation(
             Placement(transformation(extent = {{-40, -40}, {-20, -20}})));
+          // --- End-stops on the shock line (see DoubleWishbone for the wiring rationale) ---
+          MultiBody.Forces.LineForceWithMass endStop(m = 0, animateLine = false, animateMass = false) if useEndStops annotation(
+            Placement(transformation(origin = {-30, -60}, extent = {{-10, -10}, {10, 10}})));
+          Modelica.Mechanics.Translational.Components.ElastoGap bumpStop(c = endStopStiffness, d = endStopDamping, s_rel0 = shockBumpLength, n = endStopExponent) if useEndStops annotation(
+            Placement(transformation(origin = {-30, -78}, extent = {{-10, -10}, {10, 10}})));
+          Modelica.Mechanics.Translational.Components.ElastoGap droopStop(c = endStopStiffness, d = endStopDamping, s_rel0 = -shockDroopLength, n = endStopExponent) if useEndStops annotation(
+            Placement(transformation(origin = {-30, -94}, extent = {{-10, -10}, {10, 10}})));
 
         equation
           connect(chassisMount, strutTravel.frame_a) annotation(
@@ -1847,6 +1955,15 @@ wheels.</p>
             Line(points = {{-40, 50}, {-30, 50}, {-30, -20}}, color = {95, 95, 95}));
           connect(strutTravel.frame_b, shock.frame_b) annotation(
             Line(points = {{0, 0}, {10, 0}, {10, -30}, {-20, -30}}, color = {95, 95, 95}));
+// End-stops: same two frames as the shock; ElastoGaps act on the 1-D flanges.
+          connect(shockTopMount.frame_b, endStop.frame_a) annotation(
+            Line(points = {{-40, 50}, {-30, 50}, {-30, -60}}, color = {95, 95, 95}));
+          connect(endStop.frame_b, strutTravel.frame_b) annotation(
+            Line(points = {{-20, -60}, {10, -60}, {10, 0}}, color = {95, 95, 95}));
+          connect(bumpStop.flange_a, endStop.flange_a);
+          connect(bumpStop.flange_b, endStop.flange_b);
+          connect(droopStop.flange_a, endStop.flange_b);
+          connect(droopStop.flange_b, endStop.flange_a);
           connect(steerInput, steer.axis) annotation(
             Line(points = {{0, 100}, {70, 100}, {70, 10}}));
           connect(steer.axis, steerLock.flange) annotation(
@@ -1870,9 +1987,19 @@ wheels.</p>
 <tr><td><code>shockTopHeight</code></td><td>0.28 m</td><td>Spring seat height above chassis attachment point</td></tr>
 <tr><td><code>wheelOffsetY</code></td><td>0 m</td><td>Wheel centre height above strut bottom (knuckle height effect)</td></tr>
 <tr><td><code>wheelOffsetZ</code></td><td>0 m</td><td>Lateral outboard offset from strut to wheel centre (lower arm lateral effect)</td></tr>
+<tr><td><code>useEndStops</code></td><td>true</td><td>Enable the elastic bump/droop travel limiters</td></tr>
+<tr><td><code>shockBumpLength</code></td><td>0.31 m</td><td>Shock length at which the bump (compression) stop engages</td></tr>
+<tr><td><code>shockDroopLength</code></td><td>0.62 m</td><td>Shock length at which the droop (extension) stop engages</td></tr>
+<tr><td><code>endStopStiffness</code></td><td>1&times;10<sup>7</sup> N/m</td><td>Contact stiffness of the end-stops (stiff, so penetration stays small)</td></tr>
+<tr><td><code>endStopDamping</code></td><td>15000 N&middot;s/m</td><td>Contact damping of the end-stops</td></tr>
+<tr><td><code>endStopExponent</code></td><td>1</td><td>Contact force exponent (1 = linear, bounded penetration)</td></tr>
 </tbody>
 </table>
 <p>Spring/damper from <code>BaseSuspension</code>: <code>k_spring</code>, <code>d_damper</code>. Natural length 0.41 m (zero spring force at s &asymp; 0.30 m strut compression).</p>
+<p><b>Travel limiters.</b> Unlike <code>DoubleWishbone</code>/<code>MultiLink</code>, the strut is a plain
+<code>Prismatic</code> joint, so there is no analytic-loop singularity to trip. The elastic stops here instead prevent
+the strut from over-travelling (under heavy load the wheel is otherwise pulled up until the strut coordinate
+<code>s</code> reaches 0 or goes negative). Disable with <code>useEndStops = false</code>.</p>
 </body>
 </html>"));
         end McPherson;
@@ -1888,6 +2015,16 @@ wheels.</p>
           parameter Modelica.Units.SI.Length lowerMountZ = 0.12 "Lower link height below chassis mount";
           parameter Modelica.Units.SI.Length rearLinkOffset = 0.08 "Fore-aft offset of lower link chassis pivot (X)";
           parameter Modelica.Units.SI.Length shockTopHeight = 0.32 "Shock top mount height above chassis mount";
+          // --- Elastic travel limiters (bump/droop stops) ---
+          // Same rationale as DoubleWishbone: the lower link is closed by an analytic JointRRR that
+          // loses a DOF (jointUSR.revolute.k1a -> 0) near full bump. One-sided ElastoGap springs on
+          // the shock line halt travel before that singular geometry (~0.10 m shock length) is reached.
+          parameter Boolean useEndStops = true "Enable elastic bump/droop travel limiters on the shock line";
+          parameter Modelica.Units.SI.Length shockBumpLength = 0.31 "Shock length at which the bump (compression) stop engages";
+          parameter Modelica.Units.SI.Length shockDroopLength = 0.62 "Shock length at which the droop (extension) stop engages";
+          parameter Modelica.Units.SI.TranslationalSpringConstant endStopStiffness = 1e7 "Contact stiffness of the end-stops (N/m) - stiff so penetration stays small under large loads";
+          parameter Modelica.Units.SI.TranslationalDampingConstant endStopDamping = 15000 "Contact damping of the end-stops (N.s/m)";
+          parameter Real endStopExponent(min = 1) = 1 "End-stop contact force exponent (1 = linear, bounded penetration)";
           // --- Chassis-side offsets ---
           MultiBody.Parts.FixedTranslation upperChassisOffset(r = {0, upperMountZ, 0}) annotation(
             Placement(transformation(extent = {{-70, 20}, {-50, 40}})));
@@ -1925,6 +2062,13 @@ wheels.</p>
           // --- Spring-damper ---
           MultiBody.Forces.SpringDamperParallel shock(c = k_spring, d = d_damper, s_unstretched = 0.50) annotation(
             Placement(transformation(origin = {-14, -2}, extent = {{-20, -80}, {0, -60}})));
+          // --- End-stops on the shock line (see DoubleWishbone for the wiring rationale) ---
+          MultiBody.Forces.LineForceWithMass endStop(m = 0, animateLine = false, animateMass = false) if useEndStops annotation(
+            Placement(transformation(origin = {30, -52}, extent = {{-10, -10}, {10, 10}})));
+          Modelica.Mechanics.Translational.Components.ElastoGap bumpStop(c = endStopStiffness, d = endStopDamping, s_rel0 = shockBumpLength, n = endStopExponent) if useEndStops annotation(
+            Placement(transformation(origin = {30, -76}, extent = {{-10, -10}, {10, 10}})));
+          Modelica.Mechanics.Translational.Components.ElastoGap droopStop(c = endStopStiffness, d = endStopDamping, s_rel0 = -shockDroopLength, n = endStopExponent) if useEndStops annotation(
+            Placement(transformation(origin = {30, -96}, extent = {{-10, -10}, {10, 10}})));
 
         equation
 // Chassis-side: upper and lower link mounts
@@ -1958,6 +2102,15 @@ wheels.</p>
             Line(points = {{-50, 60}, {-34, 60}, {-34, -72}}, color = {95, 95, 95}));
           connect(lowerLoop.frame_im, shock.frame_b) annotation(
             Line(points = {{50, -38}, {50, -56}, {-14, -56}, {-14, -72}}, color = {95, 95, 95}));
+// End-stops: same two frames as the shock; ElastoGaps act on the 1-D flanges.
+          connect(shockTopMount.frame_b, endStop.frame_a) annotation(
+            Line(points = {{-50, 60}, {20, 60}, {20, -52}}, color = {95, 95, 95}));
+          connect(endStop.frame_b, lowerLoop.frame_im) annotation(
+            Line(points = {{40, -52}, {50, -52}, {50, -38}}, color = {95, 95, 95}));
+          connect(bumpStop.flange_a, endStop.flange_a);
+          connect(bumpStop.flange_b, endStop.flange_b);
+          connect(droopStop.flange_a, endStop.flange_b);
+          connect(droopStop.flange_b, endStop.flange_a);
 // Steering
           connect(steerInput, steer.axis) annotation(
             Line(points = {{0, 100}, {0, 44}, {86, 44}, {86, 28}}));
@@ -1986,9 +2139,22 @@ wheels.</p>
 <tr><td><code>lowerMountZ</code></td><td>0.12 m</td><td>Lower link height below chassis mount</td></tr>
 <tr><td><code>rearLinkOffset</code></td><td>0.08 m</td><td>Fore-aft offset of lower link chassis pivot (X direction)</td></tr>
 <tr><td><code>shockTopHeight</code></td><td>0.32 m</td><td>Shock absorber top mount height</td></tr>
+<tr><td><code>useEndStops</code></td><td>true</td><td>Enable the elastic bump/droop travel limiters</td></tr>
+<tr><td><code>shockBumpLength</code></td><td>0.31 m</td><td>Shock length at which the bump (compression) stop engages</td></tr>
+<tr><td><code>shockDroopLength</code></td><td>0.62 m</td><td>Shock length at which the droop (extension) stop engages</td></tr>
+<tr><td><code>endStopStiffness</code></td><td>1&times;10<sup>7</sup> N/m</td><td>Contact stiffness of the end-stops (stiff, so penetration stays small)</td></tr>
+<tr><td><code>endStopDamping</code></td><td>15000 N&middot;s/m</td><td>Contact damping of the end-stops</td></tr>
+<tr><td><code>endStopExponent</code></td><td>1</td><td>Contact force exponent (1 = linear, bounded penetration)</td></tr>
 </tbody>
 </table>
 <p>Spring/damper parameters from <code>BaseSuspension</code>: <code>k_spring</code>, <code>d_damper</code>. Shock free length 0.50 m.</p>
+<p><b>Travel limiters.</b> Because the lower link is closed by the same analytic <code>JointRRR</code> as
+<code>DoubleWishbone</code>, it can reach a singular position under a large enough drive torque (the loop goes singular
+around a shock length of ~0.26&ndash;0.31 m, depending on the loop pose). Two one-sided <code>ElastoGap</code> springs on
+the shock line limit compression travel, which keeps the loop out of that region for realistic and moderately overloaded
+drive torques; note that under extreme, unrealistic torque the analytic loop can still be driven singular during violent
+transients &mdash; the definitive cure there is rebuilding the loop from basic joints with dynamic state selection. See
+<code>DoubleWishbone</code> for the wiring; disable with <code>useEndStops = false</code>.</p>
 </body>
 </html>"));
         end MultiLink;
@@ -2103,7 +2269,7 @@ wheels.</p>
    model MockTransmission
           extends Components.BaseTransmission;
           Modelica.Mechanics.Rotational.Sources.Torque drive(useSupport = false);
-          parameter Real torqueValue = 200 "Drive torque per unit pedal input (N.m)";
+          parameter Real torqueValue = 1500 "Drive torque per unit pedal input (N.m)";
    equation
           drive.tau = torqueValue*pedalInput;
           connect(drive.flange, torqueOut);
@@ -2166,6 +2332,64 @@ are interchangeable.</p>
         end Components;
       end Transmission;
 
+      package Steering
+        model MockSteering
+          extends Components.BaseSteering;
+          parameter Modelica.Units.SI.Angle maxSteerAngle = 0.53 "Road-wheel angle at full lock (|steerCmd| = 1), rad (~30 deg)";
+        equation
+          steerAngle = maxSteerAngle*steerCmd;
+          annotation(
+            Icon(graphics = {Ellipse(extent = {{-70, 70}, {70, -70}}, lineThickness = 2), Ellipse(extent = {{-18, 18}, {18, -18}}, fillColor = {95, 95, 95}, fillPattern = FillPattern.Solid), Line(points = {{0, 18}, {0, 70}}, thickness = 2), Line(points = {{-15, -10}, {-60, -36}}, thickness = 2), Line(points = {{15, -10}, {60, -36}}, thickness = 2), Text(extent = {{-100, -78}, {100, -98}}, textString = "%name")}),
+            Documentation(info = "<html>
+<body>
+<h4>MockSteering</h4>
+<p>Simplified stand-in for a steering column/rack. Maps the normalized driver steering command
+<code>steerCmd</code> (&minus;1&hellip;+1) linearly to a road-wheel steer angle in radians:</p>
+<pre>steerAngle = maxSteerAngle &middot; steerCmd</pre>
+<p>So <code>steerCmd = &plusmn;1</code> gives full lock (&plusmn;<code>maxSteerAngle</code>) and 0 is straight ahead.
+The output is a plain <code>RealOutput</code> angle intended to drive the front-wheel steering position
+actuators (<code>Rotational.Sources.Position.phi_ref</code>). No steering dynamics, ratio non-linearity, or
+Ackermann split are modelled &mdash; both front wheels receive the same angle.</p>
+<p><b>Extending to a real column.</b> Because the interface is command in / angle out, a richer model
+(steering-ratio map, compliance, rate limiting, speed-dependent ratio) can replace <code>MockSteering</code>
+without touching the cars, as long as it keeps the <code>Components.BaseSteering</code> interface.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>maxSteerAngle</code></td><td>0.53 rad (~30&deg;)</td><td>Road-wheel angle at full lock (|steerCmd| = 1)</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
+        end MockSteering;
+
+        package Components
+          partial model BaseSteering
+            Modelica.Blocks.Interfaces.RealInput steerCmd "Normalized steering command [-1..1]" annotation(
+              Placement(transformation(origin = {-120, 0}, extent = {{-20, -20}, {20, 20}}), iconTransformation(origin = {-100, 0}, extent = {{-20, -20}, {20, 20}})));
+            Modelica.Blocks.Interfaces.RealOutput steerAngle "Commanded road-wheel steer angle (rad)" annotation(
+              Placement(transformation(origin = {110, 0}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}})));
+          annotation(
+            Documentation(info = "<html>
+<body>
+<h4>BaseSteering (base)</h4>
+<p>Base class defining the steering interface shared by every steering model: a normalized driver
+command in (&minus;1&hellip;+1) and a road-wheel steer angle out (rad). Extend this to build any steering
+model; the cars connect their <code>steerInput</code> to <code>steerCmd</code> and feed <code>steerAngle</code>
+to the front-wheel position actuators, so implementations are interchangeable.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>steerCmd</code></td><td>RealInput</td><td>Normalized steering command [-1..1]</td></tr>
+<tr><td><code>steerAngle</code></td><td>RealOutput</td><td>Commanded road-wheel steer angle (rad)</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
+          end BaseSteering;
+        end Components;
+      end Steering;
+
     end Parts;
 
   end Cars;
@@ -2208,6 +2432,7 @@ DDynamics
         &#9500;&#9472;&#9472; Tires: Tire, DrivingTire, TireVisualizer
         &#9500;&#9472;&#9472; Differentials: SolidAxle, Differential (partial)
         &#9500;&#9472;&#9472; Transmission: MockTransmission, BaseTransmission
+        &#9500;&#9472;&#9472; Steering: MockSteering, BaseSteering (partial)
         &#9500;&#9472;&#9472; Suspension: SpringDamper, DoubleWishbone, BaseSuspension (partial)
         &#9492;&#9472;&#9472; Chassis: RectangularChassis, BaseChassis (partial)
 </pre>
@@ -2224,6 +2449,7 @@ DDynamics
 <p><b>Custom terrain:</b> Modify <code>Roads.Terrains.TerrainMap.getZ</code>, update <code>terrainSurface</code> and <code>TerrainVisualizer.groundHeight</code> to match.</p>
 <p><b>Custom differential:</b> Extend <code>Cars.Parts.Differentials.Components.Differential</code> and wire <code>pedalInput</code> to <code>left_out</code>/<code>right_out</code> (rigidly, as in <code>SolidAxle</code>, or through an <code>IdealPlanetary</code> for an open diff).</p>
 <p><b>Custom transmission:</b> Extend <code>Cars.Parts.Transmission.Components.BaseTransmission</code> and compute <code>torqueOut</code> from <code>pedalInput</code> (for a real engine, derive torque from engine speed via a torque map, add flywheel inertia, and apply gear ratios).</p>
+<p><b>Custom steering:</b> Extend <code>Cars.Parts.Steering.Components.BaseSteering</code> and compute <code>steerAngle</code> (rad) from the normalized <code>steerCmd</code> (for a real column, add a steering-ratio map, compliance, rate limiting, or a speed-dependent ratio).</p>
 <p><b>Custom suspension:</b> Extend <code>Cars.Parts.Suspension.Components.BaseSuspension</code> and implement kinematics between <code>chassisMount</code> and <code>wheelMount</code>.</p>
 <p><b>Custom chassis:</b> Extend <code>Cars.Parts.Chassis.Components.BaseChassis</code> and connect geometry to <code>frame_a</code>.</p>
 </body>
