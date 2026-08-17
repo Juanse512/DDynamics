@@ -144,9 +144,9 @@ package DDynamics
       inner parameter Real R_wheel = 0.25 "Tire radius (m) — propagated to tires and floor contact";
       Cars.Car car annotation(
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
-      Modelica.Blocks.Sources.Constant speed(k = 5) annotation(
+      Modelica.Blocks.Sources.Constant speed(k = 1) annotation(
         Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Blocks.Sources.Sine steer(amplitude = 1, f = 0.2) annotation(
+      Modelica.Blocks.Sources.Sine steer(amplitude = 0.5, f = 0.2) annotation(
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Roads.Road road annotation(
         Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
@@ -946,7 +946,7 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
       Parts.Brakes.DiscBrake brakeRR(maxBrakeTorque = 2000) annotation(
         Placement(transformation(origin = {-118, -64}, extent = {{-10, -10}, {10, 10}})));
       outer Modelica.Mechanics.MultiBody.World world;
-  Parts.Transmission.MockTransmission mockTransmission annotation(
+  Parts.Transmission.MockTransmission mockTransmission(torqueValue = 500)  annotation(
         Placement(transformation(origin = {-80, -4}, extent = {{-10, -10}, {10, 10}})));
     equation
       connect(mountFL.frame_b, doubleWishboneFL.chassisMount) annotation(
