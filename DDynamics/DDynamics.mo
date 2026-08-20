@@ -11,7 +11,7 @@ package DDynamics
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Roads.Road road annotation(
         Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Blocks.Sources.Step brake_input(height = 1, startTime = 3)  annotation(
+  Modelica.Blocks.Sources.Step brake_input(height = 0, startTime = 3)  annotation(
         Placement(transformation(origin = {-68, 58}, extent = {{-10, -10}, {10, 10}})));
     equation
       connect(speed.y, car.throttleInput) annotation(
@@ -211,6 +211,233 @@ package DDynamics
 </html>"));
     end CarExampleUDP;
 
+    package ClosedLoop
+      model CarExampleClosedLoop
+        inner parameter Real R_wheel = 0.25 "Tire radius (m) — propagated to tires and floor contact";
+        Cars.Car car annotation(
+          Placement(transformation(extent = {{-28, -28}, {28, 28}})));
+        Roads.Road road annotation(
+          Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
+        // One UDP streamer per rigid body. Each uses its own port so the Unity
+        // receiver can bind one GameObject (chassis / wheel) per port.
+        Interfaces.FrameToUDPOrientation udpChassis(port_send = 12345) annotation(
+          Placement(transformation(origin = {-60, -54}, extent = {{-10, -10}, {10, 10}})));
+        Interfaces.FrameToUDPOrientation udpFL(port_send = 12346) annotation(
+          Placement(transformation(origin = {-18, -72}, extent = {{-10, -10}, {10, 10}})));
+        Interfaces.FrameToUDPOrientation udpFR(port_send = 12347) annotation(
+          Placement(transformation(origin = {24, -74}, extent = {{-10, -10}, {10, 10}})));
+        Interfaces.FrameToUDPOrientation udpRL(port_send = 12348) annotation(
+          Placement(transformation(origin = {60, -70}, extent = {{-10, -10}, {10, 10}})));
+        Interfaces.FrameToUDPOrientation udpRR(port_send = 12349) annotation(
+          Placement(transformation(origin = {100, -70}, extent = {{-10, -10}, {10, 10}})));
+  Interfaces.UDPInputDirect uDPInputDirect annotation(
+          Placement(transformation(origin = {-72, 36}, extent = {{-10, -10}, {10, 10}})));
+      equation
+        connect(road.FL, car.frame_FL) annotation(
+          Line(points = {{66, 70}, {66, 86}, {16, 86}, {16, 28}}, color = {95, 95, 95}));
+        connect(road.RL, car.frame_RL) annotation(
+          Line(points = {{54, 70}, {54, 80}, {-22, 80}, {-22, 28}}, color = {95, 95, 95}));
+        connect(road.FR, car.frame_FR) annotation(
+          Line(points = {{66, 50}, {80, 50}, {80, -50}, {16, -50}, {16, -28}}, color = {95, 95, 95}));
+        connect(road.RR, car.frame_RR) annotation(
+          Line(points = {{54, 50}, {54, 26}, {76, 26}, {76, -44}, {-22, -44}, {-22, -28}}, color = {95, 95, 95}));
+// Tap chassis + each wheel frame for streaming. These are pure sensors
+// (zero force/torque) so they do not alter the vehicle dynamics.
+        connect(car.chassis_pos, udpChassis.frame_a) annotation(
+          Line(points = {{0, -28}, {0, -54}, {-70, -54}}, color = {95, 95, 95}));
+        connect(car.frame_FL, udpFL.frame_a) annotation(
+          Line(points = {{16, 28}, {16, -72}, {-28, -72}}, color = {95, 95, 95}));
+        connect(car.frame_FR, udpFR.frame_a) annotation(
+          Line(points = {{16, -28}, {16, -50}, {14, -50}, {14, -74}}, color = {95, 95, 95}));
+        connect(car.frame_RL, udpRL.frame_a) annotation(
+          Line(points = {{-22, 28}, {60, 28}, {60, -60}}, color = {95, 95, 95}));
+        connect(car.frame_RR, udpRR.frame_a) annotation(
+          Line(points = {{-22, -28}, {100, -28}, {100, -60}}, color = {95, 95, 95}));
+  connect(uDPInputDirect.steer, car.steerInput) annotation(
+          Line(points = {{-62, 42}, {46, 42}, {46, 0}, {28, 0}}, color = {0, 0, 127}));
+  connect(uDPInputDirect.brake, car.brakeInput) annotation(
+          Line(points = {{-62, 34}, {0, 34}, {0, 28}}, color = {0, 0, 127}));
+  connect(uDPInputDirect.throttle, car.throttleInput) annotation(
+          Line(points = {{-62, 30}, {-50, 30}, {-50, 0}, {-28, 0}}, color = {0, 0, 127}));
+        annotation(
+          Documentation(info = "<html>
+      <body>
+      <h4>CarExampleUDP</h4>
+      <p>Same vehicle as <code>CarExample</code>, but streams the pose (position + orientation) of the chassis and all four wheels to a Unity visualizer over UDP via <code>Interfaces.FrameToUDPOrientation</code>. A sinusoidal steer input makes the front wheels sweep so the steering can be verified visually in Unity.</p>
+      <table border=\"1\" cellspacing=\"0\">
+      <thead><tr><th>Streamer</th><th>Frame</th><th>UDP port</th></tr></thead>
+      <tbody>
+      <tr><td><code>udpChassis</code></td><td><code>car.chassis_pos</code></td><td>12345</td></tr>
+      <tr><td><code>udpFL</code></td><td><code>car.frame_FL</code></td><td>12346</td></tr>
+      <tr><td><code>udpFR</code></td><td><code>car.frame_FR</code></td><td>12347</td></tr>
+      <tr><td><code>udpRL</code></td><td><code>car.frame_RL</code></td><td>12348</td></tr>
+      <tr><td><code>udpRR</code></td><td><code>car.frame_RR</code></td><td>12349</td></tr>
+      </tbody>
+      </table>
+      <p>The wheel frames sit on the spinning revolute output, so the transmitted orientation includes steer <b>and</b> spin. Attach the <code>Test2</code> script (<code>Assets/Scripts/Test2.cs</code>) to each Unity GameObject and set its <code>listenPort</code> to match.</p>
+      </body>
+      </html>"));
+      end CarExampleClosedLoop;
+    end ClosedLoop;
+
+    package CarExport
+    model CarExport 
+        extends ExportInterface;
+        inner parameter Real R_wheel = 0.25;
+        Cars.Car car annotation(
+          Placement(transformation(extent = {{-24, -24}, {24, 24}})));
+        Roads.Road road annotation(
+          Placement(transformation(origin = {96, 60}, extent = {{-24, -24}, {24, 24}})));
+      equation
+        connect(road.RL, car.frame_RL) annotation(
+          Line(points = {{82, 84}, {-20, 84}, {-20, 24}}, color = {95, 95, 95}));
+        connect(road.FL, car.frame_FL) annotation(
+          Line(points = {{110, 84}, {14, 84}, {14, 24}}, color = {95, 95, 95}));
+        connect(road.RR, car.frame_RR) annotation(
+          Line(points = {{82, 36}, {82, -52}, {-20, -52}, {-20, -24}}, color = {95, 95, 95}));
+        connect(road.FR, car.frame_FR) annotation(
+            Line(points = {{110, 36}, {102, 36}, {102, -52}, {14, -52}, {14, -24}}, color = {95, 95, 95}));
+        connect(brake, car.brakeInput) annotation(
+                Line(points = {{-104, -60}, {-40, -60}, {-40, 58}, {0, 58}, {0, 24}}, color = {0, 0, 127}));
+        connect(throttle, car.throttleInput) annotation(
+                Line(points = {{-106, 60}, {-56, 60}, {-56, 0}, {-24, 0}}, color = {0, 0, 127}));
+        connect(steer, car.steerInput) annotation(
+            Line(points = {{-106, 0}, {-124, 0}, {-124, -88}, {42, -88}, {42, 0}, {24, 0}}, color = {0, 0, 127}));
+        
+        r_chassis = car.chassis_pos.r_0;
+        T_chassis = {car.chassis_pos.R.T[1,1], car.chassis_pos.R.T[1,2], car.chassis_pos.R.T[1,3],
+                     car.chassis_pos.R.T[2,1], car.chassis_pos.R.T[2,2], car.chassis_pos.R.T[2,3],
+                     car.chassis_pos.R.T[3,1], car.chassis_pos.R.T[3,2], car.chassis_pos.R.T[3,3]};
+        r_FL = car.frame_FL.r_0;
+        T_FL = {car.frame_FL.R.T[1,1], car.frame_FL.R.T[1,2], car.frame_FL.R.T[1,3],
+                car.frame_FL.R.T[2,1], car.frame_FL.R.T[2,2], car.frame_FL.R.T[2,3],
+                car.frame_FL.R.T[3,1], car.frame_FL.R.T[3,2], car.frame_FL.R.T[3,3]};
+        r_FR = car.frame_FR.r_0;
+        T_FR = {car.frame_FR.R.T[1,1], car.frame_FR.R.T[1,2], car.frame_FR.R.T[1,3],
+                car.frame_FR.R.T[2,1], car.frame_FR.R.T[2,2], car.frame_FR.R.T[2,3],
+                car.frame_FR.R.T[3,1], car.frame_FR.R.T[3,2], car.frame_FR.R.T[3,3]};
+        r_RL = car.frame_RL.r_0;
+        T_RL = {car.frame_RL.R.T[1,1], car.frame_RL.R.T[1,2], car.frame_RL.R.T[1,3],
+                car.frame_RL.R.T[2,1], car.frame_RL.R.T[2,2], car.frame_RL.R.T[2,3],
+                car.frame_RL.R.T[3,1], car.frame_RL.R.T[3,2], car.frame_RL.R.T[3,3]};
+        r_RR = car.frame_RR.r_0;
+        T_RR = {car.frame_RR.R.T[1,1], car.frame_RR.R.T[1,2], car.frame_RR.R.T[1,3],
+                car.frame_RR.R.T[2,1], car.frame_RR.R.T[2,2], car.frame_RR.R.T[2,3],
+                car.frame_RR.R.T[3,1], car.frame_RR.R.T[3,2], car.frame_RR.R.T[3,3]};
+      
+      end CarExport;
+
+      partial model ExportInterface
+      
+      Modelica.Blocks.Interfaces.RealInput throttle annotation(
+            Placement(transformation(origin = {-106, 60}, extent = {{-20, -20}, {20, 20}}), iconTransformation(origin = {-96, 54}, extent = {{-20, -20}, {20, 20}})));
+      Modelica.Blocks.Interfaces.RealInput steer annotation(
+        Placement(transformation(origin = {-106, 0}, extent = {{-20, -20}, {20, 20}}), iconTransformation(origin = {-88, -8}, extent = {{-20, -20}, {20, 20}})));
+      Modelica.Blocks.Interfaces.RealInput brake annotation(
+            Placement(transformation(origin = {-104, -60}, extent = {{-20, -20}, {20, 20}}), iconTransformation(origin = {-92, -62}, extent = {{-20, -20}, {20, 20}})));
+      Modelica.Blocks.Interfaces.RealOutput r_chassis[3], T_chassis[9];
+      Modelica.Blocks.Interfaces.RealOutput r_FL[3], T_FL[9];
+      Modelica.Blocks.Interfaces.RealOutput r_FR[3], T_FR[9];
+      Modelica.Blocks.Interfaces.RealOutput r_RL[3], T_RL[9];
+      Modelica.Blocks.Interfaces.RealOutput r_RR[3], T_RR[9];
+      
+      equation
+
+      end ExportInterface;
+      
+      model E36Export 
+          extends ExportInterface;
+          inner parameter Real R_wheel = 0.31;
+          Cars.E36Car car annotation(
+            Placement(transformation(extent = {{-24, -24}, {24, 24}})));
+          Roads.Road road annotation(
+            Placement(transformation(origin = {96, 60}, extent = {{-24, -24}, {24, 24}})));
+        equation
+          connect(road.RL, car.frame_RL) annotation(
+            Line(points = {{82, 84}, {-20, 84}, {-20, 24}}, color = {95, 95, 95}));
+          connect(road.FL, car.frame_FL) annotation(
+            Line(points = {{110, 84}, {14, 84}, {14, 24}}, color = {95, 95, 95}));
+          connect(road.RR, car.frame_RR) annotation(
+            Line(points = {{82, 36}, {82, -52}, {-20, -52}, {-20, -24}}, color = {95, 95, 95}));
+          connect(road.FR, car.frame_FR) annotation(
+              Line(points = {{110, 36}, {102, 36}, {102, -52}, {14, -52}, {14, -24}}, color = {95, 95, 95}));
+          connect(brake, car.brakeInput) annotation(
+                  Line(points = {{-104, -60}, {-40, -60}, {-40, 58}, {0, 58}, {0, 24}}, color = {0, 0, 127}));
+          connect(throttle, car.throttleInput) annotation(
+                  Line(points = {{-106, 60}, {-56, 60}, {-56, 0}, {-24, 0}}, color = {0, 0, 127}));
+          connect(steer, car.steerInput) annotation(
+              Line(points = {{-106, 0}, {-124, 0}, {-124, -88}, {42, -88}, {42, 0}, {24, 0}}, color = {0, 0, 127}));
+          
+          r_chassis = car.chassis_pos.r_0;
+          T_chassis = {car.chassis_pos.R.T[1,1], car.chassis_pos.R.T[1,2], car.chassis_pos.R.T[1,3],
+                       car.chassis_pos.R.T[2,1], car.chassis_pos.R.T[2,2], car.chassis_pos.R.T[2,3],
+                       car.chassis_pos.R.T[3,1], car.chassis_pos.R.T[3,2], car.chassis_pos.R.T[3,3]};
+          r_FL = car.frame_FL.r_0;
+          T_FL = {car.frame_FL.R.T[1,1], car.frame_FL.R.T[1,2], car.frame_FL.R.T[1,3],
+                  car.frame_FL.R.T[2,1], car.frame_FL.R.T[2,2], car.frame_FL.R.T[2,3],
+                  car.frame_FL.R.T[3,1], car.frame_FL.R.T[3,2], car.frame_FL.R.T[3,3]};
+          r_FR = car.frame_FR.r_0;
+          T_FR = {car.frame_FR.R.T[1,1], car.frame_FR.R.T[1,2], car.frame_FR.R.T[1,3],
+                  car.frame_FR.R.T[2,1], car.frame_FR.R.T[2,2], car.frame_FR.R.T[2,3],
+                  car.frame_FR.R.T[3,1], car.frame_FR.R.T[3,2], car.frame_FR.R.T[3,3]};
+          r_RL = car.frame_RL.r_0;
+          T_RL = {car.frame_RL.R.T[1,1], car.frame_RL.R.T[1,2], car.frame_RL.R.T[1,3],
+                  car.frame_RL.R.T[2,1], car.frame_RL.R.T[2,2], car.frame_RL.R.T[2,3],
+                  car.frame_RL.R.T[3,1], car.frame_RL.R.T[3,2], car.frame_RL.R.T[3,3]};
+          r_RR = car.frame_RR.r_0;
+          T_RR = {car.frame_RR.R.T[1,1], car.frame_RR.R.T[1,2], car.frame_RR.R.T[1,3],
+                  car.frame_RR.R.T[2,1], car.frame_RR.R.T[2,2], car.frame_RR.R.T[2,3],
+                  car.frame_RR.R.T[3,1], car.frame_RR.R.T[3,2], car.frame_RR.R.T[3,3]};
+        
+        end E36Export;
+      
+      model CivicExport 
+          extends ExportInterface;
+          inner parameter Real R_wheel = 0.30;
+          Cars.CivicEKCar car annotation(
+            Placement(transformation(extent = {{-24, -24}, {24, 24}})));
+          Roads.Road road annotation(
+            Placement(transformation(origin = {96, 60}, extent = {{-24, -24}, {24, 24}})));
+        equation
+          connect(road.RL, car.frame_RL) annotation(
+            Line(points = {{82, 84}, {-20, 84}, {-20, 24}}, color = {95, 95, 95}));
+          connect(road.FL, car.frame_FL) annotation(
+            Line(points = {{110, 84}, {14, 84}, {14, 24}}, color = {95, 95, 95}));
+          connect(road.RR, car.frame_RR) annotation(
+            Line(points = {{82, 36}, {82, -52}, {-20, -52}, {-20, -24}}, color = {95, 95, 95}));
+          connect(road.FR, car.frame_FR) annotation(
+              Line(points = {{110, 36}, {102, 36}, {102, -52}, {14, -52}, {14, -24}}, color = {95, 95, 95}));
+          connect(brake, car.brakeInput) annotation(
+                  Line(points = {{-104, -60}, {-40, -60}, {-40, 58}, {0, 58}, {0, 24}}, color = {0, 0, 127}));
+          connect(throttle, car.throttleInput) annotation(
+                  Line(points = {{-106, 60}, {-56, 60}, {-56, 0}, {-24, 0}}, color = {0, 0, 127}));
+          connect(steer, car.steerInput) annotation(
+              Line(points = {{-106, 0}, {-124, 0}, {-124, -88}, {42, -88}, {42, 0}, {24, 0}}, color = {0, 0, 127}));
+          
+          r_chassis = car.chassis_pos.r_0;
+          T_chassis = {car.chassis_pos.R.T[1,1], car.chassis_pos.R.T[1,2], car.chassis_pos.R.T[1,3],
+                       car.chassis_pos.R.T[2,1], car.chassis_pos.R.T[2,2], car.chassis_pos.R.T[2,3],
+                       car.chassis_pos.R.T[3,1], car.chassis_pos.R.T[3,2], car.chassis_pos.R.T[3,3]};
+          r_FL = car.frame_FL.r_0;
+          T_FL = {car.frame_FL.R.T[1,1], car.frame_FL.R.T[1,2], car.frame_FL.R.T[1,3],
+                  car.frame_FL.R.T[2,1], car.frame_FL.R.T[2,2], car.frame_FL.R.T[2,3],
+                  car.frame_FL.R.T[3,1], car.frame_FL.R.T[3,2], car.frame_FL.R.T[3,3]};
+          r_FR = car.frame_FR.r_0;
+          T_FR = {car.frame_FR.R.T[1,1], car.frame_FR.R.T[1,2], car.frame_FR.R.T[1,3],
+                  car.frame_FR.R.T[2,1], car.frame_FR.R.T[2,2], car.frame_FR.R.T[2,3],
+                  car.frame_FR.R.T[3,1], car.frame_FR.R.T[3,2], car.frame_FR.R.T[3,3]};
+          r_RL = car.frame_RL.r_0;
+          T_RL = {car.frame_RL.R.T[1,1], car.frame_RL.R.T[1,2], car.frame_RL.R.T[1,3],
+                  car.frame_RL.R.T[2,1], car.frame_RL.R.T[2,2], car.frame_RL.R.T[2,3],
+                  car.frame_RL.R.T[3,1], car.frame_RL.R.T[3,2], car.frame_RL.R.T[3,3]};
+          r_RR = car.frame_RR.r_0;
+          T_RR = {car.frame_RR.R.T[1,1], car.frame_RR.R.T[1,2], car.frame_RR.R.T[1,3],
+                  car.frame_RR.R.T[2,1], car.frame_RR.R.T[2,2], car.frame_RR.R.T[2,3],
+                  car.frame_RR.R.T[3,1], car.frame_RR.R.T[3,2], car.frame_RR.R.T[3,3]};
+        
+        end CivicExport;
+    end CarExport;
+
   end Examples;
 
   package Interfaces
@@ -379,7 +606,7 @@ package DDynamics
         Placement(transformation(origin = {48, -52}, extent = {{-10, -10}, {10, 10}})));
       Modelica_DeviceDrivers.Blocks.Communication.UDPSend uDPSend(port_send = port_send, sampleTime = sampleTime) annotation(
         Placement(transformation(origin = {48, -80}, extent = {{-10, -10}, {10, 10}})));
-      Modelica_DeviceDrivers.Blocks.OperatingSystem.RealtimeSynchronize realtimeSynchronize annotation(
+      Modelica_DeviceDrivers.Blocks.OperatingSystem.RealtimeSynchronize realtimeSynchronize(sampled = true, sampleTime=0.01) annotation(
         Placement(transformation(origin = {-72, 82}, extent = {{-10, -10}, {10, 10}})));
     equation
       connect(frame_a, frameToReal.frame_a) annotation(
@@ -441,6 +668,13 @@ package DDynamics
     model UDPInput
     parameter Integer udpPort = 12347;
     parameter Real sampleFreq = 0.1;
+    // UDPReceive is a zero-order hold, so the raw commands are piecewise constant
+      // and jump at every sample instant. Feeding such a signal straight into the
+      // position-driven steering actuators (Cars.Car.steerAct/steerAct1) excites a
+      // stiff transient per sample and drives CVODE down to "Desired step to small".
+      // These filters turn each command into a continuous, differentiable signal;
+      // they also stand in for the lag of a real steering column and pedal linkage.
+    parameter Modelica.Units.SI.Frequency f_cut = 3 "Command low-pass cut-off (Hz)";
   Modelica_DeviceDrivers.Blocks.Communication.UDPReceive uDPReceive(sampleTime = sampleFreq, port_recv = udpPort)  annotation(
         Placement(transformation(origin = {-74, -24}, extent = {{-10, -10}, {10, 10}})));
   Modelica_DeviceDrivers.Blocks.Packaging.SerialPackager.GetFloat getFloat(nu = 1)  annotation(
@@ -461,6 +695,18 @@ package DDynamics
         Placement(transformation(origin = {42, 106}, extent = {{-10, -10}, {10, 10}}, rotation = 90), iconTransformation(origin = {104, -20}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Interfaces.RealOutput clutch annotation(
         Placement(transformation(origin = {74, 106}, extent = {{-10, -10}, {10, 10}}, rotation = 90), iconTransformation(origin = {104, 20}, extent = {{-10, -10}, {10, 10}})));
+  // Critically damped 2nd order low-pass, one per channel. Order 2 leaves the
+      // output C1-continuous across a step, which is what the downstream Position
+      // actuators need. init = SteadyState (the default) starts each filter at its
+      // initial input, so there is no start-up transient.
+  Modelica.Blocks.Continuous.Filter filterSteer(f_cut = f_cut, order = 2) annotation(
+        Placement(transformation(origin = {-30, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+  Modelica.Blocks.Continuous.Filter filterThrottle(f_cut = f_cut, order = 2) annotation(
+        Placement(transformation(origin = {8, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+  Modelica.Blocks.Continuous.Filter filterBrake(f_cut = f_cut, order = 2) annotation(
+        Placement(transformation(origin = {42, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+  Modelica.Blocks.Continuous.Filter filterClutch(f_cut = f_cut, order = 2) annotation(
+        Placement(transformation(origin = {74, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
     equation
   connect(uDPReceive.pkgOut, getFloat.pkgIn) annotation(
         Line(points = {{-63.2, -24}, {-39.2, -24}}));
@@ -470,18 +716,216 @@ package DDynamics
         Line(points = {{18.8, -24}, {32.8, -24}}));
   connect(getFloat2.pkgOut[1], getFloat3.pkgIn) annotation(
         Line(points = {{52.8, -24}, {63.8, -24}}));
-  connect(getFloat.y[1], steer) annotation(
-        Line(points = {{-30, -12}, {-30, 106}}, color = {0, 0, 127}));
-  connect(getFloat1.y[1], throttle) annotation(
-        Line(points = {{8, -12}, {8, 106}}, color = {0, 0, 127}));
-  connect(getFloat2.y[1], brake) annotation(
-        Line(points = {{42, -12}, {42, 106}}, color = {0, 0, 127}));
-  connect(getFloat3.y[1], clutch) annotation(
-        Line(points = {{74, -12}, {74, 106}}, color = {0, 0, 127}));
+// Raw held command -> low-pass -> output. Never connect a getFloat output
+// straight to an output connector: the un-filtered step is what stalls CVODE.
+  connect(getFloat.y[1], filterSteer.u) annotation(
+        Line(points = {{-30, -12}, {-30, 28}}, color = {0, 0, 127}));
+  connect(filterSteer.y, steer) annotation(
+        Line(points = {{-30, 51}, {-30, 106}}, color = {0, 0, 127}));
+  connect(getFloat1.y[1], filterThrottle.u) annotation(
+        Line(points = {{8, -12}, {8, 28}}, color = {0, 0, 127}));
+  connect(filterThrottle.y, throttle) annotation(
+        Line(points = {{8, 51}, {8, 106}}, color = {0, 0, 127}));
+  connect(getFloat2.y[1], filterBrake.u) annotation(
+        Line(points = {{42, -12}, {42, 28}}, color = {0, 0, 127}));
+  connect(filterBrake.y, brake) annotation(
+        Line(points = {{42, 51}, {42, 106}}, color = {0, 0, 127}));
+  connect(getFloat3.y[1], filterClutch.u) annotation(
+        Line(points = {{74, -12}, {74, 28}}, color = {0, 0, 127}));
+  connect(filterClutch.y, clutch) annotation(
+        Line(points = {{74, 51}, {74, 106}}, color = {0, 0, 127}));
     annotation(
         Icon(graphics = {Ellipse(origin = {65, 61}, extent = {{-17, 17}, {17, -17}}), Line(origin = {65, 53}, points = {{-17, 9}, {15, 9}, {17, 9}, {17, 9}, {17, 5}, {-17, 5}, {-17, 9}, {-17, 5}, {-1, 5}, {-1, -9}, {3, -9}, {3, 5}, {5, 5}}), Rectangle(origin = {66, 19}, lineColor = {111, 255, 1}, fillColor = {111, 255, 1}, fillPattern = FillPattern.Solid, extent = {{-6, 15}, {6, -15}}), Rectangle(origin = {66, -19}, lineColor = {255, 0, 4}, fillColor = {255, 0, 4}, fillPattern = FillPattern.Solid, extent = {{-6, 15}, {6, -15}}), Rectangle(origin = {66, -61}, lineColor = {3, 20, 255}, fillColor = {3, 20, 255}, fillPattern = FillPattern.Solid, extent = {{-6, 15}, {6, -15}}), Text(origin = {-17, -2}, extent = {{-69, 28}, {69, -28}}, textString = "UDP")}),
   Diagram(graphics));
 end UDPInput;
+
+  // PROTOTYPE. Alternative to UDPInput that bypasses Modelica_DeviceDrivers entirely.
+    //
+    // Motivation: with Modelica_DeviceDrivers' UDPReceive block present, CVODE stalls
+    // permanently at t ~ 2.6 s — regardless of the datagram rate, the datagram contents,
+    // or whether a sender is running at all (a single receive event is enough). DASSL and
+    // gbode survive it but are ~3x slower, and CVODE is the only solver that reaches
+    // near-real-time on this model (1.13x on CarExampleUDP). See
+    // notas-sesion-2026-08-18.md sections 4 and 5.8.
+    //
+    // This block reads the socket from a single impure external function called inside a
+    // when-clause, writing straight into four discrete variables. No SerialPackager chain,
+    // no pkg/dummy dependency threading, no MDD trigger semantics — so if the stall is
+    // specific to how MDD structures those equations, this avoids it.
+    impure function udpRead4
+      "Non-blocking read of the most recent 4-float32 datagram on a UDP port"
+      input Integer port;
+      output Real y[4] "Decoded values; previous values are held when no datagram arrived";
+      output Integer nBytes "Size of the last datagram accepted, 0 if none ever arrived";
+      external "C" DD_udpRead(port, 4, y, nBytes) annotation(
+        Library = {"ws2_32"},
+        Include = "
+#include <string.h>
+#ifdef _WIN32
+#include <winsock2.h>
+static SOCKET DD_sock = INVALID_SOCKET;
+static int    DD_wsaUp = 0;
+static double DD_last[8] = {0,0,0,0,0,0,0,0};
+static int    DD_lastN = 0;
+
+static void DD_open(int port) {
+  WSADATA wsa;
+  struct sockaddr_in addr;
+  unsigned long nb = 1;
+  if (!DD_wsaUp) { WSAStartup(MAKEWORD(2,2), &wsa); DD_wsaUp = 1; }
+  DD_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+  if (DD_sock == INVALID_SOCKET) return;
+  memset(&addr, 0, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  addr.sin_port = htons((unsigned short)port);
+  bind(DD_sock, (struct sockaddr*)&addr, sizeof(addr));
+  ioctlsocket(DD_sock, FIONBIO, &nb);
+}
+
+void DD_udpRead(int port, int n, double *y, int *nBytes) {
+  char buf[512];
+  int got = 0, r, i;
+  float f;
+  if (DD_sock == INVALID_SOCKET) DD_open(port);
+  /* Drain the socket and keep only the newest datagram: for a real-time loop the
+     freshest driver input is the only one that matters. */
+  for (;;) {
+    r = recvfrom(DD_sock, buf, (int)sizeof(buf), 0, NULL, NULL);
+    if (r <= 0) break;
+    got = r;
+  }
+  if (got >= n * 4) {
+    for (i = 0; i < n; i++) { memcpy(&f, buf + 4*i, 4); DD_last[i] = (double)f; }
+    DD_lastN = got;
+  }
+  for (i = 0; i < n; i++) y[i] = DD_last[i];
+  *nBytes = DD_lastN;
+}
+#else
+void DD_udpRead(int port, int n, double *y, int *nBytes) {
+  int i; for (i = 0; i < n; i++) y[i] = 0.0; *nBytes = 0;
+}
+#endif
+");
+    end udpRead4;
+
+    block UDPInputDirect
+      "Driver-command input read directly from a UDP socket (prototype, no Modelica_DeviceDrivers)"
+      parameter Integer udpPort = 12344 "UDP port to listen on";
+      parameter Modelica.Units.SI.Time samplePeriod = 0.01 "Polling period (s)";
+      parameter Modelica.Units.SI.Frequency f_cut = 3 "Command low-pass cut-off (Hz)";
+      Modelica.Blocks.Interfaces.RealOutput steer annotation(
+        Placement(transformation(origin = {110, 60}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {104, 60}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Blocks.Interfaces.RealOutput brake annotation(
+        Placement(transformation(origin = {110, 20}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {104, -20}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Blocks.Interfaces.RealOutput clutch annotation(
+        Placement(transformation(origin = {110, -20}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {104, 20}, extent = {{-10, -10}, {10, 10}})));
+      Modelica.Blocks.Interfaces.RealOutput throttle annotation(
+        Placement(transformation(origin = {110, -60}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {104, -60}, extent = {{-10, -10}, {10, 10}})));
+      // Packet order matches FFBReceiver's ChannelId: steer, throttle, brake, clutch.
+      discrete Real raw[4](each start = 0, each fixed = true) "Held raw commands";
+      Integer nBytes(start = 0, fixed = true) "Last datagram size (0 = none received)";
+    protected
+      // Same smoothing as UDPInput: the held commands are piecewise constant, and the
+      // position-driven steering actuators need a C1-continuous reference.
+      Modelica.Blocks.Continuous.Filter filt[4](each f_cut = f_cut, each order = 2);
+    equation
+      when sample(0, samplePeriod) then
+        (raw, nBytes) = udpRead4(udpPort);
+      end when;
+      for i in 1:4 loop
+        filt[i].u = raw[i];
+      end for;
+      steer = filt[1].y;
+      throttle = filt[2].y;
+      brake = filt[3].y;
+      clutch = filt[4].y;
+      annotation(
+        Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}), Text(origin = {-10, 0}, extent = {{-70, 30}, {70, -30}}, textString = "UDP\ndirect")}));
+    end UDPInputDirect;
+
+  // PROTOTYPE. Outbound counterpart to UDPInputDirect, replacing
+    // FrameToUDPOrientation's Modelica_DeviceDrivers chain (SerialPackager -> 7 x AddFloat
+    // -> UDPSend) with a single sendto from an impure external function.
+    //
+    // Motivation: CVODE stalls at t ~ 19 s whenever MDD's UDP blocks are present in the
+    // model. Established by elimination (notas-sesion-2026-08-18.md section 5.10): the
+    // stall is independent of throttle, speed, distance, steering, the input path,
+    // RealtimeSynchronize, orientation representation and disk space; it occurs with the
+    // car parked; and it occurs even when the senders' sampleTime is raised so they never
+    // transmit. DDynamics.Examples.CarExample, which contains no UDP blocks at all, runs
+    // past it fine. DASSL is immune but is ~3x slower than CVODE on this model.
+    //
+    // One shared socket serves every instance: UDP sendto takes the destination per call,
+    // so no per-port socket table is needed.
+    impure function udpSend7
+      "Send 7 values as little-endian float32 in one datagram"
+      input String ipAddress;
+      input Integer port;
+      input Real values[7];
+      output Integer nBytes "Bytes sent, or -1 on failure";
+      external "C" nBytes = DD_udpSend(ipAddress, port, 7, values) annotation(
+        Library = {"ws2_32"},
+        Include = "
+#include <string.h>
+#ifdef _WIN32
+#include <winsock2.h>
+static SOCKET DD_tx    = INVALID_SOCKET;
+static int    DD_txWsa = 0;
+
+int DD_udpSend(const char *ip, int port, int n, const double *v) {
+  char buf[128];
+  struct sockaddr_in dst;
+  int i;
+  float f;
+  if (n < 0 || n > 32) return -1;
+  if (DD_tx == INVALID_SOCKET) {
+    WSADATA wsa;
+    if (!DD_txWsa) { WSAStartup(MAKEWORD(2,2), &wsa); DD_txWsa = 1; }
+    DD_tx = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (DD_tx == INVALID_SOCKET) return -1;
+  }
+  /* Pack as float32 little-endian, matching FrameToUDPOrientation's wire format
+     so the Unity receiver needs no change. */
+  for (i = 0; i < n; i++) { f = (float)v[i]; memcpy(buf + 4*i, &f, 4); }
+  memset(&dst, 0, sizeof(dst));
+  dst.sin_family = AF_INET;
+  dst.sin_addr.s_addr = inet_addr(ip);
+  dst.sin_port = htons((unsigned short)port);
+  return sendto(DD_tx, buf, n * 4, 0, (struct sockaddr *)&dst, sizeof(dst));
+}
+#else
+int DD_udpSend(const char *ip, int port, int n, const double *v) { return -1; }
+#endif
+");
+    end udpSend7;
+
+    model FrameToUDPDirect
+      "Streams a frame's pose over UDP without Modelica_DeviceDrivers (prototype)"
+      parameter Integer port_send = 12345 "Destination UDP port";
+      parameter String ipAddress = "127.0.0.1" "Destination IP address";
+      parameter Modelica.Units.SI.Time samplePeriod = 0.01 "Transmit period (s)";
+      Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
+        Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
+      // Reused so the packet layout stays byte-identical to FrameToUDPOrientation:
+      // 7 x float32 = x, y, z, qx, qy, qz, qw (quaternion vector part first, scalar last).
+      // It is also the component that zeroes frame_a.f/t, keeping this a pure sensor.
+      FrameToRealOrientation frameToReal annotation(
+        Placement(transformation(origin = {-30, 0}, extent = {{-10, -10}, {10, 10}})));
+      Integer nBytes(start = 0, fixed = true) "Bytes sent by the last transmission";
+    equation
+      connect(frame_a, frameToReal.frame_a);
+// The impure send is confined to a when-clause, so it is never reachable from the
+// continuous residual and cannot be re-executed during a retried solver step.
+      when sample(0, samplePeriod) then
+        nBytes = udpSend7(ipAddress, port_send,
+          {frameToReal.x_out, frameToReal.y_out, frameToReal.z_out,
+           frameToReal.q_out[1], frameToReal.q_out[2], frameToReal.q_out[3], frameToReal.q_out[4]});
+      end when;
+      annotation(
+        Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}), Text(origin = {0, 40}, extent = {{-80, 30}, {80, -30}}, textString = "UDP tx"), Text(origin = {0, -40}, extent = {{-80, 25}, {80, -25}}, textString = "%port_send")}));
+    end FrameToUDPDirect;
 
   end Interfaces;
 
@@ -549,7 +993,7 @@ end UDPInput;
         parameter Real ground_c  = 1e5    "Floor stiffness (N/m)";
         parameter Real ground_d  = 5000   "Floor damping (N.s/m)";
         parameter Real ground_mu = 10000  "Longitudinal viscous friction coefficient (N.s/m)";
-        parameter Real mu_lat    = 100000 "Lateral viscous friction coefficient (N.s/m)";
+        parameter Real mu_lat    = 10000 "Lateral viscous friction coefficient (N.s/m)";
         parameter Real mu_peak   = 1.0    "Peak friction coefficient (friction-circle limit): |F| <= mu_peak*normalLoad. Lower to reduce grip.";
         outer parameter Real R_wheel   "Wheel radius (m)";
         MultiBody.Interfaces.Frame_b wheelContactFL annotation(
@@ -913,11 +1357,27 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
         Placement(transformation(origin = {-150, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Parts.Differentials.SolidAxle solidAxle annotation(
         Placement(transformation(origin = {-152, -2}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-      Modelica.Mechanics.MultiBody.Joints.FreeMotion freeMotion(r_rel_a(start = {0, 1.2, 0}), v_rel_a(start = {0, 0, 0})) annotation(
+  // useQuaternions = false switches the chassis orientation states from a quaternion
+      // to three angles. With the default (quaternions) the four Q components are states
+      // subject to an algebraic unit-norm constraint, which becomes a nonlinear system
+      // solved at every step; it was reported "(nearly) singular at initialization" and is
+      // where CVODE stalled (system 6992, iterating on freeMotion.Q, retried ~121k times at
+      // t = 2.6 s without advancing). Three angles carry no algebraic constraint, so that
+      // system disappears entirely. The trade-off is the usual Euler-angle singularity when
+      // the second angle passes +/-90 deg -- irrelevant for a road car, but revisit this
+      // (or set sequence_angleStates) if you ever simulate a rollover.
+      Modelica.Mechanics.MultiBody.Joints.FreeMotion freeMotion(useQuaternions = false, r_rel_a(start = {0, 1.2, 0}), v_rel_a(start = {0, 0, 0})) annotation(
         Placement(transformation(origin = {-4, 44}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.Rotational.Sources.Position steerAct annotation(
+  // f_crit is the cut-off of the filter these blocks apply to their reference angle
+      // when exact = false (the MSL default). The MSL default f_crit = 50 Hz makes the
+      // actuator a ~3 ms servo, so a step in the steer command produces an angular
+      // acceleration of order (2*pi*f_crit)^2 * delta_phi and a stiff transient that
+      // collapses the integrator step. 5 Hz is physically sensible for a steering rack
+      // and tolerable for the solver when the command is sampled rather than analytic
+      // (see Interfaces.UDPInput, which additionally low-pass filters the raw command).
+      Modelica.Mechanics.Rotational.Sources.Position steerAct(f_crit = 5) annotation(
         Placement(transformation(origin = {102, 10}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.Rotational.Sources.Position steerAct1 annotation(
+      Modelica.Mechanics.Rotational.Sources.Position steerAct1(f_crit = 5) annotation(
         Placement(transformation(origin = {102, -12}, extent = {{-10, -10}, {10, 10}})));
       Parts.Steering.MockSteering mockSteering annotation(
         Placement(transformation(origin = {60, 24}, extent = {{-9, -9}, {9, 9}})));
@@ -1376,7 +1836,15 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
       package Tires
         model Tire
           outer parameter Real R_wheel "Tire radius (m)";
-          Modelica.Mechanics.MultiBody.Parts.Body wheelFL(m = 20, animation = false) annotation(
+  // Body's I_ij default to 0.001 kg.m^2 (a placeholder that only avoids a singular mass
+          // matrix), so without explicit values this 20 kg wheel had ~600x too little rotational
+          // inertia. The contact-patch friction torque then acted on a near-massless spin state,
+          // making that DOF ~600x faster than physical and the model hypersensitive to any
+          // disturbance at the inputs. The revolute spins about local Z (n = {0,0,-1}), so I_33
+          // is the spin inertia and I_11/I_22 the transverse ones. For a 20 kg, 0.25 m wheel
+          // treated as a disc: I_spin ~ 0.5*m*R^2 = 0.63, I_transverse ~ 0.25*m*R^2 = 0.31.
+          Modelica.Mechanics.MultiBody.Parts.Body wheelFL(m = 20, animation = false,
+            r_CM = {0, 0, 0}, I_11 = 0.31, I_22 = 0.31, I_33 = 0.63) annotation(
             Placement(transformation(origin = {-148, -40}, extent = {{210, 30}, {230, 50}})));
           Modelica.Mechanics.MultiBody.Interfaces.Frame_a wheelSupport annotation(
             Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
@@ -1420,7 +1888,9 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
           outer parameter Real R_wheel "Tire radius (m)";
           Modelica.Mechanics.MultiBody.Joints.Revolute spinFL(n = {0, 0, -1}, useAxisFlange = true) annotation(
             Placement(transformation(origin = {-148, -42}, extent = {{170, 30}, {190, 50}})));
-          Modelica.Mechanics.MultiBody.Parts.Body wheelFL(m = 20, animation = false) annotation(
+  // Same zero-inertia fix as Tire.wheelFL above; see the comment there.
+          Modelica.Mechanics.MultiBody.Parts.Body wheelFL(m = 20, animation = false,
+            r_CM = {0, 0, 0}, I_11 = 0.31, I_22 = 0.31, I_33 = 0.63) annotation(
             Placement(transformation(origin = {-148, -42}, extent = {{210, 30}, {230, 50}})));
           Modelica.Mechanics.MultiBody.Interfaces.Frame_a wheelSupport annotation(
             Placement(transformation(origin = {100, -2}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
@@ -2337,7 +2807,7 @@ are interchangeable.</p>
           extends Components.BaseSteering;
           parameter Modelica.Units.SI.Angle maxSteerAngle = 0.53 "Road-wheel angle at full lock (|steerCmd| = 1), rad (~30 deg)";
         equation
-          steerAngle = maxSteerAngle*steerCmd;
+          steerAngle = -maxSteerAngle*steerCmd;
           annotation(
             Icon(graphics = {Ellipse(extent = {{-70, 70}, {70, -70}}, lineThickness = 2), Ellipse(extent = {{-18, 18}, {18, -18}}, fillColor = {95, 95, 95}, fillPattern = FillPattern.Solid), Line(points = {{0, 18}, {0, 70}}, thickness = 2), Line(points = {{-15, -10}, {-60, -36}}, thickness = 2), Line(points = {{15, -10}, {60, -36}}, thickness = 2), Text(extent = {{-100, -78}, {100, -98}}, textString = "%name")}),
             Documentation(info = "<html>
