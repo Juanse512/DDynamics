@@ -1,8 +1,8 @@
-package DDynamics
+﻿package DDynamics
 
   package Examples
     model CarExample
-      inner parameter Real R_wheel = 0.25 "Tire radius (m) — propagated to tires and floor contact";
+      inner parameter Real R_wheel = 0.25 "Tire radius (m) â€” propagated to tires and floor contact";
       Cars.Car car annotation(
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
       Modelica.Blocks.Sources.Constant speed(k = 1) annotation(
@@ -49,7 +49,7 @@ package DDynamics
     end CarExample;
 
     model CivicEKExample
-      inner parameter Real R_wheel = 0.30 "Tire radius (m) — 185/65R14, propagated to tires and floor contact";
+      inner parameter Real R_wheel = 0.30 "Tire radius (m) â€” 185/65R14, propagated to tires and floor contact";
       Cars.CivicEKCar car annotation(
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
       Modelica.Blocks.Sources.Constant speed(k = 1) annotation(
@@ -95,7 +95,7 @@ package DDynamics
     end CivicEKExample;
 
     model E36Example
-      inner parameter Real R_wheel = 0.31 "Tire radius (m) — 195/65R15, propagated to tires and floor contact";
+      inner parameter Real R_wheel = 0.31 "Tire radius (m) â€” 195/65R15, propagated to tires and floor contact";
       Cars.E36Car car annotation(
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
       Modelica.Blocks.Sources.Constant speed(k = 1) annotation(
@@ -141,7 +141,7 @@ package DDynamics
     end E36Example;
 
     model CarExampleUDP
-      inner parameter Real R_wheel = 0.25 "Tire radius (m) — propagated to tires and floor contact";
+      inner parameter Real R_wheel = 0.25 "Tire radius (m) â€” propagated to tires and floor contact";
       Cars.Car car annotation(
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
       Modelica.Blocks.Sources.Constant speed(k = 1) annotation(
@@ -213,7 +213,7 @@ package DDynamics
 
     package ClosedLoop
       model CarExampleClosedLoop
-        inner parameter Real R_wheel = 0.25 "Tire radius (m) — propagated to tires and floor contact";
+        inner parameter Real R_wheel = 0.25 "Tire radius (m) â€” propagated to tires and floor contact";
         Cars.Car car annotation(
           Placement(transformation(extent = {{-28, -28}, {28, 28}})));
         Roads.Road road annotation(
@@ -588,7 +588,7 @@ package DDynamics
         Placement(transformation(origin = {48, 60}, extent = {{-10, -10}, {10, 10}})));
       // One AddFloat per value, chained (mirrors the proven FrameToUDP structure).
       // NOTE: each AddFloat adds exactly one float (default n = 1). Do NOT set the
-      // AddFloat "n" modifier — under OpenModelica 1.25.5 a modifier on n triggers an
+      // AddFloat "n" modifier â€” under OpenModelica 1.25.5 a modifier on n triggers an
       // instantiation internal error, so use the default and chain instead.
       Modelica_DeviceDrivers.Blocks.Packaging.SerialPackager.AddFloat addFloat(nu = 1) annotation(
         Placement(transformation(origin = {48, 44}, extent = {{-10, -10}, {10, 10}})));
@@ -742,7 +742,7 @@ end UDPInput;
   // PROTOTYPE. Alternative to UDPInput that bypasses Modelica_DeviceDrivers entirely.
     //
     // Motivation: with Modelica_DeviceDrivers' UDPReceive block present, CVODE stalls
-    // permanently at t ~ 2.6 s — regardless of the datagram rate, the datagram contents,
+    // permanently at t ~ 2.6 s â€” regardless of the datagram rate, the datagram contents,
     // or whether a sender is running at all (a single receive event is enough). DASSL and
     // gbode survive it but are ~3x slower, and CVODE is the only solver that reaches
     // near-real-time on this model (1.13x on CarExampleUDP). See
@@ -750,7 +750,7 @@ end UDPInput;
     //
     // This block reads the socket from a single impure external function called inside a
     // when-clause, writing straight into four discrete variables. No SerialPackager chain,
-    // no pkg/dummy dependency threading, no MDD trigger semantics — so if the stall is
+    // no pkg/dummy dependency threading, no MDD trigger semantics â€” so if the stall is
     // specific to how MDD structures those equations, this avoids it.
     impure function udpRead4
       "Non-blocking read of the most recent 4-float32 datagram on a UDP port"
@@ -995,6 +995,8 @@ int DD_udpSend(const char *ip, int port, int n, const double *v) { return -1; }
         parameter Real ground_mu = 10000  "Longitudinal viscous friction coefficient (N.s/m)";
         parameter Real mu_lat    = 10000 "Lateral viscous friction coefficient (N.s/m)";
         parameter Real mu_peak   = 1.0    "Peak friction coefficient (friction-circle limit): |F| <= mu_peak*normalLoad. Lower to reduce grip.";
+        parameter Real Crr       = 0.012  "Rolling resistance coefficient (dimensionless); ~0.010-0.015 for a car tire on asphalt.";
+        parameter Real v_rr      = 0.3    "Speed over which rolling resistance builds to full value (m/s).";
         outer parameter Real R_wheel   "Wheel radius (m)";
         MultiBody.Interfaces.Frame_b wheelContactFL annotation(
           Placement(transformation(origin = {100, 60}, extent = {{-16, -16}, {16, 16}}),
@@ -1008,13 +1010,13 @@ int DD_udpSend(const char *ip, int port, int n, const double *v) { return -1; }
         MultiBody.Interfaces.Frame_b wheelContactRR annotation(
           Placement(transformation(origin = {100, -60}, extent = {{-16, -16}, {16, 16}}),
           iconTransformation(origin = {-60, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
-        Components.Floor floorFL(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, mu_peak = mu_peak) annotation(
+        Components.Floor floorFL(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, mu_peak = mu_peak, Crr = Crr, v_rr = v_rr) annotation(
           Placement(transformation(origin = {0, 60}, extent = {{-10, -10}, {10, 10}})));
-        Components.Floor floorFR(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, mu_peak = mu_peak) annotation(
+        Components.Floor floorFR(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, mu_peak = mu_peak, Crr = Crr, v_rr = v_rr) annotation(
           Placement(transformation(origin = {0, 20}, extent = {{-10, -10}, {10, 10}})));
-        Components.Floor floorRL(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, mu_peak = mu_peak) annotation(
+        Components.Floor floorRL(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, mu_peak = mu_peak, Crr = Crr, v_rr = v_rr) annotation(
           Placement(transformation(origin = {0, -20}, extent = {{-10, -10}, {10, 10}})));
-        Components.Floor floorRR(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, mu_peak = mu_peak) annotation(
+        Components.Floor floorRR(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, mu_peak = mu_peak, Crr = Crr, v_rr = v_rr) annotation(
           Placement(transformation(origin = {0, -60}, extent = {{-10, -10}, {10, 10}})));
       equation
         connect(floorFL.wheelContact, wheelContactFL);
@@ -1101,6 +1103,8 @@ int DD_udpSend(const char *ip, int port, int n, const double *v) { return -1; }
           parameter Real ground_c = 1e5 "Floor stiffness (N/m) - used to estimate the normal load";
           parameter Real ground_d = 5000 "Floor damping (N.s/m) - used to estimate the normal load";
           parameter Real mu_peak = 1.0 "Peak friction coefficient; total contact force is capped at mu_peak*normalLoad (friction circle). Set <1 to reduce grip.";
+          parameter Real Crr = 0.012 "Rolling resistance coefficient (dimensionless); ~0.010-0.015 for a car tire on asphalt";
+          parameter Real v_rr = 0.3 "Speed over which rolling resistance builds to full value (m/s); see note below";
           outer parameter Real R_wheel "Wheel radius (m)";
           outer DDynamics.Roads.Terrains.TerrainMap terrain;
           MultiBody.Interfaces.Frame_b wheelContact annotation(
@@ -1118,6 +1122,8 @@ int DD_udpSend(const char *ip, int port, int n, const double *v) { return -1; }
           Real fRaw[3] "Unsaturated (viscous) friction demand";
           Real fMag "Magnitude of fRaw";
           Real fMax "Friction-circle limit = mu_peak*Nload";
+          Real fRoll[3] "Rolling resistance force at the contact patch";
+          Real fContact[3] "Total contact force = saturated friction + rolling resistance";
         equation
           connect(frictionForce.frame_b, wheelContact);
           vWorld = der(wheelContact.r_0);
@@ -1144,10 +1150,26 @@ int DD_udpSend(const char *ip, int port, int n, const double *v) { return -1; }
           fMag = sqrt(fRaw * fRaw + 1e-12);
           fMax = mu_peak * Nload;
           frictionVec = noEvent(if fMag > fMax then fRaw * (fMax / fMag) else fRaw);
-          frictionForce.force  = frictionVec;
-// Torque from applying friction at the contact patch (offset R_wheel below wheel center).
-// cross({0,-R,0}, F) gives the rolling torque that spins the free revolute on non-driven wheels.
-          frictionForce.torque = cross({0, -R_wheel, 0}, frictionVec);
+// Rolling resistance: hysteresis loss in the tire carcass as it deforms through the
+// contact patch. It is NOT Coulomb friction, so it is added AFTER the friction circle
+// rather than competing for the same grip budget - saturating it would wrongly make a
+// sliding tire lose its rolling loss.
+//
+// tanh regularizes what is physically a sign() discontinuity at zero speed. A raw
+// -Crr*N*sign(vLong) would step across the origin, which is exactly where a parked car
+// sits, and would chatter. v_rr sets the width of the transition: smaller is more
+// faithful but stiffer. Matches the tanh idiom already used by DiscBrake.
+//
+// Nload is already zero out of contact (max(0, ...)), so fRoll vanishes off the ground
+// without needing frictionScale.
+          fRoll = -Crr * Nload * tanh(vLong / v_rr) * headingWorld;
+          fContact = frictionVec + fRoll;
+          frictionForce.force = fContact;
+// Torque from applying the contact force at the patch (offset R_wheel below wheel center).
+// cross({0,-R,0}, F) gives the rolling torque that spins the free revolute on non-driven
+// wheels. Rolling resistance is included here too: acting at the patch, it produces the
+// retarding moment that slows a coasting wheel.
+          frictionForce.torque = cross({0, -R_wheel, 0}, fContact);
           annotation(
             Documentation(info = "<html>
 <body>
@@ -1189,13 +1211,15 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
           parameter Real ground_mu = 10000 "Longitudinal viscous friction coefficient (N.s/m)";
           parameter Real mu_lat = 100000 "Lateral viscous friction coefficient (N.s/m)";
           parameter Real mu_peak = 1.0 "Peak friction coefficient (friction-circle limit): |F| <= mu_peak*normalLoad. Lower to reduce grip.";
+          parameter Real Crr = 0.012 "Rolling resistance coefficient (dimensionless).";
+          parameter Real v_rr = 0.3 "Speed over which rolling resistance builds to full value (m/s).";
           outer parameter Real R_wheel "Wheel radius (m)";
           MultiBody.Interfaces.Frame_b wheelContact annotation(
             Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
             iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
           GroundSpring gs(ground_c = ground_c, ground_d = ground_d) annotation(
             Placement(transformation(origin = {0, 30}, extent = {{-10, -10}, {10, 10}})));
-          GroundFriction gf(ground_mu = ground_mu, mu_lat = mu_lat, ground_c = ground_c, ground_d = ground_d, mu_peak = mu_peak) annotation(
+          GroundFriction gf(ground_mu = ground_mu, mu_lat = mu_lat, ground_c = ground_c, ground_d = ground_d, mu_peak = mu_peak, Crr = Crr, v_rr = v_rr) annotation(
             Placement(transformation(origin = {0, -30}, extent = {{-10, -10}, {10, 10}})));
         equation
           connect(gs.wheelContact, wheelContact);
@@ -1324,11 +1348,89 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
 
     end Terrains;
 
+    package Aerodynamics "Resistive forces from the surrounding air"
+
+      model AeroDrag "Aerodynamic drag applied at a body frame"
+        import MultiBody = Modelica.Mechanics.MultiBody;
+        parameter Real Cd = 0.32 "Drag coefficient (dimensionless)";
+        parameter Real A = 2.0 "Reference frontal area (m2)";
+        parameter Real rho = 1.2 "Air density (kg/m3) - ISA at 20 C, sea level";
+        parameter Real v_reg = 0.1 "Regularization speed (m/s); see note below";
+        MultiBody.Interfaces.Frame_a frame_a annotation(
+          Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
+          iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
+        MultiBody.Sensors.AbsoluteVelocity absoluteVelocity(
+          resolveInFrame = MultiBody.Types.ResolveInFrameA.world) annotation(
+          Placement(transformation(origin = {-40, 40}, extent = {{-10, -10}, {10, 10}})));
+        MultiBody.Forces.WorldForce dragForce(animation = false,
+          resolveInFrame = MultiBody.Types.ResolveInFrameB.world) annotation(
+          Placement(transformation(origin = {40, 0}, extent = {{10, -10}, {-10, 10}})));
+      protected
+        Real v[3] "Velocity of frame_a resolved in the world frame (m/s)";
+        Real vMag "Regularized speed magnitude (m/s)";
+      equation
+        connect(frame_a, absoluteVelocity.frame_a);
+        connect(frame_a, dragForce.frame_b);
+        v = absoluteVelocity.v;
+// Regularized magnitude. The drag law needs |v|, but sqrt(v*v) has an undefined
+// Jacobian at standstill (the v(x)v/|v| term goes 0/0), and the vehicle starts at
+// rest. Adding v_reg^2 keeps the derivative finite there at the cost of a residual
+// force below v_reg that is negligible against rolling resistance.
+        vMag = sqrt(v * v + v_reg ^ 2);
+// Quadratic drag opposing the velocity vector: F = -1/2 rho Cd A |v| v.
+// Applied at frame_a, so no pitching moment is produced: the centre of pressure is
+// taken to coincide with the frame origin. A real body has it above the CoG, which
+// adds a small nose-up moment; modelling that means offsetting this component with a
+// FixedTranslation.
+        dragForce.force = -0.5 * rho * Cd * A * vMag * v;
+        annotation(
+          Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}),
+            Text(origin = {0, 60}, extent = {{-80, 20}, {80, -20}}, textString = "drag"),
+            Line(points = {{-60, 0}, {40, 0}}, thickness = 0.6, arrow = {Arrow.None, Arrow.Filled}),
+            Line(points = {{-60, -30}, {20, -30}}, thickness = 0.6, arrow = {Arrow.None, Arrow.Filled}),
+            Line(points = {{-60, 30}, {20, 30}}, thickness = 0.6, arrow = {Arrow.None, Arrow.Filled}),
+            Text(textColor = {0, 0, 255}, extent = {{-150, 150}, {150, 110}}, textString = "%name")}),
+          Documentation(info = "<html>
+<body>
+<h4>AeroDrag</h4>
+<p>Applies quadratic aerodynamic drag at the frame it is connected to:</p>
+<pre>F = -1/2 &middot; rho &middot; Cd &middot; A &middot; |v| &middot; v</pre>
+<p>where <code>v</code> is the absolute velocity of <code>frame_a</code> resolved in the
+world frame. The force opposes the velocity vector in three dimensions, so it also damps
+lateral and vertical motion, not just forward travel.</p>
+<p><b>Why this matters.</b> Without drag the vehicle accelerates indefinitely under
+constant throttle: there is no speed at which tractive force and resistance balance.
+Drag introduces a terminal velocity, given by
+<code>v_max = sqrt(2&middot;F_tractive / (rho&middot;Cd&middot;A))</code>.</p>
+<p><b>Regularization.</b> <code>v_reg</code> keeps the Jacobian finite at standstill.
+The product <code>|v|&middot;v</code> is C1 at the origin, but its Jacobian contains
+<code>v&otimes;v/|v|</code>, which is 0/0 there â€” and the vehicle starts at rest. The
+default 0.1 m/s leaves a residual force far below rolling resistance at walking pace.</p>
+<p><b>Not modelled:</b> lift/downforce, centre-of-pressure offset (hence no aerodynamic
+pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>Cd</code></td><td>0.32</td><td>Drag coefficient</td></tr>
+<tr><td><code>A</code></td><td>2.0</td><td>Reference frontal area (m&sup2;)</td></tr>
+<tr><td><code>rho</code></td><td>1.2</td><td>Air density (kg/m&sup3;)</td></tr>
+<tr><td><code>v_reg</code></td><td>0.1</td><td>Regularization speed (m/s)</td></tr>
+</tbody>
+</table>
+</body>
+</html>"));
+      end AeroDrag;
+
+    end Aerodynamics;
+
   end Roads;
 
   package Cars
 
     model Car
+      // Aerodynamic drag on the chassis. Formula Ford 1600: open-wheel, exposed tires dominate Cd.
+      DDynamics.Roads.Aerodynamics.AeroDrag aeroDrag(Cd = 0.7, A = 1.1) annotation(
+        Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
       Parts.Chassis.RectangularChassis chassis(m = 400, length = 3.0, width = 1.8, height = 0.5) annotation(
         Placement(transformation(extent = {{-10, -10}, {10, 10}})));
       Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFL(r = {1.5, -0.25, 0.9}) annotation(
@@ -1467,6 +1569,7 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
         Line(points = {{0, 110}, {0, 80}, {-118, 80}, {-118, -54}}, color = {0, 0, 127}));
       connect(world.frame_b, freeMotion.frame_a) annotation(
         Line(points = {{-20, 100}, {-20, 44}, {-14, 44}}));
+      //connect(aeroDrag.frame_a, chassis.frame_a);
       connect(chassis_pos, chassis.frame_a) annotation(
         Line(points = {{-2, -102}, {0, -102}, {0, -10}}));
       connect(mountRL.frame_a, chassis.frame_a) annotation(
@@ -1483,6 +1586,8 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
         Line(points = {{-80, 110}, {-80, 5}}, color = {0, 0, 127}));
   connect(mockTransmission.torqueOut, solidAxle.pedalInput) annotation(
         Line(points = {{-80, -14}, {-142, -14}, {-142, -2}}));
+  connect(aeroDrag.frame_a, chassis.frame_a) annotation(
+        Line(points = {{50, 60}, {0, 60}, {0, -10}}, color = {95, 95, 95}));
       annotation(
         Icon(graphics = {Line(points = {{-80, 60}, {-80, -60}, {80, -60}, {80, 60}, {-80, 60}, {-80, 60}}), Line(origin = {-2, 0}, points = {{-58, 40}, {-58, -40}, {62, -40}, {62, 40}, {-58, 40}, {-58, 40}, {-58, 40}}), Line(origin = {-0.193375, 0.27735}, points = {{-59.8066, 39.7226}, {-29.8066, 19.7226}, {-29.8066, -20.2774}, {-59.8066, -40.2774}, {-29.8066, -20.2774}, {40.1934, -20.2774}, {40.1934, 19.7226}, {-29.8066, 19.7226}, {40.1934, 19.7226}, {60.1934, 39.7226}, {40.1934, 19.7226}, {40.1934, -20.2774}, {60.1934, -40.2774}, {60.1934, -38.2774}})}),
         Documentation(info = "<html>
@@ -1508,6 +1613,9 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
     end Car;
 
     model CivicEKCar
+      // Aerodynamic drag on the chassis. Honda Civic EK hatchback.
+      DDynamics.Roads.Aerodynamics.AeroDrag aeroDrag(Cd = 0.36, A = 1.9) annotation(
+        Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
       Parts.Chassis.RectangularChassis chassis(m = 990, length = 4.178, width = 1.704, height = 0.4) annotation(
         Placement(transformation(extent = {{-10, -10}, {10, 10}})));
       Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFL(r = {1.31, -0.25, 0.735}) annotation(
@@ -1538,9 +1646,9 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
         Placement(transformation(origin = {164, -2}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
       Modelica.Mechanics.MultiBody.Joints.FreeMotion freeMotion(r_rel_a(start = {0, 1.4, 0}), v_rel_a(start = {0, 0, 0})) annotation(
         Placement(transformation(origin = {-4, 44}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.Rotational.Sources.Position steerAct annotation(
+      Modelica.Mechanics.Rotational.Sources.Position steerAct(f_crit = 5) annotation(
         Placement(transformation(origin = {102, 10}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.Rotational.Sources.Position steerAct1 annotation(
+      Modelica.Mechanics.Rotational.Sources.Position steerAct1(f_crit = 5) annotation(
         Placement(transformation(origin = {102, -12}, extent = {{-10, -10}, {10, 10}})));
       Parts.Steering.MockSteering mockSteering annotation(
         Placement(transformation(origin = {60, 24}, extent = {{-9, -9}, {9, 9}})));
@@ -1628,6 +1736,7 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
         Line(points = {{0, 110}, {0, 80}, {-118, 80}, {-118, -54}}, color = {0, 0, 127}));
       connect(world.frame_b, freeMotion.frame_a) annotation(
         Line(points = {{-20, 100}, {-20, 44}, {-14, 44}}));
+      //connect(aeroDrag.frame_a, chassis.frame_a);
       connect(chassis_pos, chassis.frame_a) annotation(
         Line(points = {{-2, -102}, {0, -102}, {0, -10}}));
       connect(mountRL.frame_a, chassis.frame_a) annotation(
@@ -1644,6 +1753,8 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
         Line(points = {{-80, 110}, {-80, 86}, {-26, 86}, {-26, 74}}, color = {0, 0, 127}));
   connect(mockTransmission.torqueOut, solidAxle.pedalInput) annotation(
         Line(points = {{-26, 54}, {134, 54}, {134, -2}, {154, -2}}));
+  connect(aeroDrag.frame_a, chassis.frame_a) annotation(
+        Line(points = {{50, 60}, {0, 60}, {0, -10}}, color = {95, 95, 95}));
       annotation(
         Icon(graphics = {Line(points = {{-80, 60}, {-80, -60}, {80, -60}, {80, 60}, {-80, 60}, {-80, 60}}), Line(origin = {-2, 0}, points = {{-58, 40}, {-58, -40}, {62, -40}, {62, 40}, {-58, 40}, {-58, 40}, {-58, 40}}), Line(origin = {-0.193375, 0.27735}, points = {{-59.8066, 39.7226}, {-29.8066, 19.7226}, {-29.8066, -20.2774}, {-59.8066, -40.2774}, {-29.8066, -20.2774}, {40.1934, -20.2774}, {40.1934, 19.7226}, {-29.8066, 19.7226}, {40.1934, 19.7226}, {60.1934, 39.7226}, {40.1934, 19.7226}, {40.1934, -20.2774}, {60.1934, -40.2774}, {60.1934, -38.2774}})}),
         Documentation(info = "<html>
@@ -1669,6 +1780,9 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
     end CivicEKCar;
 
     model E36Car
+      // Aerodynamic drag on the chassis. BMW E36 saloon.
+      DDynamics.Roads.Aerodynamics.AeroDrag aeroDrag(Cd = 0.32, A = 1.95) annotation(
+        Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
       Parts.Chassis.RectangularChassis chassis(m = 1000, length = 4.433, width = 1.710, height = 0.4) annotation(
         Placement(transformation(extent = {{-10, -10}, {10, 10}})));
       Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFL(r = {1.350, -0.15, 0.710}) annotation(
@@ -1699,9 +1813,9 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
         Placement(transformation(origin = {-152, -2}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
       Modelica.Mechanics.MultiBody.Joints.FreeMotion freeMotion(r_rel_a(start = {0, 1.35, 0}), v_rel_a(start = {0, 0, 0})) annotation(
         Placement(transformation(origin = {-4, 44}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.Rotational.Sources.Position steerAct annotation(
+      Modelica.Mechanics.Rotational.Sources.Position steerAct(f_crit = 5) annotation(
         Placement(transformation(origin = {102, 10}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.Rotational.Sources.Position steerAct1 annotation(
+      Modelica.Mechanics.Rotational.Sources.Position steerAct1(f_crit = 5) annotation(
         Placement(transformation(origin = {102, -12}, extent = {{-10, -10}, {10, 10}})));
       Parts.Steering.MockSteering mockSteering annotation(
         Placement(transformation(origin = {60, 24}, extent = {{-9, -9}, {9, 9}})));
@@ -1791,6 +1905,7 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
         Line(points = {{0, 110}, {0, 80}, {-118, 80}, {-118, -54}}, color = {0, 0, 127}));
       connect(world.frame_b, freeMotion.frame_a) annotation(
         Line(points = {{-20, 100}, {-20, 44}, {-14, 44}}));
+      //connect(aeroDrag.frame_a, chassis.frame_a);
       connect(chassis_pos, chassis.frame_a) annotation(
         Line(points = {{-2, -102}, {0, -102}, {0, -10}}));
       connect(mountRL.frame_a, chassis.frame_a) annotation(
@@ -1807,6 +1922,8 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
         Line(points = {{-80, 110}, {-82, 110}, {-82, 12}}, color = {0, 0, 127}));
   connect(mockTransmission.torqueOut, solidAxle.pedalInput) annotation(
         Line(points = {{-82, -8}, {-142, -8}, {-142, -2}}));
+  connect(aeroDrag.frame_a, chassis.frame_a) annotation(
+        Line(points = {{50, 60}, {0, 60}, {0, -10}}, color = {95, 95, 95}));
       annotation(
         Icon(graphics = {Line(points = {{-80, 60}, {-80, -60}, {80, -60}, {80, 60}, {-80, 60}, {-80, 60}}), Line(origin = {-2, 0}, points = {{-58, 40}, {-58, -40}, {62, -40}, {62, 40}, {-58, 40}, {-58, 40}, {-58, 40}}), Line(origin = {-0.193375, 0.27735}, points = {{-59.8066, 39.7226}, {-29.8066, 19.7226}, {-29.8066, -20.2774}, {-59.8066, -40.2774}, {-29.8066, -20.2774}, {40.1934, -20.2774}, {40.1934, 19.7226}, {-29.8066, 19.7226}, {40.1934, 19.7226}, {60.1934, 39.7226}, {40.1934, 19.7226}, {40.1934, -20.2774}, {60.1934, -40.2774}, {60.1934, -38.2774}})}),
         Documentation(info = "<html>
@@ -2019,7 +2136,7 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
 <tr><td><code>n_rCurvature</code></td><td>20</td><td>Points along cross-section</td></tr>
 </tbody>
 </table>
-<p><b>Connector:</b> <code>frame_a</code> (Frame_a, from PartialVisualizer) — attach to wheel body frame.</p>
+<p><b>Connector:</b> <code>frame_a</code> (Frame_a, from PartialVisualizer) â€” attach to wheel body frame.</p>
 </body>
 </html>"));
           end TireVisualizer;
@@ -2266,7 +2383,7 @@ wheels.</p>
             Line(points={{-100, 0}, {-80, 0}, {-80, 30}, {-70, 30}}, color={95, 95, 95}));
           connect(chassisMount, lowerChassisOffset.frame_a) annotation(
             Line(points={{-100, 0}, {-80, 0}, {-80, -30}, {-70, -30}}, color={95, 95, 95}));
-// Tree branch: upper chassis pivot → upper A-arm
+// Tree branch: upper chassis pivot â†’ upper A-arm
           connect(upperChassisOffset.frame_b, upperChassisPivot.frame_a) annotation(
             Line(points={{-50, 30}, {-40, 30}}, color={95, 95, 95}));
           connect(upperChassisPivot.frame_b, upperArm.frame_a) annotation(
@@ -2726,7 +2843,7 @@ transients &mdash; the definitive cure there is rebuilding the loop from basic j
 <tr><td><code>m</code></td><td>400 kg</td><td>Total chassis mass</td></tr>
 </tbody>
 </table>
-<p><b>Connector:</b> <code>frame_a</code> (Frame_a) — central reference frame; all suspension mounts, FreeMotion, and <code>chassis_pos</code> connect here.</p>
+<p><b>Connector:</b> <code>frame_a</code> (Frame_a) â€” central reference frame; all suspension mounts, FreeMotion, and <code>chassis_pos</code> connect here.</p>
 <p>Extend this class and add <code>BodyBox</code>, <code>BodyCylinder</code>, or any geometry connected to <code>frame_a</code>.</p>
 </body>
 </html>"));
