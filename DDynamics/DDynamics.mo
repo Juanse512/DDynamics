@@ -5,13 +5,13 @@
       inner parameter Real R_wheel = 0.25 "Tire radius (m) â€” propagated to tires and floor contact";
       Cars.Car car annotation(
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
-      Modelica.Blocks.Sources.Constant speed(k = 1) annotation(
+      Modelica.Blocks.Sources.Constant speed(k = 0.5) annotation(
         Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Blocks.Sources.Constant steer(k = 1)  annotation(
+      Modelica.Blocks.Sources.Constant steer(k = 0.2)  annotation(
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Roads.Road road annotation(
         Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Blocks.Sources.Step brake_input(height = 0, startTime = 3)  annotation(
+  Modelica.Blocks.Sources.Step brake_input(height = 1, startTime = 5)  annotation(
         Placement(transformation(origin = {-68, 58}, extent = {{-10, -10}, {10, 10}})));
     equation
       connect(speed.y, car.throttleInput) annotation(
@@ -52,9 +52,9 @@
       inner parameter Real R_wheel = 0.30 "Tire radius (m) â€” 185/65R14, propagated to tires and floor contact";
       Cars.CivicEKCar car annotation(
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
-      Modelica.Blocks.Sources.Constant speed(k = 1) annotation(
+      Modelica.Blocks.Sources.Constant speed(k = 0.5) annotation(
         Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Blocks.Sources.Constant steer(k = -1) annotation(
+      Modelica.Blocks.Sources.Constant steer(k = 0.2) annotation(
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Roads.Road road annotation(
         Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
@@ -98,9 +98,9 @@
       inner parameter Real R_wheel = 0.31 "Tire radius (m) â€” 195/65R15, propagated to tires and floor contact";
       Cars.E36Car car annotation(
         Placement(transformation(extent = {{-28, -28}, {28, 28}})));
-      Modelica.Blocks.Sources.Constant speed(k = 1) annotation(
+      Modelica.Blocks.Sources.Constant speed(k = 0.5) annotation(
         Placement(transformation(origin = {-72, 0}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Blocks.Sources.Constant steer(k = 1) annotation(
+      Modelica.Blocks.Sources.Constant steer(k = 0.2) annotation(
         Placement(transformation(origin = {62, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Roads.Road road annotation(
         Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
@@ -155,15 +155,15 @@
       // One UDP streamer per rigid body. Each uses its own port so the Unity
       // receiver can bind one GameObject (chassis / wheel) per port.
       Interfaces.FrameToUDPOrientation udpChassis(port_send = 12345) annotation(
-        Placement(transformation(origin = {-60, -54}, extent = {{-10, -10}, {10, 10}})));
+        Placement(transformation(origin = {0, -64}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
       Interfaces.FrameToUDPOrientation udpFL(port_send = 12346) annotation(
-        Placement(transformation(origin = {-18, -72}, extent = {{-10, -10}, {10, 10}})));
+        Placement(transformation(origin = {46, 28}, extent = {{-10, -10}, {10, 10}})));
       Interfaces.FrameToUDPOrientation udpFR(port_send = 12347) annotation(
-        Placement(transformation(origin = {24, -74}, extent = {{-10, -10}, {10, 10}})));
+        Placement(transformation(origin = {44, -28}, extent = {{-10, -10}, {10, 10}})));
       Interfaces.FrameToUDPOrientation udpRL(port_send = 12348) annotation(
-        Placement(transformation(origin = {60, -70}, extent = {{-10, -10}, {10, 10}})));
+        Placement(transformation(origin = {-48, 28}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Interfaces.FrameToUDPOrientation udpRR(port_send = 12349) annotation(
-        Placement(transformation(origin = {100, -70}, extent = {{-10, -10}, {10, 10}})));
+        Placement(transformation(origin = {-50, -28}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
     equation
       connect(speed.y, car.throttleInput) annotation(
         Line(points = {{-60, 0}, {-28, 0}}, color = {0, 0, 127}));
@@ -181,16 +181,16 @@
         Line(points = {{-56, 58}, {0, 58}, {0, 28}}, color = {0, 0, 127}));
 // Tap chassis + each wheel frame for streaming. These are pure sensors
 // (zero force/torque) so they do not alter the vehicle dynamics.
-      connect(car.chassis_pos, udpChassis.frame_a) annotation(
-        Line(points = {{0, -28}, {0, -54}, {-70, -54}}, color = {95, 95, 95}));
       connect(car.frame_FL, udpFL.frame_a) annotation(
-        Line(points = {{16, 28}, {16, -72}, {-28, -72}}, color = {95, 95, 95}));
-      connect(car.frame_FR, udpFR.frame_a) annotation(
-        Line(points = {{16, -28}, {16, -50}, {14, -50}, {14, -74}}, color = {95, 95, 95}));
+        Line(points = {{16, 28}, {36, 28}}, color = {95, 95, 95}));
       connect(car.frame_RL, udpRL.frame_a) annotation(
-        Line(points = {{-22, 28}, {60, 28}, {60, -60}}, color = {95, 95, 95}));
+        Line(points = {{-22, 28}, {-38, 28}}, color = {95, 95, 95}));
       connect(car.frame_RR, udpRR.frame_a) annotation(
-        Line(points = {{-22, -28}, {100, -28}, {100, -60}}, color = {95, 95, 95}));
+        Line(points = {{-22, -28}, {-40, -28}}, color = {95, 95, 95}));
+  connect(udpFR.frame_a, car.frame_FR) annotation(
+        Line(points = {{34, -28}, {16, -28}}, color = {95, 95, 95}));
+  connect(car.chassis_pos, udpChassis.frame_a) annotation(
+        Line(points = {{0, 0}, {0, -54}}, color = {95, 95, 95}));
       annotation(
         Documentation(info = "<html>
 <body>
@@ -695,46 +695,30 @@
         Placement(transformation(origin = {42, 106}, extent = {{-10, -10}, {10, 10}}, rotation = 90), iconTransformation(origin = {104, -20}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Interfaces.RealOutput clutch annotation(
         Placement(transformation(origin = {74, 106}, extent = {{-10, -10}, {10, 10}}, rotation = 90), iconTransformation(origin = {104, 20}, extent = {{-10, -10}, {10, 10}})));
-  // Critically damped 2nd order low-pass, one per channel. Order 2 leaves the
+    // Critically damped 2nd order low-pass, one per channel. Order 2 leaves the
       // output C1-continuous across a step, which is what the downstream Position
       // actuators need. init = SteadyState (the default) starts each filter at its
       // initial input, so there is no start-up transient.
-  Modelica.Blocks.Continuous.Filter filterSteer(f_cut = f_cut, order = 2) annotation(
-        Placement(transformation(origin = {-30, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  Modelica.Blocks.Continuous.Filter filterThrottle(f_cut = f_cut, order = 2) annotation(
-        Placement(transformation(origin = {8, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  Modelica.Blocks.Continuous.Filter filterBrake(f_cut = f_cut, order = 2) annotation(
-        Placement(transformation(origin = {42, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  Modelica.Blocks.Continuous.Filter filterClutch(f_cut = f_cut, order = 2) annotation(
-        Placement(transformation(origin = {74, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
     equation
-  connect(uDPReceive.pkgOut, getFloat.pkgIn) annotation(
+      connect(uDPReceive.pkgOut, getFloat.pkgIn) annotation(
         Line(points = {{-63.2, -24}, {-39.2, -24}}));
-  connect(getFloat.pkgOut[1], getFloat1.pkgIn) annotation(
+      connect(getFloat.pkgOut[1], getFloat1.pkgIn) annotation(
         Line(points = {{-19.2, -24}, {-1.2, -24}}));
-  connect(getFloat1.pkgOut[1], getFloat2.pkgIn) annotation(
+      connect(getFloat1.pkgOut[1], getFloat2.pkgIn) annotation(
         Line(points = {{18.8, -24}, {32.8, -24}}));
-  connect(getFloat2.pkgOut[1], getFloat3.pkgIn) annotation(
+      connect(getFloat2.pkgOut[1], getFloat3.pkgIn) annotation(
         Line(points = {{52.8, -24}, {63.8, -24}}));
 // Raw held command -> low-pass -> output. Never connect a getFloat output
 // straight to an output connector: the un-filtered step is what stalls CVODE.
-  connect(getFloat.y[1], filterSteer.u) annotation(
-        Line(points = {{-30, -12}, {-30, 28}}, color = {0, 0, 127}));
-  connect(filterSteer.y, steer) annotation(
-        Line(points = {{-30, 51}, {-30, 106}}, color = {0, 0, 127}));
-  connect(getFloat1.y[1], filterThrottle.u) annotation(
-        Line(points = {{8, -12}, {8, 28}}, color = {0, 0, 127}));
-  connect(filterThrottle.y, throttle) annotation(
-        Line(points = {{8, 51}, {8, 106}}, color = {0, 0, 127}));
-  connect(getFloat2.y[1], filterBrake.u) annotation(
-        Line(points = {{42, -12}, {42, 28}}, color = {0, 0, 127}));
-  connect(filterBrake.y, brake) annotation(
-        Line(points = {{42, 51}, {42, 106}}, color = {0, 0, 127}));
-  connect(getFloat3.y[1], filterClutch.u) annotation(
-        Line(points = {{74, -12}, {74, 28}}, color = {0, 0, 127}));
-  connect(filterClutch.y, clutch) annotation(
-        Line(points = {{74, 51}, {74, 106}}, color = {0, 0, 127}));
-    annotation(
+      connect(getFloat.y[1], steer) annotation(
+        Line(points = {{-30, -12}, {-30, 106}}, color = {0, 0, 127}));
+  connect(getFloat1.y[1], throttle) annotation(
+        Line(points = {{8, -12}, {8, 106}}, color = {0, 0, 127}));
+  connect(getFloat2.y[1], brake) annotation(
+        Line(points = {{42, -12}, {42, 106}}, color = {0, 0, 127}));
+  connect(getFloat3.y[1], clutch) annotation(
+        Line(points = {{74, -12}, {74, 106}}, color = {0, 0, 127}));
+      annotation(
         Icon(graphics = {Ellipse(origin = {65, 61}, extent = {{-17, 17}, {17, -17}}), Line(origin = {65, 53}, points = {{-17, 9}, {15, 9}, {17, 9}, {17, 9}, {17, 5}, {-17, 5}, {-17, 9}, {-17, 5}, {-1, 5}, {-1, -9}, {3, -9}, {3, 5}, {5, 5}}), Rectangle(origin = {66, 19}, lineColor = {111, 255, 1}, fillColor = {111, 255, 1}, fillPattern = FillPattern.Solid, extent = {{-6, 15}, {6, -15}}), Rectangle(origin = {66, -19}, lineColor = {255, 0, 4}, fillColor = {255, 0, 4}, fillPattern = FillPattern.Solid, extent = {{-6, 15}, {6, -15}}), Rectangle(origin = {66, -61}, lineColor = {3, 20, 255}, fillColor = {3, 20, 255}, fillPattern = FillPattern.Solid, extent = {{-6, 15}, {6, -15}}), Text(origin = {-17, -2}, extent = {{-69, 28}, {69, -28}}, textString = "UDP")}),
   Diagram(graphics));
 end UDPInput;
@@ -999,16 +983,16 @@ int DD_udpSend(const char *ip, int port, int n, const double *v) { return -1; }
         parameter Real v_rr      = 0.3    "Speed over which rolling resistance builds to full value (m/s).";
         outer parameter Real R_wheel   "Wheel radius (m)";
         MultiBody.Interfaces.Frame_b wheelContactFL annotation(
-          Placement(transformation(origin = {100, 60}, extent = {{-16, -16}, {16, 16}}),
+          Placement(transformation(origin = {-98, 60}, extent = {{-16, -16}, {16, 16}}),
           iconTransformation(origin = {60, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
         MultiBody.Interfaces.Frame_b wheelContactFR annotation(
-          Placement(transformation(origin = {100, 20}, extent = {{-16, -16}, {16, 16}}),
+          Placement(transformation(origin = {-98, 20}, extent = {{-16, -16}, {16, 16}}),
           iconTransformation(origin = {60, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
         MultiBody.Interfaces.Frame_b wheelContactRL annotation(
-          Placement(transformation(origin = {100, -20}, extent = {{-16, -16}, {16, 16}}),
+          Placement(transformation(origin = {-98, -20}, extent = {{-16, -16}, {16, 16}}),
           iconTransformation(origin = {-60, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
         MultiBody.Interfaces.Frame_b wheelContactRR annotation(
-          Placement(transformation(origin = {100, -60}, extent = {{-16, -16}, {16, 16}}),
+          Placement(transformation(origin = {-98, -60}, extent = {{-16, -16}, {16, 16}}),
           iconTransformation(origin = {-60, -98}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
         Components.Floor floorFL(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, mu_peak = mu_peak, Crr = Crr, v_rr = v_rr) annotation(
           Placement(transformation(origin = {0, 60}, extent = {{-10, -10}, {10, 10}})));
@@ -1019,10 +1003,14 @@ int DD_udpSend(const char *ip, int port, int n, const double *v) { return -1; }
         Components.Floor floorRR(ground_c = ground_c, ground_d = ground_d, ground_mu = ground_mu, mu_lat = mu_lat, mu_peak = mu_peak, Crr = Crr, v_rr = v_rr) annotation(
           Placement(transformation(origin = {0, -60}, extent = {{-10, -10}, {10, 10}})));
       equation
-        connect(floorFL.wheelContact, wheelContactFL);
-        connect(floorFR.wheelContact, wheelContactFR);
-        connect(floorRL.wheelContact, wheelContactRL);
-        connect(floorRR.wheelContact, wheelContactRR);
+        connect(floorFL.wheelContact, wheelContactFL) annotation(
+          Line(points = {{-10, 60}, {-98, 60}}, color = {95, 95, 95}));
+      connect(floorFR.wheelContact, wheelContactFR) annotation(
+            Line(points = {{-10, 20}, {-98, 20}}, color = {95, 95, 95}));
+      connect(floorRL.wheelContact, wheelContactRL) annotation(
+            Line(points = {{-10, -20}, {-98, -20}}, color = {95, 95, 95}));
+    connect(floorRR.wheelContact, wheelContactRR) annotation(
+          Line(points = {{-10, -60}, {-98, -60}}, color = {95, 95, 95}));
         annotation(
           Icon(graphics = {Rectangle(origin = {0, -1}, fillColor = {126, 126, 126}, fillPattern = FillPattern.Solid, extent = {{-100, 51}, {100, -51}}), Rectangle(origin = {-61, -1}, lineColor = {255, 238, 56}, fillColor = {254, 238, 19}, fillPattern = FillPattern.Solid, extent = {{-21, 7}, {21, -7}}), Rectangle(origin = {-3, -1}, lineColor = {255, 238, 56}, fillColor = {254, 238, 19}, fillPattern = FillPattern.Solid, extent = {{-21, 7}, {21, -7}}), Rectangle(origin = {57, -1}, lineColor = {255, 238, 56}, fillColor = {254, 238, 19}, fillPattern = FillPattern.Solid, extent = {{-21, 7}, {21, -7}})}),
           Diagram(graphics),
@@ -1093,7 +1081,8 @@ int DD_udpSend(const char *ip, int port, int n, const double *v) { return -1; }
 </table>
 <p><b>Connector:</b> <code>wheelContact</code> (Frame_b) &mdash; attach to tire wheel center frame.</p>
 </body>
-</html>"));
+</html>"),
+  Icon(graphics = {Rectangle(origin = {0, -60}, lineColor = {255, 255, 255}, fillColor = {76, 76, 76}, fillPattern = FillPattern.Vertical, extent = {{-100, 40}, {100, -40}}), Text(origin = {1, 42}, extent = {{-39, 28}, {39, -28}}, textString = "GroundSpring")}));
         end GroundSpring;
 
         model GroundFriction "Slip-based longitudinal and viscous lateral friction"
@@ -1124,6 +1113,7 @@ int DD_udpSend(const char *ip, int port, int n, const double *v) { return -1; }
           Real fMax "Friction-circle limit = mu_peak*Nload";
           Real fRoll[3] "Rolling resistance force at the contact patch";
           Real fContact[3] "Total contact force = saturated friction + rolling resistance";
+        public
         equation
           connect(frictionForce.frame_b, wheelContact);
           vWorld = der(wheelContact.r_0);
@@ -1201,7 +1191,9 @@ overall grip; the default 1.0 is a typical dry tire-road peak.</p>
 <p><b>Note:</b> <code>ground_c</code>/<code>ground_d</code> must match the <code>GroundSpring</code> values for the
 normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code> pass the same values to both.</p>
 </body>
-</html>"));
+</html>"),
+            Icon(graphics = {Rectangle(origin = {0, -60}, lineColor = {255, 255, 255}, fillColor = {89, 89, 89}, fillPattern = FillPattern.Horizontal, extent = {{-100, 40}, {100, -40}}), Text(origin = {1, 42}, extent = {{-39, 28}, {39, -28}}, textString = "GroundFriction")}),
+            Diagram(graphics));
         end GroundFriction;
 
         model Floor "Complete wheel-ground contact. Connect tire.wheelSupport to wheelContact."
@@ -1218,12 +1210,14 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
             Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
             iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
           GroundSpring gs(ground_c = ground_c, ground_d = ground_d) annotation(
-            Placement(transformation(origin = {0, 30}, extent = {{-10, -10}, {10, 10}})));
+            Placement(transformation(origin = {18, 32}, extent = {{-26, -26}, {26, 26}})));
           GroundFriction gf(ground_mu = ground_mu, mu_lat = mu_lat, ground_c = ground_c, ground_d = ground_d, mu_peak = mu_peak, Crr = Crr, v_rr = v_rr) annotation(
-            Placement(transformation(origin = {0, -30}, extent = {{-10, -10}, {10, 10}})));
+            Placement(transformation(origin = {19, -35}, extent = {{-27, -27}, {27, 27}})));
         equation
-          connect(gs.wheelContact, wheelContact);
-          connect(gf.wheelContact, wheelContact);
+    connect(gf.wheelContact, wheelContact) annotation(
+              Line(points = {{-8, -35}, {-100, -35}, {-100, 0}}, color = {95, 95, 95}));
+    connect(gs.wheelContact, wheelContact) annotation(
+            Line(points = {{-8, 32}, {-100, 32}, {-100, 0}}, color = {95, 95, 95}));
           annotation(
             Documentation(info = "<html>
 <body>
@@ -1232,7 +1226,8 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
 <p><b>Parameters:</b> <code>ground_c</code>, <code>ground_d</code>, <code>ground_mu</code>, <code>mu_lat</code>, <code>mu_peak</code> plus <code>outer R_wheel</code>. <code>ground_c</code>/<code>ground_d</code> are shared with <code>GroundSpring</code> and reused by <code>GroundFriction</code> for the friction-circle normal load.</p>
 <p><b>Connector:</b> <code>wheelContact</code> (Frame_b).</p>
 </body>
-</html>"));
+</html>"),
+  Icon(graphics = {Rectangle(origin = {0, -60}, fillColor = {71, 71, 71}, fillPattern = FillPattern.Solid, extent = {{-100, 40}, {100, -40}}), Text(origin = {1, 41}, extent = {{-49, 15}, {49, -15}}, textString = "Floor")}));
         end Floor;
 
       end Components;
@@ -1246,8 +1241,8 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
           input Real y;
           output Real z;
         algorithm
-//  z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
-          z := 1;
+    z := 0.2 * Modelica.Math.sin(2 * Modelica.Constants.pi * x / 5);
+          //z := 1;
         end getZ;
         annotation(
           Icon(graphics = {Rectangle(origin = {0, -40}, fillColor = {163, 141, 98}, fillPattern = FillPattern.Solid, extent = {{-100, 60}, {100, -60}}), Line(origin = {-1.29108, 33.677}, points = {{-98.7089, -13.677}, {-78.7089, 16.323}, {-68.7089, 6.323}, {-58.7089, 16.323}, {-48.7089, 6.323}, {-38.7089, 16.323}, {-28.7089, 6.323}, {-18.7089, 16.323}, {-6.70892, 6.323}, {1.29108, 16.323}, {11.2911, 6.323}, {21.2911, 16.323}, {33.2911, 6.323}, {41.2911, 14.323}, {51.2911, 6.323}, {61.2911, 16.323}, {71.2911, 6.323}, {81.2911, 16.323}, {101.291, -13.677}, {-98.7089, -13.677}, {-100.709, -15.677}})}),
@@ -1361,16 +1356,14 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
           iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
         MultiBody.Sensors.AbsoluteVelocity absoluteVelocity(
           resolveInFrame = MultiBody.Types.ResolveInFrameA.world) annotation(
-          Placement(transformation(origin = {-40, 40}, extent = {{-10, -10}, {10, 10}})));
+          Placement(transformation(origin = {-10, 42}, extent = {{-10, -10}, {10, 10}})));
         MultiBody.Forces.WorldForce dragForce(animation = false,
           resolveInFrame = MultiBody.Types.ResolveInFrameB.world) annotation(
-          Placement(transformation(origin = {40, 0}, extent = {{10, -10}, {-10, 10}})));
+          Placement(transformation(origin = {-10, 0}, extent = {{10, -10}, {-10, 10}})));
       protected
         Real v[3] "Velocity of frame_a resolved in the world frame (m/s)";
         Real vMag "Regularized speed magnitude (m/s)";
       equation
-        connect(frame_a, absoluteVelocity.frame_a);
-        connect(frame_a, dragForce.frame_b);
         v = absoluteVelocity.v;
 // Regularized magnitude. The drag law needs |v|, but sqrt(v*v) has an undefined
 // Jacobian at standstill (the v(x)v/|v| term goes 0/0), and the vehicle starts at
@@ -1383,6 +1376,10 @@ normal-load estimate to be correct; <code>Floor</code>/<code>Floor4Corners</code
 // adds a small nose-up moment; modelling that means offsetting this component with a
 // FixedTranslation.
         dragForce.force = -0.5 * rho * Cd * A * vMag * v;
+    connect(frame_a, dragForce.frame_b) annotation(
+            Line(points = {{-100, 0}, {-20, 0}}));
+    connect(frame_a, absoluteVelocity.frame_a) annotation(
+          Line(points = {{-100, 0}, {-40, 0}, {-40, 42}, {-20, 42}}));
         annotation(
           Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}),
             Text(origin = {0, 60}, extent = {{-80, 20}, {80, -20}}, textString = "drag"),
@@ -1428,18 +1425,34 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
   package Cars
 
     model Car
+      // Las barras estabilizadoras se declaran aqui, por delante del resto de
+      // los componentes, y no al final como en los otros dos vehiculos. Es un
+      // requisito del compilador y no del modelo: declaradas al final, la
+      // reduccion de indice de OpenModelica falla al construir un modelo que
+      // instancie este vehiculo y le conecte fuentes, con el mismo error de
+      // singularidad estructural descrito en el apendice. El sistema de
+      // ecuaciones es identico en ambos casos.
+      Parts.RollResistance.AntiRollBar frontARB(c_arb = 13000) annotation(
+        Placement(transformation(origin = {188, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
+      Parts.RollResistance.AntiRollBar rearARB(c_arb = 13000) annotation(
+        Placement(transformation(origin = {-194, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
       // Aerodynamic drag on the chassis. Formula Ford 1600: open-wheel, exposed tires dominate Cd.
       DDynamics.Roads.Aerodynamics.AeroDrag aeroDrag(Cd = 0.7, A = 1.1) annotation(
         Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
       Parts.Chassis.RectangularChassis chassis(m = 400, length = 3.0, width = 1.8, height = 0.5) annotation(
         Placement(transformation(extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFL(r = {1.5, -0.25, 0.9}) annotation(
+      // Anclajes de suspension. La coordenada lateral se elige junto con el
+      // alcance del varillaje para que la via resulte la del vehiculo real:
+      // semivia = mountZ + alcance lateral del brazo. Con brazos de 0,35 m que
+      // en equilibrio proyectan unos 0,33 m, mountZ = 0,37 da una via de
+      // 1,40 m, la de un monoplaza de formula de escuela.
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFL(r = {1.5, -0.25, 0.37}) annotation(
         Placement(transformation(origin = {50, 40}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFR(r = {1.5, -0.25, -0.9}) annotation(
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFR(r = {1.5, -0.25, -0.37}) annotation(
         Placement(transformation(origin = {50, -40}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRL(r = {-1.5, -0.25, 0.9}) annotation(
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRL(r = {-1.5, -0.25, 0.37}) annotation(
         Placement(transformation(origin = {-70, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
-      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRR(r = {-1.5, -0.25, -0.9}) annotation(
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRR(r = {-1.5, -0.25, -0.37}) annotation(
         Placement(transformation(origin = {-70, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Parts.Suspension.DoubleWishbone doubleWishboneRL annotation(
         Placement(transformation(origin = {-110, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
@@ -1569,7 +1582,7 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
         Line(points = {{0, 110}, {0, 80}, {-118, 80}, {-118, -54}}, color = {0, 0, 127}));
       connect(world.frame_b, freeMotion.frame_a) annotation(
         Line(points = {{-20, 100}, {-20, 44}, {-14, 44}}));
-      //connect(aeroDrag.frame_a, chassis.frame_a);
+//connect(aeroDrag.frame_a, chassis.frame_a);
       connect(chassis_pos, chassis.frame_a) annotation(
         Line(points = {{-2, -102}, {0, -102}, {0, -10}}));
       connect(mountRL.frame_a, chassis.frame_a) annotation(
@@ -1588,6 +1601,22 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
         Line(points = {{-80, -14}, {-142, -14}, {-142, -2}}));
   connect(aeroDrag.frame_a, chassis.frame_a) annotation(
         Line(points = {{50, 60}, {0, 60}, {0, -10}}, color = {95, 95, 95}));
+  connect(frontARB.left_wheel, ttireFL.suspMount) annotation(
+        Line(points = {{194, 10}, {194, 40}, {140, 40}}, color = {95, 95, 95}));
+  connect(frontARB.left_chasisMount, mountFL.frame_b) annotation(
+        Line(points = {{182, 10}, {180, 10}, {180, 40}, {60, 40}}, color = {95, 95, 95}));
+  connect(frontARB.right_wheel, tireFR.suspMount) annotation(
+        Line(points = {{194, -10}, {196, -10}, {196, -40}, {140, -40}}, color = {95, 95, 95}));
+  connect(frontARB.right_chasisMount, mountFR.frame_b) annotation(
+        Line(points = {{182, -10}, {180, -10}, {180, -40}, {60, -40}}, color = {95, 95, 95}));
+  connect(rearARB.left_wheel, tireRL.suspMount) annotation(
+        Line(points = {{-188, 10}, {-186, 10}, {-186, 40}, {-140, 40}}, color = {95, 95, 95}));
+  connect(rearARB.left_chasisMount, mountRL.frame_b) annotation(
+        Line(points = {{-200, 10}, {-200, 40}, {-80, 40}}, color = {95, 95, 95}));
+  connect(rearARB.right_wheel, tireRR.suspMount) annotation(
+        Line(points = {{-188, -10}, {-188, -40}, {-140, -40}}, color = {95, 95, 95}));
+  connect(rearARB.right_chasisMount, mountRR.frame_b) annotation(
+        Line(points = {{-200, -10}, {-202, -10}, {-202, -40}, {-80, -40}}, color = {95, 95, 95}));
       annotation(
         Icon(graphics = {Line(points = {{-80, 60}, {-80, -60}, {80, -60}, {80, 60}, {-80, 60}, {-80, 60}}), Line(origin = {-2, 0}, points = {{-58, 40}, {-58, -40}, {62, -40}, {62, 40}, {-58, 40}, {-58, 40}, {-58, 40}}), Line(origin = {-0.193375, 0.27735}, points = {{-59.8066, 39.7226}, {-29.8066, 19.7226}, {-29.8066, -20.2774}, {-59.8066, -40.2774}, {-29.8066, -20.2774}, {40.1934, -20.2774}, {40.1934, 19.7226}, {-29.8066, 19.7226}, {40.1934, 19.7226}, {60.1934, 39.7226}, {40.1934, 19.7226}, {40.1934, -20.2774}, {60.1934, -40.2774}, {60.1934, -38.2774}})}),
         Documentation(info = "<html>
@@ -1618,13 +1647,15 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
         Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
       Parts.Chassis.RectangularChassis chassis(m = 990, length = 4.178, width = 1.704, height = 0.4) annotation(
         Placement(transformation(extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFL(r = {1.31, -0.25, 0.735}) annotation(
+      // Anclajes de suspension: mountZ = 0,47 mas los 0,27 que proyecta el
+      // brazo en equilibrio dan una via de 1,475 m, la del Civic EK real.
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFL(r = {1.31, -0.25, 0.47}) annotation(
         Placement(transformation(origin = {50, 40}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFR(r = {1.31, -0.25, -0.735}) annotation(
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFR(r = {1.31, -0.25, -0.47}) annotation(
         Placement(transformation(origin = {50, -40}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRL(r = {-1.31, -0.25, 0.735}) annotation(
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRL(r = {-1.31, -0.25, 0.47}) annotation(
         Placement(transformation(origin = {-70, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
-      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRR(r = {-1.31, -0.25, -0.735}) annotation(
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRR(r = {-1.31, -0.25, -0.47}) annotation(
         Placement(transformation(origin = {-70, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Parts.Suspension.DoubleWishbone doubleWishboneRL(k_spring = 14000, d_damper = 1800) annotation(
         Placement(transformation(origin = {-110, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
@@ -1679,6 +1710,10 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
       outer Modelica.Mechanics.MultiBody.World world;
   Parts.Transmission.MockTransmission mockTransmission annotation(
         Placement(transformation(origin = {-26, 64}, extent = {{-10, -10}, {10, 10}})));
+  Parts.RollResistance.AntiRollBar frontARB(c_arb = 41000)  annotation(
+        Placement(transformation(origin = {186, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
+  Parts.RollResistance.AntiRollBar rearARB(c_arb = 23000)  annotation(
+        Placement(transformation(origin = {-186, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
     equation
       connect(mountFL.frame_b, doubleWishboneFL.chassisMount) annotation(
         Line(points = {{60, 40}, {100, 40}}, color = {95, 95, 95}));
@@ -1736,7 +1771,7 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
         Line(points = {{0, 110}, {0, 80}, {-118, 80}, {-118, -54}}, color = {0, 0, 127}));
       connect(world.frame_b, freeMotion.frame_a) annotation(
         Line(points = {{-20, 100}, {-20, 44}, {-14, 44}}));
-      //connect(aeroDrag.frame_a, chassis.frame_a);
+//connect(aeroDrag.frame_a, chassis.frame_a);
       connect(chassis_pos, chassis.frame_a) annotation(
         Line(points = {{-2, -102}, {0, -102}, {0, -10}}));
       connect(mountRL.frame_a, chassis.frame_a) annotation(
@@ -1755,6 +1790,22 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
         Line(points = {{-26, 54}, {134, 54}, {134, -2}, {154, -2}}));
   connect(aeroDrag.frame_a, chassis.frame_a) annotation(
         Line(points = {{50, 60}, {0, 60}, {0, -10}}, color = {95, 95, 95}));
+  connect(frontARB.left_wheel, tireFL.suspMount) annotation(
+        Line(points = {{192, 10}, {192, 40}, {140, 40}}, color = {95, 95, 95}));
+  connect(frontARB.left_chasisMount, mountFL.frame_b) annotation(
+        Line(points = {{180, 10}, {180, 40}, {60, 40}}, color = {95, 95, 95}));
+  connect(frontARB.right_wheel, tireFR.suspMount) annotation(
+        Line(points = {{192, -10}, {192, -40}, {138, -40}}, color = {95, 95, 95}));
+  connect(frontARB.right_chasisMount, mountFR.frame_b) annotation(
+        Line(points = {{180, -10}, {180, -40}, {60, -40}}, color = {95, 95, 95}));
+  connect(rearARB.left_wheel, tireRL.suspMount) annotation(
+        Line(points = {{-180, 10}, {-180, 40}, {-140, 40}}, color = {95, 95, 95}));
+  connect(rearARB.left_chasisMount, mountRL.frame_b) annotation(
+        Line(points = {{-192, 10}, {-190, 10}, {-190, 40}, {-80, 40}}, color = {95, 95, 95}));
+  connect(rearARB.right_wheel, tireRR.suspMount) annotation(
+        Line(points = {{-180, -10}, {-184, -10}, {-184, -40}, {-140, -40}}, color = {95, 95, 95}));
+  connect(rearARB.right_chasisMount, mountRR.frame_b) annotation(
+        Line(points = {{-192, -10}, {-194, -10}, {-194, -40}, {-80, -40}}, color = {95, 95, 95}));
       annotation(
         Icon(graphics = {Line(points = {{-80, 60}, {-80, -60}, {80, -60}, {80, 60}, {-80, 60}, {-80, 60}}), Line(origin = {-2, 0}, points = {{-58, 40}, {-58, -40}, {62, -40}, {62, 40}, {-58, 40}, {-58, 40}, {-58, 40}}), Line(origin = {-0.193375, 0.27735}, points = {{-59.8066, 39.7226}, {-29.8066, 19.7226}, {-29.8066, -20.2774}, {-59.8066, -40.2774}, {-29.8066, -20.2774}, {40.1934, -20.2774}, {40.1934, 19.7226}, {-29.8066, 19.7226}, {40.1934, 19.7226}, {60.1934, 39.7226}, {40.1934, 19.7226}, {40.1934, -20.2774}, {60.1934, -40.2774}, {60.1934, -38.2774}})}),
         Documentation(info = "<html>
@@ -1780,18 +1831,34 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
     end CivicEKCar;
 
     model E36Car
+      // Las barras estabilizadoras se declaran por delante del resto de los
+      // componentes. Es un requisito del compilador y no del modelo: declaradas
+      // al final, la reduccion de indice de OpenModelica falla al construir un
+      // modelo que instancie este vehiculo y le conecte fuentes, con el error de
+      // singularidad estructural descrito en el apendice. El sistema de
+      // ecuaciones es identico en ambos casos.
+      Parts.RollResistance.AntiRollBar frontARB(c_arb = 31000) annotation(
+        Placement(transformation(origin = {188, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
+      Parts.RollResistance.AntiRollBar rearARB(c_arb = 16000) annotation(
+        Placement(transformation(origin = {-194, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
       // Aerodynamic drag on the chassis. BMW E36 saloon.
       DDynamics.Roads.Aerodynamics.AeroDrag aeroDrag(Cd = 0.32, A = 1.95) annotation(
         Placement(transformation(origin = {60, 60}, extent = {{-10, -10}, {10, 10}})));
       Parts.Chassis.RectangularChassis chassis(m = 1000, length = 4.433, width = 1.710, height = 0.4) annotation(
         Placement(transformation(extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFL(r = {1.350, -0.15, 0.710}) annotation(
+      // Anclajes de suspension. Los dos ejes llevan coordenadas laterales
+      // distintas porque sus topologias alcanzan hacia afuera de forma
+      // distinta: el puntal McPherson aporta los 0,30 m de wheelOffsetZ,
+      // mientras que el varillaje MultiLink proyecta unos 0,27 m en
+      // equilibrio. Con mountZ de 0,41 y 0,45 la via resulta de 1,42 m
+      // delante y 1,44 m detras, la del BMW E36 real.
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFL(r = {1.350, -0.15, 0.41}) annotation(
         Placement(transformation(origin = {50, 40}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFR(r = {1.350, -0.15, -0.710}) annotation(
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountFR(r = {1.350, -0.15, -0.41}) annotation(
         Placement(transformation(origin = {50, -40}, extent = {{-10, -10}, {10, 10}})));
-      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRL(r = {-1.350, -0.25, 0.710}) annotation(
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRL(r = {-1.350, -0.25, 0.45}) annotation(
         Placement(transformation(origin = {-70, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
-      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRR(r = {-1.350, -0.25, -0.710}) annotation(
+      Modelica.Mechanics.MultiBody.Parts.FixedTranslation mountRR(r = {-1.350, -0.25, -0.45}) annotation(
         Placement(transformation(origin = {-70, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Parts.Suspension.McPherson mcphersonFL(steerable = true, k_spring = 20000, d_damper = 2200, wheelOffsetY = 0.25, wheelOffsetZ = 0.30) annotation(
         Placement(transformation(origin = {110, 40}, extent = {{-10, -10}, {10, 10}})));
@@ -1810,7 +1877,7 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
       Parts.Tires.DrivingTire tireRR annotation(
         Placement(transformation(origin = {-150, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
       Parts.Differentials.SolidAxle solidAxle annotation(
-        Placement(transformation(origin = {-152, -2}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
+        Placement(transformation(origin = {-150, -2}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
       Modelica.Mechanics.MultiBody.Joints.FreeMotion freeMotion(r_rel_a(start = {0, 1.35, 0}), v_rel_a(start = {0, 0, 0})) annotation(
         Placement(transformation(origin = {-4, 44}, extent = {{-10, -10}, {10, 10}})));
       Modelica.Mechanics.Rotational.Sources.Position steerAct(f_crit = 5) annotation(
@@ -1863,10 +1930,6 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
         Line(points = {{-100, 40}, {-80, 40}}, color = {95, 95, 95}));
       connect(multiLinkRR.chassisMount, mountRR.frame_b) annotation(
         Line(points = {{-100, -40}, {-80, -40}}, color = {95, 95, 95}));
-      connect(solidAxle.right_out, tireRR.spinInput) annotation(
-        Line(points = {{-152, -12}, {-152, -22}, {-174, -22}, {-174, -58}, {-154, -58}, {-154, -50}}));
-      connect(solidAxle.left_out, tireRL.spinInput) annotation(
-        Line(points = {{-152, 8}, {-152, 19}, {-154, 19}, {-154, 30}}));
       connect(steerAct1.flange, mcphersonFR.steerInput) annotation(
         Line(points = {{112, -12}, {124, -12}, {124, -26}, {110, -26}, {110, -30}}));
       connect(steerAct.flange, mcphersonFL.steerInput) annotation(
@@ -1905,7 +1968,7 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
         Line(points = {{0, 110}, {0, 80}, {-118, 80}, {-118, -54}}, color = {0, 0, 127}));
       connect(world.frame_b, freeMotion.frame_a) annotation(
         Line(points = {{-20, 100}, {-20, 44}, {-14, 44}}));
-      //connect(aeroDrag.frame_a, chassis.frame_a);
+//connect(aeroDrag.frame_a, chassis.frame_a);
       connect(chassis_pos, chassis.frame_a) annotation(
         Line(points = {{-2, -102}, {0, -102}, {0, -10}}));
       connect(mountRL.frame_a, chassis.frame_a) annotation(
@@ -1921,9 +1984,29 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
   connect(throttleInput, mockTransmission.pedalInput) annotation(
         Line(points = {{-80, 110}, {-82, 110}, {-82, 12}}, color = {0, 0, 127}));
   connect(mockTransmission.torqueOut, solidAxle.pedalInput) annotation(
-        Line(points = {{-82, -8}, {-142, -8}, {-142, -2}}));
+        Line(points = {{-82, -8}, {-142, -8}, {-142, -2}, {-141, -2}}));
   connect(aeroDrag.frame_a, chassis.frame_a) annotation(
         Line(points = {{50, 60}, {0, 60}, {0, -10}}, color = {95, 95, 95}));
+  connect(tireRR.suspMount, rearARB.right_wheel) annotation(
+        Line(points = {{-140, -40}, {-188, -40}, {-188, -10}}, color = {95, 95, 95}));
+  connect(mountRR.frame_b, rearARB.right_chasisMount) annotation(
+        Line(points = {{-80, -40}, {-200, -40}, {-200, -10}}, color = {95, 95, 95}));
+  connect(mountRL.frame_b, rearARB.left_chasisMount) annotation(
+        Line(points = {{-80, 40}, {-200, 40}, {-200, 10}}, color = {95, 95, 95}));
+  connect(tireRL.suspMount, rearARB.left_wheel) annotation(
+        Line(points = {{-140, 40}, {-188, 40}, {-188, 10}}, color = {95, 95, 95}));
+  connect(solidAxle.left_out, tireRL.spinInput) annotation(
+        Line(points = {{-150, 8}, {-150, 30}}));
+  connect(solidAxle.right_out, tireRR.spinInput) annotation(
+        Line(points = {{-150, -12}, {-170, -12}, {-170, -60}, {-150, -60}, {-150, -50}}));
+  connect(mountFR.frame_b, frontARB.right_chasisMount) annotation(
+        Line(points = {{60, -40}, {182, -40}, {182, -10}}, color = {95, 95, 95}));
+  connect(frontARB.right_wheel, tireFR.suspMount) annotation(
+        Line(points = {{194, -10}, {194, -40}, {140, -40}}, color = {95, 95, 95}));
+  connect(tireFL.suspMount, frontARB.left_wheel) annotation(
+        Line(points = {{140, 40}, {194, 40}, {194, 10}}, color = {95, 95, 95}));
+  connect(mountFL.frame_b, frontARB.left_chasisMount) annotation(
+        Line(points = {{60, 40}, {182, 40}, {182, 10}}, color = {95, 95, 95}));
       annotation(
         Icon(graphics = {Line(points = {{-80, 60}, {-80, -60}, {80, -60}, {80, 60}, {-80, 60}, {-80, 60}}), Line(origin = {-2, 0}, points = {{-58, 40}, {-58, -40}, {62, -40}, {62, 40}, {-58, 40}, {-58, 40}, {-58, 40}}), Line(origin = {-0.193375, 0.27735}, points = {{-59.8066, 39.7226}, {-29.8066, 19.7226}, {-29.8066, -20.2774}, {-59.8066, -40.2774}, {-29.8066, -20.2774}, {40.1934, -20.2774}, {40.1934, 19.7226}, {-29.8066, 19.7226}, {40.1934, 19.7226}, {60.1934, 39.7226}, {40.1934, 19.7226}, {40.1934, -20.2774}, {60.1934, -40.2774}, {60.1934, -38.2774}})}),
         Documentation(info = "<html>
@@ -1982,7 +2065,9 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
             Line(points = {{38, 0}, {62, 0}}, color = {95, 95, 95}));
           connect(tireVisualizer.frame_a, wheelFL.frame_a) annotation(
             Line(points = {{86, 46}, {62, 46}, {62, 0}}, color = {95, 95, 95}));
-          connect(spinRL.axis, brakeFlange);
+//connect(spinRL.axis, brakeFlange);
+          connect(spinRL.axis, brakeFlange) annotation(
+            Line(points = {{28, 10}, {28, 88}, {0, 88}, {0, 100}}));
           annotation(
             Diagram(graphics),
             Icon(graphics = {Ellipse(origin = {-1, -4}, fillPattern = FillPattern.Solid, extent = {{-97, 94}, {97, -94}}), Ellipse(origin = {-1, -3}, fillColor = {255, 255, 255}, fillPattern = FillPattern.Solid, extent = {{-77, 73}, {77, -73}})}),
@@ -2005,7 +2090,7 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
           outer parameter Real R_wheel "Tire radius (m)";
           Modelica.Mechanics.MultiBody.Joints.Revolute spinFL(n = {0, 0, -1}, useAxisFlange = true) annotation(
             Placement(transformation(origin = {-148, -42}, extent = {{170, 30}, {190, 50}})));
-  // Same zero-inertia fix as Tire.wheelFL above; see the comment there.
+        // Same zero-inertia fix as Tire.wheelFL above; see the comment there.
           Modelica.Mechanics.MultiBody.Parts.Body wheelFL(m = 20, animation = false,
             r_CM = {0, 0, 0}, I_11 = 0.31, I_22 = 0.31, I_33 = 0.63) annotation(
             Placement(transformation(origin = {-148, -42}, extent = {{210, 30}, {230, 50}})));
@@ -2030,24 +2115,26 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
             Line(points = {{-102, -2}, {22, -2}}));
           connect(tireVisualizer.frame_a, wheelFL.frame_a) annotation(
             Line(points = {{88, 56}, {62, 56}, {62, -2}}, color = {95, 95, 95}));
-          connect(spinFL.axis, brakeFlange);
+          //connect(spinFL.axis, brakeFlange);
+          connect(spinFL.axis, brakeFlange) annotation(
+            Line(points = {{0, -100}, {0, 26}, {32, 26}, {32, 8}}));
           annotation(
             Icon(graphics = {Ellipse(origin = {-1, -4}, fillPattern = FillPattern.Solid, extent = {{-97, 94}, {97, -94}}), Ellipse(origin = {-1, -3}, fillColor = {255, 255, 255}, fillPattern = FillPattern.Solid, extent = {{-77, 73}, {77, -73}}), Rectangle(origin = {0, 46}, extent = {{-8, 54}, {8, -54}})}),
             Diagram(graphics),
             Documentation(info = "<html>
-<body>
-<h4>DrivingTire (driven)</h4>
-<p>Driven wheel. Same structure as <code>Tire</code> but the <code>Revolute</code> has <code>useAxisFlange = true</code>, accepting a rotational input from the differential. The tire body has mass 20 kg.</p>
-<table border=\"1\" cellspacing=\"0\">
-<thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><code>suspMount</code></td><td>Frame_a</td><td>Connects to suspension wheelMount</td></tr>
-<tr><td><code>wheelSupport</code></td><td>Frame_a</td><td>Connects to road contact frame</td></tr>
-<tr><td><code>spinInput</code></td><td>Flange_a</td><td>Driven by SolidAxle.left_out / right_out</td></tr>
-</tbody>
-</table>
-</body>
-</html>"));
+        <body>
+        <h4>DrivingTire (driven)</h4>
+        <p>Driven wheel. Same structure as <code>Tire</code> but the <code>Revolute</code> has <code>useAxisFlange = true</code>, accepting a rotational input from the differential. The tire body has mass 20 kg.</p>
+        <table border=\"1\" cellspacing=\"0\">
+        <thead><tr><th>Connector</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+        <tr><td><code>suspMount</code></td><td>Frame_a</td><td>Connects to suspension wheelMount</td></tr>
+        <tr><td><code>wheelSupport</code></td><td>Frame_a</td><td>Connects to road contact frame</td></tr>
+        <tr><td><code>spinInput</code></td><td>Flange_a</td><td>Driven by SolidAxle.left_out / right_out</td></tr>
+        </tbody>
+        </table>
+        </body>
+        </html>"));
         end DrivingTire;
 
         package Components
@@ -2157,13 +2244,16 @@ pitching moment), yaw-dependent Cd, and wind. Air is assumed still.</p>
           Modelica.Mechanics.Rotational.Sensors.SpeedSensor speedSensor annotation(
             Placement(transformation(origin = {-40, -40}, extent = {{-10, -10}, {10, 10}})));
           Modelica.Mechanics.Rotational.Sources.Torque brakeTorque(useSupport = false) annotation(
-            Placement(transformation(origin = {40, 0}, extent = {{-10, -10}, {10, 10}})));
+            Placement(transformation(origin = {-2, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
           Modelica.Blocks.Sources.RealExpression tauExpr(y = -u * maxBrakeTorque * tanh(sharpness * speedSensor.w)) annotation(
-            Placement(transformation(origin = {-10, 30}, extent = {{-10, -10}, {10, 10}})));
+            Placement(transformation(origin = {84, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
         equation
-          connect(speedSensor.flange, shaft);
-          connect(brakeTorque.flange, shaft);
-          connect(tauExpr.y, brakeTorque.tau);
+          connect(speedSensor.flange, shaft) annotation(
+              Line(points = {{-50, -40}, {-66, -40}, {-66, 0}, {-100, 0}}));
+      connect(brakeTorque.flange, shaft) annotation(
+              Line(points = {{-100, 0}, {-12, 0}}));
+      connect(brakeTorque.tau, tauExpr.y) annotation(
+            Line(points = {{10, 0}, {74, 0}}, color = {0, 0, 127}));
           annotation(
             Icon(graphics = {Ellipse(fillColor = {200, 200, 200}, fillPattern = FillPattern.Solid, extent = {{-80, 80}, {80, -80}}), Ellipse(fillColor = {120, 120, 120}, fillPattern = FillPattern.Solid, extent = {{-40, 40}, {40, -40}}), Line(points = {{-90, 0}, {-40, 0}}), Text(textColor = {0, 0, 255}, extent = {{-150, 100}, {150, 140}}, textString = "%name")}),
             Documentation(info = "<html>
@@ -2202,8 +2292,12 @@ at zero speed, keeping the model C&sup1; continuous and event-free through zero.
         model SolidAxle
           extends Components.Differential;
         equation
-          connect(pedalInput, left_out);
-          connect(pedalInput, right_out);
+          //connect(pedalInput, left_out);
+          //connect(pedalInput, right_out);
+  connect(pedalInput, left_out) annotation(
+            Line(points = {{0, 108}, {0, 0}, {-102, 0}}));
+  connect(pedalInput, right_out) annotation(
+            Line(points = {{0, 108}, {0, 0}, {102, 0}}));
           annotation(
             Icon(graphics = {Rectangle(lineColor = {134, 159, 156}, fillColor = {185, 192, 194}, fillPattern = FillPattern.Solid, extent = {{-100, 20}, {100, -20}}), Rectangle(origin = {0, 40}, fillPattern = FillPattern.Solid, extent = {{-20, 60}, {20, -60}})}),
             Documentation(info = "<html>
@@ -2317,6 +2411,7 @@ wheels.</p>
           parameter Modelica.Units.SI.Length lowerArmLength = 0.35 "Lower control arm length";
           parameter Modelica.Units.SI.Length upperMountZ = 0.25 "Upper mount height above chassis mount";
           parameter Modelica.Units.SI.Length lowerMountZ = 0.15 "Lower mount height below chassis mount";
+          parameter Modelica.Units.SI.Length lowerArmInboard = lowerArmLength - upperArmLength "Lateral inboard offset of the lower arm chassis pivot";
           parameter Modelica.Units.SI.Length shockTopHeight = 0.35 "Shock top mount height above chassis mount";
           // --- Elastic travel limiters (bump/droop stops) ---
           // The four-bar loop is closed by the analytic JointRRR, which loses a DOF (singular
@@ -2332,7 +2427,7 @@ wheels.</p>
           // --- Chassis-side offsets ---
           MultiBody.Parts.FixedTranslation upperChassisOffset(r={0, upperMountZ, 0}) annotation(
             Placement(transformation(extent={{-70, 20}, {-50, 40}})));
-          MultiBody.Parts.FixedTranslation lowerChassisOffset(r={0, -lowerMountZ, 0}) annotation(
+          MultiBody.Parts.FixedTranslation lowerChassisOffset(r={0, -lowerMountZ, -sideSign*lowerArmInboard}) annotation(
             Placement(transformation(extent={{-70, -40}, {-50, -20}})));
           // --- Upper A-arm (tree branch: the only regular revolute) ---
           MultiBody.Joints.Revolute upperChassisPivot(n={1, 0, 0}) annotation(
@@ -2344,7 +2439,7 @@ wheels.</p>
             rRod1_ia={0, -(upperMountZ + lowerMountZ), 0},
             rRod2_ib={0, 0, sideSign*lowerArmLength},
             n_a={1, 0, 0}) annotation(
-            Placement(transformation(origin = {90, 2},extent = {{20, -40}, {60, 40}}, rotation = 180)));
+            Placement(transformation(origin = {94, 18},extent = {{20, -40}, {60, 40}}, rotation = 180)));
           // --- Hub/knuckle mass at the upper ball joint, CM at knuckle center ---
           MultiBody.Parts.Body hub(m=m_hub,
             r_CM={0, -(upperMountZ + lowerMountZ)/2, 0},
@@ -2355,14 +2450,14 @@ wheels.</p>
             Placement(transformation(extent={{-70, 50}, {-50, 70}})));
           // --- Wheel center offset (from upper ball joint down to knuckle midpoint) ---
           MultiBody.Parts.FixedTranslation wheelOffset(r={0, -(upperMountZ + lowerMountZ)/2, 0}) annotation(
-            Placement(transformation(extent={{60, -10}, {80, 10}})));
+            Placement(transformation(origin = {10, -34}, extent = {{60, -10}, {80, 10}})));
           // --- Steering revolute (axis always exposed; locked by steerLock when steerable=false) ---
           MultiBody.Joints.Revolute steer(
             n = {0, 1, 0},
             useAxisFlange = true) annotation(
-            Placement(transformation(origin = {-6, 18}, extent = {{82, -10}, {102, 10}})));
+            Placement(transformation(origin = {2, 22}, extent = {{82, -10}, {102, 10}})));
           Modelica.Mechanics.Rotational.Components.Fixed steerLock if not steerable annotation(
-            Placement(transformation(origin = {76, 40}, extent = {{-6, -6}, {6, 6}})));
+            Placement(transformation(origin = {78, 42}, extent = {{-6, -6}, {6, 6}})));
           // --- Spring-damper ---
           MultiBody.Forces.SpringDamperParallel shock(c=k_spring, d=d_damper, s_unstretched=0.55) annotation(
             Placement(transformation(origin = {-14, -2}, extent = {{-20, -80}, {0, -60}})));
@@ -2373,9 +2468,9 @@ wheels.</p>
           MultiBody.Forces.LineForceWithMass endStop(m = 0, animateLine = false, animateMass = false) if useEndStops annotation(
             Placement(transformation(origin = {30, -52}, extent = {{-10, -10}, {10, 10}})));
           Modelica.Mechanics.Translational.Components.ElastoGap bumpStop(c = endStopStiffness, d = endStopDamping, s_rel0 = shockBumpLength, n = endStopExponent) if useEndStops annotation(
-            Placement(transformation(origin = {30, -76}, extent = {{-10, -10}, {10, 10}})));
+            Placement(transformation(origin = {88, -66}, extent = {{-10, -10}, {10, 10}})));
           Modelica.Mechanics.Translational.Components.ElastoGap droopStop(c = endStopStiffness, d = endStopDamping, s_rel0 = -shockDroopLength, n = endStopExponent) if useEndStops annotation(
-            Placement(transformation(origin = {30, -96}, extent = {{-10, -10}, {10, 10}})));
+            Placement(transformation(origin = {88, -94}, extent = {{-10, -10}, {10, 10}})));
 
         equation
 // Chassis-side: split into upper and lower mount points
@@ -2389,40 +2484,40 @@ wheels.</p>
           connect(upperChassisPivot.frame_b, upperArm.frame_a) annotation(
             Line(points={{-20, 30}, {-10, 30}}, color={95, 95, 95}));
 // JointRRR closes the loop analytically
-          connect(upperArm.frame_b, jointLoop.frame_a) annotation(
-            Line(points={{10, 30}, {16, 30}, {16, 2}, {70, 2}}, color={95, 95, 95}));
-          connect(lowerChassisOffset.frame_b, jointLoop.frame_b) annotation(
-            Line(points={{-50, -30}, {30, -30}, {30, 2}}, color={95, 95, 95}));
 // Hub body at knuckle top (frame_ia = after first revolute of JointRRR)
           connect(jointLoop.frame_ia, hub.frame_a) annotation(
-            Line(points={{66, -38}, {66, 58}, {88, 58}}, color={95, 95, 95}));
+            Line(points = {{70, -22}, {70, 58}, {88, 58}}, color = {95, 95, 95}));
 // Wheel output at knuckle center (offset down from upper ball joint)
           connect(jointLoop.frame_ia, wheelOffset.frame_a) annotation(
-            Line(points={{66, -38}, {66, 50}, {60, 50}, {60, 0}}, color={95, 95, 95}));
+            Line(points={{70, -22}, {70, -34}}, color={95, 95, 95}));
           connect(wheelOffset.frame_b, steer.frame_a) annotation(
-            Line(points = {{80, 0}, {80, 10}, {76, 10}, {76, 18}}, color = {95, 95, 95}));
+            Line(points = {{90, -34}, {90, -15}, {84, -15}, {84, 22}}, color = {95, 95, 95}));
 // Shock: top mount above chassis to lower ball-joint point (middle revolute = frame_im)
           connect(chassisMount, shockTopMount.frame_a) annotation(
             Line(points={{-100, 0}, {-80, 0}, {-80, 60}, {-70, 60}}, color={95, 95, 95}));
           connect(shockTopMount.frame_b, shock.frame_a) annotation(
             Line(points={{-50, 60}, {-34, 60}, {-34, -72}}, color={95, 95, 95}));
           connect(jointLoop.frame_im, shock.frame_b) annotation(
-            Line(points={{50, -38}, {50, -56}, {-14, -56}, {-14, -72}}, color={95, 95, 95}));
+            Line(points={{54, -22}, {54, -56}, {-14, -56}, {-14, -72}}, color={95, 95, 95}));
 // End-stops: same two frames as the shock; ElastoGaps act on the 1-D flanges.
           connect(shockTopMount.frame_b, endStop.frame_a) annotation(
             Line(points={{-50, 60}, {20, 60}, {20, -52}}, color={95, 95, 95}));
           connect(endStop.frame_b, jointLoop.frame_im) annotation(
-            Line(points={{40, -52}, {50, -52}, {50, -38}}, color={95, 95, 95}));
+            Line(points={{40, -52}, {54, -52}, {54, -22}}, color={95, 95, 95}));
           connect(bumpStop.flange_a, endStop.flange_a);
           connect(bumpStop.flange_b, endStop.flange_b);
           connect(droopStop.flange_a, endStop.flange_b);
           connect(droopStop.flange_b, endStop.flange_a);
           connect(steerInput, steer.axis) annotation(
-            Line(points = {{0, 100}, {0, 44}, {86, 44}, {86, 28}}));
-          connect(steer.axis, steerLock.flange) annotation(
-            Line(points = {{86, 28}, {86, 40}, {82, 40}}));
+            Line(points = {{0, 100}, {0, 44}, {94, 44}, {94, 32}}));
           connect(steer.frame_b, wheelMount) annotation(
-            Line(points = {{96, 18}, {114, 18}, {114, 0}, {100, 0}}, color = {95, 95, 95}));
+            Line(points = {{104, 22}, {114, 22}, {114, 0}, {100, 0}}, color = {95, 95, 95}));
+  connect(steerLock.flange, steer.axis) annotation(
+            Line(points = {{78, 42}, {94, 42}, {94, 32}}));
+  connect(lowerChassisOffset.frame_b, jointLoop.frame_b) annotation(
+            Line(points = {{-50, -30}, {10, -30}, {10, 18}, {34, 18}}, color = {95, 95, 95}));
+  connect(upperArm.frame_b, jointLoop.frame_a) annotation(
+            Line(points = {{10, 30}, {80, 30}, {80, 18}, {74, 18}}, color = {95, 95, 95}));
           annotation(Icon(graphics={
             Line(points={{-80, 30}, {0, 50}}, color={95, 95, 95}, thickness=1),
             Line(points={{-80, -30}, {0, -50}}, color={95, 95, 95}, thickness=1),
@@ -2514,16 +2609,23 @@ change where they engage.</p>
           Modelica.Mechanics.Rotational.Components.Fixed steerLock if not steerable annotation(
             Placement(transformation(extent = {{60, 20}, {80, 40}})));
           // --- Spring-damper: shock top mount to strut bottom (not wheel center) ---
-          // Free length = sqrt(shockTopHeight^2 + s_rest^2) = sqrt(0.28^2+0.30^2) ~ 0.41 m
-          MultiBody.Forces.SpringDamperParallel shock(c = k_spring, d = d_damper, s_unstretched = 0.41) annotation(
-            Placement(transformation(extent = {{-40, -40}, {-20, -20}})));
+          // Both spring ends sit on the same vertical line through chassisMount:
+          // shockTopMount is r={0,+shockTopHeight,0} and the strut is a Prismatic
+          // along n={0,-1,0} from that same frame, so the spring length is exactly
+          // shockTopHeight + s. The offsets ADD; they are not perpendicular as they
+          // are in DoubleWishbone/MultiLink, where the lower end attaches to
+          // jointLoop.frame_im and is genuinely offset laterally.
+          // Free length = shockTopHeight + s_rest = 0.28 + 0.30 = 0.58 m, which
+          // places static equilibrium mid-travel and clear of shockBumpLength.
+          MultiBody.Forces.SpringDamperParallel shock(c = k_spring, d = d_damper, s_unstretched = 0.58) annotation(
+            Placement(transformation(origin = {4, -4}, extent = {{-40, -40}, {-20, -20}})));
           // --- End-stops on the shock line (see DoubleWishbone for the wiring rationale) ---
           MultiBody.Forces.LineForceWithMass endStop(m = 0, animateLine = false, animateMass = false) if useEndStops annotation(
-            Placement(transformation(origin = {-30, -60}, extent = {{-10, -10}, {10, 10}})));
+            Placement(transformation(origin = {-60, -60}, extent = {{-10, -10}, {10, 10}})));
           Modelica.Mechanics.Translational.Components.ElastoGap bumpStop(c = endStopStiffness, d = endStopDamping, s_rel0 = shockBumpLength, n = endStopExponent) if useEndStops annotation(
-            Placement(transformation(origin = {-30, -78}, extent = {{-10, -10}, {10, 10}})));
+            Placement(transformation(origin = {74, -34}, extent = {{-10, -10}, {10, 10}})));
           Modelica.Mechanics.Translational.Components.ElastoGap droopStop(c = endStopStiffness, d = endStopDamping, s_rel0 = -shockDroopLength, n = endStopExponent) if useEndStops annotation(
-            Placement(transformation(origin = {-30, -94}, extent = {{-10, -10}, {10, 10}})));
+            Placement(transformation(origin = {74, -68}, extent = {{-10, -10}, {10, 10}})));
 
         equation
           connect(chassisMount, strutTravel.frame_a) annotation(
@@ -2538,15 +2640,11 @@ change where they engage.</p>
             Line(points = {{80, 0}, {100, 0}}, color = {95, 95, 95}));
           connect(chassisMount, shockTopMount.frame_a) annotation(
             Line(points = {{-100, 0}, {-80, 0}, {-80, 50}, {-60, 50}}, color = {95, 95, 95}));
-          connect(shockTopMount.frame_b, shock.frame_a) annotation(
-            Line(points = {{-40, 50}, {-30, 50}, {-30, -20}}, color = {95, 95, 95}));
           connect(strutTravel.frame_b, shock.frame_b) annotation(
-            Line(points = {{0, 0}, {10, 0}, {10, -30}, {-20, -30}}, color = {95, 95, 95}));
+            Line(points = {{0, 0}, {10, 0}, {10, -34}, {-16, -34}}, color = {95, 95, 95}));
 // End-stops: same two frames as the shock; ElastoGaps act on the 1-D flanges.
-          connect(shockTopMount.frame_b, endStop.frame_a) annotation(
-            Line(points = {{-40, 50}, {-30, 50}, {-30, -60}}, color = {95, 95, 95}));
           connect(endStop.frame_b, strutTravel.frame_b) annotation(
-            Line(points = {{-20, -60}, {10, -60}, {10, 0}}, color = {95, 95, 95}));
+            Line(points = {{-50, -60}, {8, -60}, {8, 0}, {10, 0}}, color = {95, 95, 95}));
           connect(bumpStop.flange_a, endStop.flange_a);
           connect(bumpStop.flange_b, endStop.flange_b);
           connect(droopStop.flange_a, endStop.flange_b);
@@ -2555,6 +2653,10 @@ change where they engage.</p>
             Line(points = {{0, 100}, {70, 100}, {70, 10}}));
           connect(steer.axis, steerLock.flange) annotation(
             Line(points = {{70, 10}, {70, 20}}));
+  connect(shockTopMount.frame_b, endStop.frame_a) annotation(
+            Line(points = {{-40, 50}, {-30, 50}, {-30, 14}, {-76, 14}, {-76, -60}, {-70, -60}}, color = {95, 95, 95}));
+  connect(shockTopMount.frame_b, shock.frame_a) annotation(
+            Line(points = {{-40, 50}, {-30, 50}, {-30, -10}, {-50, -10}, {-50, -34}, {-36, -34}}, color = {95, 95, 95}));
           annotation(Icon(graphics = {
             Line(points = {{-80, -30}, {0, -50}}, color = {95, 95, 95}, thickness = 1),
             Line(points = {{-20, 60}, {0, -50}}, color = {95, 95, 95}, thickness = 1.5),
@@ -2582,7 +2684,7 @@ change where they engage.</p>
 <tr><td><code>endStopExponent</code></td><td>1</td><td>Contact force exponent (1 = linear, bounded penetration)</td></tr>
 </tbody>
 </table>
-<p>Spring/damper from <code>BaseSuspension</code>: <code>k_spring</code>, <code>d_damper</code>. Natural length 0.41 m (zero spring force at s &asymp; 0.30 m strut compression).</p>
+<p>Spring/damper from <code>BaseSuspension</code>: <code>k_spring</code>, <code>d_damper</code>. Natural length 0.58 m. Both spring ends lie on the vertical through <code>chassisMount</code> &mdash; the top mount is <code>shockTopHeight</code> above it and the strut travels along <code>{0,-1,0}</code> from it &mdash; so the spring length is <code>shockTopHeight + s</code> and the free length is their sum, 0.28 + 0.30 m. This differs from <code>DoubleWishbone</code>/<code>MultiLink</code>, where the lower end attaches to <code>jointLoop.frame_im</code> and the two offsets are perpendicular.</p>
 <p><b>Travel limiters.</b> Unlike <code>DoubleWishbone</code>/<code>MultiLink</code>, the strut is a plain
 <code>Prismatic</code> joint, so there is no analytic-loop singularity to trip. The elastic stops here instead prevent
 the strut from over-travelling (under heavy load the wheel is otherwise pulled up until the strut coordinate
@@ -2600,8 +2702,19 @@ the strut from over-travelling (under heavy load the wheel is otherwise pulled u
           parameter Modelica.Units.SI.Length lowerLinkLength = 0.38 "Lower link length";
           parameter Modelica.Units.SI.Length upperMountZ = 0.22 "Upper link height above chassis mount";
           parameter Modelica.Units.SI.Length lowerMountZ = 0.12 "Lower link height below chassis mount";
-          parameter Modelica.Units.SI.Length rearLinkOffset = 0.08 "Fore-aft offset of lower link chassis pivot (X)";
+          parameter Modelica.Units.SI.Length rearLinkOffset = 0.03 "Fore-aft offset of lower link chassis pivot (X), rakes the knuckle -> caster";
+          
+          parameter Modelica.Units.SI.Length lowerLinkInboard = lowerLinkLength - upperLinkLength "Lateral inboard offset of the lower link chassis pivot";
+        
+          parameter Modelica.Units.SI.Angle linkSweep = Modelica.Units.Conversions.from_deg(15) "Sweep of the link pivot axis away from the longitudinal direction";
           parameter Modelica.Units.SI.Length shockTopHeight = 0.32 "Shock top mount height above chassis mount";
+        protected
+          // Evaluate=true porque n_a de JointRRR lo declara asi: el ensamblaje
+          // especializa su solucion analitica a partir del eje, y un parametro
+          // que el compilador no pueda plegar a constantes impide esa
+          // especializacion y hace fallar la reduccion de indice.
+          final parameter Real linkAxis[3] = {Modelica.Math.cos(linkSweep), Modelica.Math.sin(linkSweep), 0} "Common axis of the four revolutes of the linkage" annotation(Evaluate = true);
+        public
           // --- Elastic travel limiters (bump/droop stops) ---
           // Same rationale as DoubleWishbone: the lower link is closed by an analytic JointRRR that
           // loses a DOF (jointUSR.revolute.k1a -> 0) near full bump. One-sided ElastoGap springs on
@@ -2615,29 +2728,32 @@ the strut from over-travelling (under heavy load the wheel is otherwise pulled u
           // --- Chassis-side offsets ---
           MultiBody.Parts.FixedTranslation upperChassisOffset(r = {0, upperMountZ, 0}) annotation(
             Placement(transformation(extent = {{-70, 20}, {-50, 40}})));
-          MultiBody.Parts.FixedTranslation lowerChassisOffset(r = {rearLinkOffset, -lowerMountZ, 0}) annotation(
+          MultiBody.Parts.FixedTranslation lowerChassisOffset(r = {rearLinkOffset, -lowerMountZ, -sideSign * lowerLinkInboard}) annotation(
             Placement(transformation(extent = {{-70, -40}, {-50, -20}})));
           // --- Upper link (tree branch) ---
-          MultiBody.Joints.Revolute upperLinkPivot(n = {1, 0, 0}) annotation(
+          MultiBody.Joints.Revolute upperLinkPivot(n = linkAxis) annotation(
             Placement(transformation(extent = {{-40, 20}, {-20, 40}})));
           MultiBody.Parts.BodyCylinder upperLink(r = {0, 0, sideSign * upperLinkLength}, diameter = 0.025) annotation(
             Placement(transformation(extent = {{-10, 20}, {10, 40}})));
           // --- Loop closure via JointRRR (same assembly as DoubleWishbone) ---
+          // The knuckle carries the same fore-aft offset as the lower pivot, so the loop
+          // closes with the knuckle merely raked fore/aft -- which is the caster the
+          // rearLinkOffset is there to produce -- instead of being twisted sideways.
           MultiBody.Joints.Assemblies.JointRRR lowerLoop(
-            rRod1_ia = {0, -(upperMountZ + lowerMountZ), 0},
+            rRod1_ia = {rearLinkOffset, -(upperMountZ + lowerMountZ), 0},
             rRod2_ib = {0, 0, sideSign * lowerLinkLength},
-            n_a = {1, 0, 0}) annotation(
-            Placement(transformation(origin = {90, 2}, extent = {{20, -40}, {60, 40}}, rotation = 180)));
+            n_a = linkAxis) annotation(
+            Placement(transformation(origin = {86, 10}, extent = {{20, -40}, {60, 40}}, rotation = 180)));
           // --- Hub/knuckle mass ---
           MultiBody.Parts.Body hub(m = m_hub,
-            r_CM = {0, -(upperMountZ + lowerMountZ) / 2, 0},
+            r_CM = {rearLinkOffset / 2, -(upperMountZ + lowerMountZ) / 2, 0},
             I_11 = 0.1, I_22 = 0.1, I_33 = 0.1) annotation(
             Placement(transformation(origin = {18, 28}, extent = {{70, 20}, {90, 40}})));
           // --- Shock top mount ---
           MultiBody.Parts.FixedTranslation shockTopMount(r = {0, shockTopHeight, 0}) annotation(
             Placement(transformation(extent = {{-70, 50}, {-50, 70}})));
-          // --- Wheel center offset ---
-          MultiBody.Parts.FixedTranslation wheelOffset(r = {0, -(upperMountZ + lowerMountZ) / 2, 0}) annotation(
+          // --- Wheel center offset: midpoint of the knuckle, so it stays on its axis ---
+          MultiBody.Parts.FixedTranslation wheelOffset(r = {rearLinkOffset / 2, -(upperMountZ + lowerMountZ) / 2, 0}) annotation(
             Placement(transformation(origin = {20, -26}, extent = {{60, -10}, {80, 10}})));
           // --- Steering revolute (locked when steerable=false) ---
           MultiBody.Joints.Revolute steer(
@@ -2647,15 +2763,22 @@ the strut from over-travelling (under heavy load the wheel is otherwise pulled u
           Modelica.Mechanics.Rotational.Components.Fixed steerLock if not steerable annotation(
             Placement(transformation(origin = {76, 40}, extent = {{-6, -6}, {6, 6}})));
           // --- Spring-damper ---
-          MultiBody.Forces.SpringDamperParallel shock(c = k_spring, d = d_damper, s_unstretched = 0.50) annotation(
+          // The shock spans shockTopMount to the lower ball joint, so at the nominal pose
+          // (links horizontal) its length is sqrt(rearLinkOffset^2 + (shockTopHeight +
+          // lowerMountZ)^2 + lowerLinkLength^2) = 0.533 m. The free length is set above
+          // that so the corner settles near mid-travel -- 0.42 m under its static load,
+          // 0.11 m clear of shockBumpLength and 0.20 m clear of shockDroopLength -- and
+          // so that the wheel center ends up the same distance below the chassis as the
+          // front corners, which leaves the chassis level rather than raked.
+          MultiBody.Forces.SpringDamperParallel shock(c = k_spring, d = d_damper, s_unstretched = 0.565) annotation(
             Placement(transformation(origin = {-14, -2}, extent = {{-20, -80}, {0, -60}})));
           // --- End-stops on the shock line (see DoubleWishbone for the wiring rationale) ---
           MultiBody.Forces.LineForceWithMass endStop(m = 0, animateLine = false, animateMass = false) if useEndStops annotation(
             Placement(transformation(origin = {30, -52}, extent = {{-10, -10}, {10, 10}})));
           Modelica.Mechanics.Translational.Components.ElastoGap bumpStop(c = endStopStiffness, d = endStopDamping, s_rel0 = shockBumpLength, n = endStopExponent) if useEndStops annotation(
-            Placement(transformation(origin = {30, -76}, extent = {{-10, -10}, {10, 10}})));
+            Placement(transformation(origin = {88, -54}, extent = {{-10, -10}, {10, 10}})));
           Modelica.Mechanics.Translational.Components.ElastoGap droopStop(c = endStopStiffness, d = endStopDamping, s_rel0 = -shockDroopLength, n = endStopExponent) if useEndStops annotation(
-            Placement(transformation(origin = {30, -96}, extent = {{-10, -10}, {10, 10}})));
+            Placement(transformation(origin = {86, -86}, extent = {{-10, -10}, {10, 10}})));
 
         equation
 // Chassis-side: upper and lower link mounts
@@ -2669,17 +2792,11 @@ the strut from over-travelling (under heavy load the wheel is otherwise pulled u
           connect(upperLinkPivot.frame_b, upperLink.frame_a) annotation(
             Line(points = {{-20, 30}, {-10, 30}}, color = {95, 95, 95}));
 // JointRRR closes the lower link loop
-          connect(upperLink.frame_b, lowerLoop.frame_a) annotation(
-            Line(points = {{10, 30}, {16, 30}, {16, 2}, {70, 2}}, color = {95, 95, 95}));
-          connect(lowerChassisOffset.frame_b, lowerLoop.frame_b) annotation(
-            Line(points = {{-50, -30}, {30, -30}, {30, 2}}, color = {95, 95, 95}));
 // Hub and wheel output
           connect(lowerLoop.frame_ia, hub.frame_a) annotation(
-            Line(points = {{66, -38}, {66, 58}, {88, 58}}, color = {95, 95, 95}));
+            Line(points = {{62, -30}, {62, 58}, {88, 58}}, color = {95, 95, 95}));
           connect(lowerLoop.frame_ia, wheelOffset.frame_a) annotation(
-            Line(points = {{66, -38}, {66, -25}, {80, -25}, {80, -26}}, color = {95, 95, 95}));
-          connect(wheelOffset.frame_b, steer.frame_a) annotation(
-            Line(points = {{100, -26}, {100, 10}, {76, 10}, {76, 18}}, color = {95, 95, 95}));
+            Line(points = {{62, -30}, {62, -25}, {80, -25}, {80, -26}}, color = {95, 95, 95}));
           connect(steer.frame_b, wheelMount) annotation(
             Line(points = {{96, 18}, {114, 18}, {114, 0}, {100, 0}}, color = {95, 95, 95}));
 // Shock: top mount to lower ball joint (frame_im)
@@ -2688,12 +2805,12 @@ the strut from over-travelling (under heavy load the wheel is otherwise pulled u
           connect(shockTopMount.frame_b, shock.frame_a) annotation(
             Line(points = {{-50, 60}, {-34, 60}, {-34, -72}}, color = {95, 95, 95}));
           connect(lowerLoop.frame_im, shock.frame_b) annotation(
-            Line(points = {{50, -38}, {50, -56}, {-14, -56}, {-14, -72}}, color = {95, 95, 95}));
+            Line(points = {{46, -30}, {46, -56}, {-14, -56}, {-14, -72}}, color = {95, 95, 95}));
 // End-stops: same two frames as the shock; ElastoGaps act on the 1-D flanges.
           connect(shockTopMount.frame_b, endStop.frame_a) annotation(
             Line(points = {{-50, 60}, {20, 60}, {20, -52}}, color = {95, 95, 95}));
           connect(endStop.frame_b, lowerLoop.frame_im) annotation(
-            Line(points = {{40, -52}, {50, -52}, {50, -38}}, color = {95, 95, 95}));
+            Line(points = {{40, -52}, {40, -50}, {46, -50}, {46, -30}}, color = {95, 95, 95}));
           connect(bumpStop.flange_a, endStop.flange_a);
           connect(bumpStop.flange_b, endStop.flange_b);
           connect(droopStop.flange_a, endStop.flange_b);
@@ -2703,6 +2820,12 @@ the strut from over-travelling (under heavy load the wheel is otherwise pulled u
             Line(points = {{0, 100}, {0, 44}, {86, 44}, {86, 28}}));
           connect(steer.axis, steerLock.flange) annotation(
             Line(points = {{86, 28}, {86, 40}, {82, 40}}));
+  connect(upperLink.frame_b, lowerLoop.frame_a) annotation(
+            Line(points = {{10, 30}, {72, 30}, {72, 10}, {66, 10}}, color = {95, 95, 95}));
+  connect(lowerChassisOffset.frame_b, lowerLoop.frame_b) annotation(
+            Line(points = {{-50, -30}, {4, -30}, {4, 10}, {26, 10}}, color = {95, 95, 95}));
+  connect(wheelOffset.frame_b, steer.frame_a) annotation(
+            Line(points = {{100, -26}, {106, -26}, {106, -12}, {74, -12}, {74, 18}, {76, 18}}, color = {95, 95, 95}));
           annotation(Icon(graphics = {
             Line(points = {{-80, 30}, {0, 50}}, color = {95, 95, 95}, thickness = 0.75),
             Line(points = {{-70, 0}, {0, 50}}, color = {95, 95, 95}, thickness = 0.75),
@@ -2715,7 +2838,7 @@ the strut from over-travelling (under heavy load the wheel is otherwise pulled u
             Documentation(info = "<html>
 <body>
 <h4>MultiLink</h4>
-<p>Multi-link suspension. Separate upper and lower transverse links replace the wide A-arms of a double wishbone. The <code>rearLinkOffset</code> parameter shifts the lower link inboard pivot fore/aft, producing characteristic multi-link toe/caster geometry. Uses a <code>JointRRR</code> for loop closure, same as <code>DoubleWishbone</code>. Extends <code>BaseSuspension</code>.</p>
+<p>Multi-link suspension. Separate upper and lower transverse links replace the wide A-arms of a double wishbone. The lower link is longer than the upper one, which is what gives a multi-link its camber gain in bump; its chassis pivot is therefore set inboard by exactly that length difference (<code>lowerLinkInboard</code>), so at the nominal pose both ball joints share the same lateral station and the knuckle is the pure vertical rod that <code>rRod1_ia</code> declares. Getting that offset wrong leaves the knuckle assembled leaning and shows up as a large constant camber angle rather than as a camber curve. The <code>rearLinkOffset</code> parameter shifts the lower link inboard pivot fore/aft and is carried in the knuckle rod as well, so it rakes the knuckle fore/aft (caster, 5.0&deg; at the default) instead of twisting it sideways. Uses a <code>JointRRR</code> for loop closure, same as <code>DoubleWishbone</code>. Extends <code>BaseSuspension</code>.</p>
 <table border=\"1\" cellspacing=\"0\">
 <thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
 <tbody>
@@ -2724,7 +2847,8 @@ the strut from over-travelling (under heavy load the wheel is otherwise pulled u
 <tr><td><code>lowerLinkLength</code></td><td>0.38 m</td><td>Lower link length</td></tr>
 <tr><td><code>upperMountZ</code></td><td>0.22 m</td><td>Upper link height above chassis mount</td></tr>
 <tr><td><code>lowerMountZ</code></td><td>0.12 m</td><td>Lower link height below chassis mount</td></tr>
-<tr><td><code>rearLinkOffset</code></td><td>0.08 m</td><td>Fore-aft offset of lower link chassis pivot (X direction)</td></tr>
+<tr><td><code>rearLinkOffset</code></td><td>0.03 m</td><td>Fore-aft offset of lower link chassis pivot (X direction); rakes the knuckle, giving 5.0&deg; of caster</td></tr>
+<tr><td><code>lowerLinkInboard</code></td><td><code>lowerLinkLength - upperLinkLength</code> (0.08 m)</td><td>Lateral inboard offset of the lower link chassis pivot, so both ball joints share a lateral station</td></tr>
 <tr><td><code>shockTopHeight</code></td><td>0.32 m</td><td>Shock absorber top mount height</td></tr>
 <tr><td><code>useEndStops</code></td><td>true</td><td>Enable the elastic bump/droop travel limiters</td></tr>
 <tr><td><code>shockBumpLength</code></td><td>0.31 m</td><td>Shock length at which the bump (compression) stop engages</td></tr>
@@ -2734,7 +2858,7 @@ the strut from over-travelling (under heavy load the wheel is otherwise pulled u
 <tr><td><code>endStopExponent</code></td><td>1</td><td>Contact force exponent (1 = linear, bounded penetration)</td></tr>
 </tbody>
 </table>
-<p>Spring/damper parameters from <code>BaseSuspension</code>: <code>k_spring</code>, <code>d_damper</code>. Shock free length 0.50 m.</p>
+<p>Spring/damper parameters from <code>BaseSuspension</code>: <code>k_spring</code>, <code>d_damper</code>. Shock free length 0.565 m, against a nominal-pose length of 0.533 m, which settles the corner at about 0.41 m under its static load: clear of both travel limiters and at the same wheel-center-to-chassis distance as the front corners, so the chassis sits level.</p>
 <p><b>Travel limiters.</b> Because the lower link is closed by the same analytic <code>JointRRR</code> as
 <code>DoubleWishbone</code>, it can reach a singular position under a large enough drive torque (the loop goes singular
 around a shock length of ~0.26&ndash;0.31 m, depending on the loop pose). Two one-sided <code>ElastoGap</code> springs on
@@ -2976,6 +3100,117 @@ to the front-wheel position actuators, so implementations are interchangeable.</
           end BaseSteering;
         end Components;
       end Steering;
+
+      package RollResistance
+   
+package Components
+          partial model BaseRollResistance
+            Modelica.Mechanics.MultiBody.Interfaces.Frame_a left_wheel annotation(
+              Placement(transformation(origin = {-100, 40}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 60}, extent = {{-16, -16}, {16, 16}})));
+            Modelica.Mechanics.MultiBody.Interfaces.Frame_a left_chasisMount annotation(
+              Placement(transformation(origin = {-100, -40}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, -60}, extent = {{-16, -16}, {16, 16}})));
+            Modelica.Mechanics.MultiBody.Interfaces.Frame_a right_wheel annotation(
+              Placement(transformation(origin = {100, 40}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 60}, extent = {{-16, -16}, {16, 16}})));
+            Modelica.Mechanics.MultiBody.Interfaces.Frame_a right_chasisMount annotation(
+              Placement(transformation(origin = {100, -40}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, -60}, extent = {{-16, -16}, {16, 16}})));
+          equation
+
+          end BaseRollResistance;
+        end Components;
+
+        model AntiRollBar "Torsion bar resisting only the differential travel of an axle"
+          extends DDynamics.Cars.Parts.RollResistance.Components.BaseRollResistance;
+          parameter Modelica.Units.SI.TranslationalSpringConstant c_arb = 0
+            "Bar rate referred to the wheel (N/m). 0 disables the bar.";
+  Modelica.Mechanics.MultiBody.Sensors.RelativePosition posLeft annotation(
+            Placement(transformation(origin = {-60, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+  Modelica.Mechanics.MultiBody.Sensors.RelativePosition posRight annotation(
+            Placement(transformation(origin = {60, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+          // One force element per side, each spanning that side's chassis mount and its
+          // wheel. A MultiBody Force applies the vector at frame_b and the balancing
+          // force AND torque at frame_a, so each side is self-equilibrating by
+          // construction. That is the reason for reacting into the mounts rather than
+          // just pushing on the two wheels: an unreacted pair of opposite wheel forces
+          // would leave a net external roll couple and create angular momentum out of
+          // nothing.
+          Modelica.Mechanics.MultiBody.Forces.Force forceLeft(animation = false,
+            resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameAB.frame_a) annotation(
+            Placement(transformation(origin = {-30, 60}, extent = {{-10, -10}, {10, 10}})));
+          Modelica.Mechanics.MultiBody.Forces.Force forceRight(animation = false,
+            resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameAB.frame_a) annotation(
+            Placement(transformation(origin = {30, 60}, extent = {{10, -10}, {-10, 10}})));
+          Real dLeft "Height of the left wheel centre above its chassis mount (m)";
+          Real dRight "Height of the right wheel centre above its chassis mount (m)";
+          Real dRoll "Differential travel; vanishes in pure heave (m)";
+          Real f "Vertical force, equal and opposite on the two sides (N)";
+        equation
+  connect(left_chasisMount, posLeft.frame_a) annotation(
+            Line(points = {{-100, -40}, {-60, -40}, {-60, -10}}));
+  connect(left_wheel, posLeft.frame_b) annotation(
+            Line(points = {{-100, 40}, {-60, 40}, {-60, 10}}));
+  connect(right_wheel, posRight.frame_b) annotation(
+            Line(points = {{100, 40}, {60, 40}, {60, 10}}));
+  connect(right_chasisMount, posRight.frame_a) annotation(
+            Line(points = {{100, -40}, {60, -40}, {60, -10}}));
+// The force elements span the same two frames as the sensors on each side.
+          connect(left_chasisMount, forceLeft.frame_a) annotation(
+            Line(points = {{-100, -40}, {-40, -40}, {-40, 60}}));
+          connect(left_wheel, forceLeft.frame_b) annotation(
+            Line(points = {{-100, 40}, {-20, 40}, {-20, 60}}));
+          connect(right_chasisMount, forceRight.frame_a) annotation(
+            Line(points = {{100, -40}, {40, -40}, {40, 60}}));
+          connect(right_wheel, forceRight.frame_b) annotation(
+            Line(points = {{100, 40}, {20, 40}, {20, 60}}));
+// The sensors resolve in frame_a, which is the chassis mount, so these travels are
+// measured along the chassis vertical and not the world vertical. A wheel rising
+// towards its mount is compression, so d grows in bump.
+          dLeft = posLeft.r_rel[2];
+          dRight = posRight.r_rel[2];
+// The bar responds to the DIFFERENCE. In pure heave both sides travel alike, dRoll
+// vanishes and the bar contributes nothing: that is exactly what distinguishes it
+// from stiffer springs, and why it leaves the ride frequency untouched.
+          dRoll = dLeft - dRight;
+          f = c_arb * dRoll / 2;
+// Applied downwards at the more compressed wheel and upwards at the other, which
+// opposes the roll and transfers load towards the outer wheel.
+          forceLeft.force = {0, -f, 0};
+          forceRight.force = {0, f, 0};
+          annotation(
+            Icon(graphics = {
+              Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}),
+              Line(points = {{-80, -40}, {-80, 20}, {80, 20}, {80, -40}}, thickness = 1.2),
+              Ellipse(extent = {{-88, -40}, {-72, -56}}, fillColor = {95, 95, 95}, fillPattern = FillPattern.Solid),
+              Ellipse(extent = {{72, -40}, {88, -56}}, fillColor = {95, 95, 95}, fillPattern = FillPattern.Solid),
+              Text(origin = {0, 60}, extent = {{-80, 20}, {80, -20}}, textString = "ARB"),
+              Text(textColor = {0, 0, 255}, extent = {{-150, 150}, {150, 110}}, textString = "%name")}),
+            Documentation(info = "<html>
+<body>
+<h4>AntiRollBar</h4>
+<p>Resists the <i>differential</i> vertical travel of the two wheels of an axle, the way a real
+torsion bar does, and contributes nothing when both wheels travel together. Connect each side's
+chassis mount and wheel mount to the four frames.</p>
+<pre>f = c_arb &middot; (d_left - d_right) / 2</pre>
+<p>with <code>d</code> the height of each wheel centre above its own chassis mount, measured in
+chassis axes. The force is applied downwards at the more compressed wheel and upwards at the other,
+each reacted into its own chassis mount, so the element adds no net force or moment to the vehicle.</p>
+<table border=\"1\" cellspacing=\"0\">
+<thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>c_arb</code></td><td>0 N/m</td><td>Bar rate referred to the wheel; 0 disables it</td></tr>
+</tbody>
+</table>
+<p><b>No extra states.</b> The force law is algebraic, so the bar adds equations but not continuous
+states and leaves the size of the integrator's state vector unchanged.</p>
+<p><b>Why not a 1-D spring between the two suspensions.</b> The travel degree of freedom is a
+<code>Prismatic</code> in <code>McPherson</code> but a <code>Revolute</code> in
+<code>DoubleWishbone</code> and <code>MultiLink</code>, and in the latter two the sides are mirrored
+by <code>sideSign</code>, so equal bump produces equal and OPPOSITE joint angles. A spring wired
+naively across those two flanges would resist heave instead of roll. Working from the sensed vertical
+travel avoids that trap and behaves identically on all three topologies.</p>
+</body>
+</html>"));
+        end AntiRollBar;
+      end RollResistance;
 
     end Parts;
 
